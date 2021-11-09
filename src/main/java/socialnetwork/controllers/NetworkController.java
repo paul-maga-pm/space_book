@@ -48,6 +48,26 @@ public class NetworkController {
     }
 
     /**
+     * Finds the user with the given id
+     * @param id identifier of the user we want to find
+     * @return empty Optional if the user with the given id doesn't exit, Optional with the existing user otherwise
+     */
+    public Optional<User> findUserById(Long id){
+        return userService.findUserByIdService(id);
+    }
+
+    /**
+     * Updates the user with the given id
+     * @param id identifier of the user we want to update
+     * @param newFirstName new value for firstName field
+     * @param newLastName new value for lastName field
+     * @throws InvalidEntityException if the id, newFirstName, newLastName are not valid
+     */
+    public Optional<User> updateUser(Long id, String newFirstName, String newLastName){
+        return userService.updateUserService(id, newFirstName, newLastName);
+    }
+
+    /**
      * Adds a new friendship between the users with the given identifiers
      * @param idOfFirstUser id of first user
      * @param idOfSecondUser id of second user
@@ -66,6 +86,17 @@ public class NetworkController {
      */
     public Optional<Friendship> removeFriendship(Long idOfFirstUser, Long idOfSecondUser){
         return networkService.removeFriendshipService(idOfFirstUser, idOfSecondUser);
+    }
+
+    /**
+     * Finds the friendship between the given users
+     * Order of parameters is irrelevant: friendship with id (1, 2) is the same with (2, 1)
+     * @param idOfFirstUser identifier of one of the users
+     * @param idOfSecondUser identifier of other user
+     * @return empty Optional if the friendship doesn't exist, Optional containing the friendship otherwise
+     */
+    public Optional<Friendship> findFriendship(Long idOfFirstUser, Long idOfSecondUser){
+       return networkService.findFriendshipService(idOfFirstUser, idOfSecondUser);
     }
 
     /**

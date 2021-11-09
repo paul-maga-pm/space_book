@@ -15,13 +15,17 @@ class Command{
     public static final String EXIT = "exit";
     public static final String ADD_USER = "add user";
     public static final String REMOVE_USER = "remove user";
+    public static final String FIND_USER = "find user";
+    public static final String UPDATE_USER = "update user";
     public static final String GET_ALL_USERS = "get all users";
 
     public static final String ADD_FRIENDSHIP = "add friendship";
     public static final String REMOVE_FRIENDSHIP = "remove friendship";
+    public static final String FIND_FRIENDSHIP = "find friendship";
 
     public static final String COUNT_COMMUNITIES = "count communities";
     public static final String MOST_SOCIAL = "most social";
+
 }
 
 public class ConsoleApplicationInterface {
@@ -60,14 +64,77 @@ public class ConsoleApplicationInterface {
         }
     }
 
+    private void printMainMenu(){
+        String menuCommandsFormat = "-- %s".indent(MENU_INDENTATION);
+        System.out.print("SOCIAL NETWORK APPLICATION".indent(MENU_INDENTATION));
+        System.out.print("MAIN MENU".indent(MENU_INDENTATION));
+        System.out.printf(menuCommandsFormat, Command.ADD_USER);
+        System.out.printf(menuCommandsFormat, Command.REMOVE_USER);
+        System.out.printf(menuCommandsFormat, Command.FIND_USER);
+        System.out.printf(menuCommandsFormat, Command.UPDATE_USER);
+
+        System.out.printf(menuCommandsFormat, Command.GET_ALL_USERS);
+        System.out.printf(menuCommandsFormat, Command.ADD_FRIENDSHIP);
+        System.out.printf(menuCommandsFormat, Command.REMOVE_FRIENDSHIP);
+        System.out.printf(menuCommandsFormat, Command.FIND_FRIENDSHIP);
+        System.out.printf(menuCommandsFormat, Command.COUNT_COMMUNITIES);
+        System.out.printf(menuCommandsFormat, Command.MOST_SOCIAL);
+        System.out.printf(menuCommandsFormat, Command.EXIT);
+    }
+
     private void initializeCommandMap(){
-        commandMap.put(Command.REMOVE_USER, this::removeUser);
-        commandMap.put(Command.GET_ALL_USERS, this::getAllUsersWithTheirFriends);
         commandMap.put(Command.ADD_USER, this::addUser);
+        commandMap.put(Command.REMOVE_USER, this::removeUser);
+        commandMap.put(Command.FIND_USER, this::findUser);
+        commandMap.put(Command.UPDATE_USER, this::updateUser);
+        commandMap.put(Command.GET_ALL_USERS, this::getAllUsersWithTheirFriends);
+
         commandMap.put(Command.ADD_FRIENDSHIP, this::addFriendship);
         commandMap.put(Command.REMOVE_FRIENDSHIP, this::removeFriendship);
+        commandMap.put(Command.FIND_FRIENDSHIP, this::findFriendship);
         commandMap.put(Command.COUNT_COMMUNITIES, this::countCommunities);
         commandMap.put(Command.MOST_SOCIAL, this::findMostSocialCommunity);
+    }
+
+    private void findFriendship() {
+        System.out.print("Id of first user: ");
+        Long idOfFirstUser = readLongFromUser("Invalid value for the id of the first user");
+
+        System.out.print("Id of second user: ");
+        Long idOfSecondUser = readLongFromUser("Invalid value for the id of the second user");
+
+        Optional<Friendship> existingFriendshipOptional = networkController.findFriendship(idOfFirstUser, idOfSecondUser);
+        if(existingFriendshipOptional.isEmpty())
+            System.out.printf("Users with id %d and %d are not friends\n", idOfFirstUser, idOfSecondUser);
+        else
+            System.out.println(existingFriendshipOptional.get());
+    }
+
+    private void updateUser() {
+        System.out.print("Id: ");
+        Long id = readLongFromUser("Invalid value for id");
+        System.out.print("New first name: ");
+        String newFirstName = readStringFromUser();
+        System.out.print("New last name: ");
+        String newLastName = readStringFromUser();
+
+        Optional<User> oldUserOptional = networkController.updateUser(id, newFirstName, newLastName);
+
+        if(oldUserOptional.isEmpty())
+            System.out.println("User doesn't exist");
+        else
+            System.out.printf("User %s has been updated\n", oldUserOptional.get());
+    }
+
+    private void findUser() {
+        System.out.print("Id: ");
+        Long id = readLongFromUser("Invalid value for id");
+        Optional<User> existingUserOptional = networkController.findUserById(id);
+
+        if(existingUserOptional.isEmpty())
+            System.out.printf("User with id %d doesn't exist\n", id);
+        else
+            System.out.println(existingUserOptional.get());
     }
 
     private void findMostSocialCommunity() {
@@ -110,19 +177,6 @@ public class ConsoleApplicationInterface {
             throw new InvalidNumericalValueException(invalidNumericalValueExceptionMessage);
         }
         return userInput;
-    }
-
-    private void printMainMenu(){
-        System.out.print("SOCIAL NETWORK APPLICATION".indent(MENU_INDENTATION));
-        System.out.print("MAIN MENU".indent(MENU_INDENTATION));
-        System.out.printf("1. %s\n".indent(MENU_INDENTATION), Command.ADD_USER);
-        System.out.printf("2. %s\n".indent(MENU_INDENTATION), Command.REMOVE_USER);
-        System.out.printf("3. %s".indent(MENU_INDENTATION), Command.GET_ALL_USERS);
-        System.out.printf("4. %s".indent(MENU_INDENTATION), Command.ADD_FRIENDSHIP);
-        System.out.printf("5. %s".indent(MENU_INDENTATION), Command.REMOVE_FRIENDSHIP);
-        System.out.printf("6. %s".indent(MENU_INDENTATION), Command.COUNT_COMMUNITIES);
-        System.out.printf("7. %s".indent(MENU_INDENTATION), Command.MOST_SOCIAL);
-        System.out.printf("8. %s".indent(MENU_INDENTATION), Command.EXIT);
     }
 
     private void addUser(){

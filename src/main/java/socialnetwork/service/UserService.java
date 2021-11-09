@@ -4,6 +4,7 @@ package socialnetwork.service;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.User;
 import socialnetwork.domain.validators.EntityValidatorInterface;
+import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
@@ -50,7 +51,6 @@ public class UserService {
      * Removes the user with the given id and his friendships with other users
      * @param id identifier of user
      * @return Optional with the user that was removed, empty Optional if the user didn't exist
-     * @throws IllegalArgumentException if id was null
      */
     public Optional<User> removeUserService(Long id){
         if(userRepository.findById(id).isEmpty())
@@ -66,4 +66,25 @@ public class UserService {
         return userRepository.remove(id);
     }
 
+    /**
+     * Finds the user with the given id
+     * @param id identifier of the user we want to find
+     * @return empty Optional if the user with the given id doesn't exit, Optional with the existing user otherwise
+     */
+    public Optional<User> findUserByIdService(Long id){
+        return userRepository.findById(id);
+    }
+
+    /**
+     * Updates the user with the given id
+     * @param id identifier of the user we want to update
+     * @param newFirstName new value for firstName field
+     * @param newLastName new value for lastName field
+     * @throws InvalidEntityException if the id, newFirstName, newLastName are not valid
+     */
+    public Optional<User> updateUserService(Long id, String newFirstName, String newLastName){
+        User newValue = new User(id, newFirstName, newLastName);
+        userValidator.validate(newValue);
+        return userRepository.update(newValue);
+    }
 }

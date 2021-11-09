@@ -59,6 +59,7 @@ public class NetworkService {
 
     /**
      * Removes the friendship between the users with the given identifiers
+     * Order of parameters is irrelevant: friendship with id (1, 2) is the same with (2, 1)
      * @param idOfFirstUser id of first user
      * @param idOfSecondUser id of second user
      * @return Optional containing the removed relationship, empty Optional if the users are not friends
@@ -66,6 +67,18 @@ public class NetworkService {
     public Optional<Friendship> removeFriendshipService(Long idOfFirstUser, Long idOfSecondUser){
         UnorderedPair<Long, Long> idOfFriendship = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
         return friendshipRepository.remove(idOfFriendship);
+    }
+
+    /**
+     * Finds the friendship between the given users
+     * Order of parameters is irrelevant: friendship with id (1, 2) is the same with (2, 1)
+     * @param idOfFirstUser identifier of one of the users
+     * @param idOfSecondUser identifier of other user
+     * @return empty Optional if the friendship doesn't exist, Optional containing the friendship otherwise
+     */
+    public Optional<Friendship> findFriendshipService(Long idOfFirstUser, Long idOfSecondUser){
+        UnorderedPair<Long, Long> id = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
+        return friendshipRepository.findById(id);
     }
 
     /**
