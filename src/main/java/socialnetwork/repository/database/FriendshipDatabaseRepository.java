@@ -7,18 +7,9 @@ import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class FriendshipDatabaseRepository
-        implements RepositoryInterface<UnorderedPair<Long, Long>, Friendship> {
-
-    private String url;
-    private String user;
-    private String password;
-    private static final String FIND_FRIENDSHIP_BY_ID_SQL_STRING = "SELECT * FROM friendships WHERE id_first_user=? " +
-            "AND id_second_user=? OR id_second_user=? AND id_first_user=?";
+        extends AbstractDatabaseRepository<UnorderedPair<Long, Long>, Friendship> {
 
     /**
      * Creates a new database with the given connection data
@@ -27,72 +18,7 @@ public class FriendshipDatabaseRepository
      * @param password master password of the server
      */
     public FriendshipDatabaseRepository(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-    }
-
-    @Override
-    public Optional<Friendship> save(Friendship friendship) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            PreparedStatement findStatement = createFindStatementForFriendshipId(friendship.getId(), connection);
-            ResultSet resultSet = findStatement.executeQuery();
-            if(resultSet.next())
-                return Optional.of(createFriendshipFromResultSet(resultSet));
-            PreparedStatement insertStatement = createInsertStatementForFriendship(friendship, connection);
-            insertStatement.executeUpdate();
-            return Optional.empty();
-        } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
-        }
-    }
-
-    @Override
-    public List<Friendship> getAll() {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            List<Friendship> friendships = new ArrayList<>();
-            PreparedStatement selectAllStatement = connection.prepareStatement("SELECT * FROM friendships");
-            ResultSet resultSet = selectAllStatement.executeQuery();
-            while(resultSet.next())
-                friendships.add(createFriendshipFromResultSet(resultSet));
-            return friendships;
-        } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
-        }
-    }
-
-    @Override
-    public Optional<Friendship> findById(UnorderedPair<Long, Long> id) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            PreparedStatement findFriendshipStatement = createFindStatementForFriendshipId(id,connection);
-            ResultSet resultSet = findFriendshipStatement.executeQuery();
-            if(resultSet.next())
-                return Optional.of(createFriendshipFromResultSet(resultSet));
-            return Optional.empty();
-        } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
-        }
-    }
-
-    @Override
-    public Optional<Friendship> update(Friendship newValue) {
-        return findById(newValue.getId());
-    }
-
-    @Override
-    public Optional<Friendship> remove(UnorderedPair<Long, Long> id) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            PreparedStatement findFriendshipStatement = createFindStatementForFriendshipId(id, connection);
-            ResultSet resultSet = findFriendshipStatement.executeQuery();
-            if(resultSet.next()){
-                PreparedStatement deleteStatement = createDeleteStatementForFriendship(id, connection);
-                deleteStatement.executeUpdate();
-                return Optional.of(createFriendshipFromResultSet(resultSet));
-            }
-            return Optional.empty();
-        } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
-        }
+        super(url, user, password);
     }
 
     /**
@@ -100,7 +26,8 @@ public class FriendshipDatabaseRepository
      * @param resultSet contains friendship data in format (id_first_user, id_second_user)
      * @return a Friendship with the given data
      */
-    private Friendship createFriendshipFromResultSet(ResultSet resultSet){
+    @Override
+    public Friendship createEntityFromResultSet(ResultSet resultSet){
         try{
             Long id1 = resultSet.getLong("id_first_user");
             Long id2 = resultSet.getLong("id_second_user");
@@ -117,7 +44,8 @@ public class FriendshipDatabaseRepository
      * @param connection Connection to database
      * @return a PreparedStatement object representing the query for inserting the friendship into database
      */
-    private PreparedStatement createInsertStatementForFriendship(Friendship friendship, Connection connection){
+    @Override
+    public PreparedStatement createInsertStatementForEntity(Connection connection, Friendship friendship){
         try {
             String insertStringStatement = "INSERT INTO friendships(id_first_user, id_second_user, friendship_date) VALUES (?,?,?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertStringStatement);
@@ -136,7 +64,8 @@ public class FriendshipDatabaseRepository
      * @param connection Connection to database
      * @return a PreparedStatement object representing the query for removing the friendship from database
      */
-    private PreparedStatement createDeleteStatementForFriendship(UnorderedPair<Long, Long> id, Connection connection){
+    @Override
+    public PreparedStatement createDeleteStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id){
         try{
             String deleteStringStatement = "DELETE FROM friendships WHERE id_first_user=? AND id_second_user=? OR " +
                     "id_second_user=? AND id_first_user=?";
@@ -157,9 +86,12 @@ public class FriendshipDatabaseRepository
      * @param connection Connection to database
      * @return a PreparedStatement object representing the query for selecting the friendship from database
      */
-    private PreparedStatement createFindStatementForFriendshipId(UnorderedPair<Long, Long> id, Connection connection){
+    @Override
+    public PreparedStatement createFindStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id){
         try {
-            PreparedStatement findStatement = connection.prepareStatement(FIND_FRIENDSHIP_BY_ID_SQL_STRING);
+            String findFriendshipByIdStatementString = "SELECT * FROM friendships WHERE id_first_user=? " +
+                    "AND id_second_user=? OR id_second_user=? AND id_first_user=?";
+            PreparedStatement findStatement = connection.prepareStatement(findFriendshipByIdStatementString);
             findStatement.setLong(1, id.first);
             findStatement.setLong(2, id.second);
             findStatement.setLong(3, id.first);
@@ -167,6 +99,43 @@ public class FriendshipDatabaseRepository
             return findStatement;
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());
+        }
+    }
+
+    /**
+     * Creates a query that selects all friendships from database
+     * @param connection Connection to database
+     * @return a PreparedStatement object representing the query for selecting all friendships from the database
+     */
+    @Override
+    public PreparedStatement createSelectAllStatement(Connection connection){
+        try{
+            return connection.prepareStatement("SELECT * FROM friendships");
+        } catch (SQLException exception) {
+            throw new DatabaseException(exception.getMessage());
+        }
+    }
+
+    /**
+     * Creates a PreparedStatement that updates the friendship with the same id as newValue
+     * @param newValue E object with the id of the friendship in the database we want to update and the new fields values
+     * @param connection Connection object to a database
+     * @return PreparedStatement representing a query that will update the friendship with the same id as newValue
+     */
+    @Override
+    public PreparedStatement createUpdateStatementForEntity(Connection connection, Friendship newValue) {
+        try{
+            String updateSqlStr = "UPDATE friendships SET friendship_date=? WHERE id_first_user=? AND id_second_user=? OR " +
+                    "id_second_user=? AND id_first_user=?";
+            PreparedStatement updateSql = connection.prepareStatement(updateSqlStr);
+            updateSql.setTimestamp(1, Timestamp.valueOf(newValue.getDate()));
+            updateSql.setLong(2, newValue.getId().first);
+            updateSql.setLong(3, newValue.getId().second);
+            updateSql.setLong(4, newValue.getId().first);
+            updateSql.setLong(5, newValue.getId().second);
+            return updateSql;
+        } catch (SQLException exception){
+            throw new DatabaseException(exception.getMessage());
         }
     }
 }
