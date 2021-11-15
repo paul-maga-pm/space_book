@@ -15,10 +15,29 @@ public class Friendship extends Entity<UnorderedPair<Long, Long>>{
      * Constructor that creates a new relationship between the users with the given id
      * @param idOfFirstUser identifier of first user
      * @param idOfSecondUser identifier of second user
-     * @throws IllegalArgumentException if any of the identifiers is null
      */
     public Friendship(Long idOfFirstUser, Long idOfSecondUser){
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
+    }
+
+    /**
+     * Constructor that creates a new relationship between the users with the given id
+     * @param idOfFirstUser identifier of first user
+     * @param idOfSecondUser identifier of second user
+     * @param date LocalDateTime when the two users became friends
+     */
+
+    public Friendship(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){
+        super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
+        this.date = date;
+    }
+
+    /**
+     * Getter method for date of creation of friendship
+     * @return LocalDateTime representing the date of creation of the friendship
+     */
+    public LocalDateTime getDate() {
+        return date;
     }
 
     /**
@@ -58,6 +77,7 @@ public class Friendship extends Entity<UnorderedPair<Long, Long>>{
     @Override
     public String toString() {
         return "Id of first user: " + getId().first +
-                ", Id of second user " + getId().second;
+                ", Id of second user: " + getId().second +
+                ", Date: " + date.toString();
     }
 }

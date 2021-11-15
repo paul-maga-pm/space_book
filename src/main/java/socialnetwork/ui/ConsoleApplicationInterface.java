@@ -8,6 +8,8 @@ import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.exceptions.InvalidNumericalValueException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -217,6 +219,7 @@ public class ConsoleApplicationInterface {
         Consumer<User> userPrinterConsumer = user ->{
             System.out.println(user.toString());
         };
+
         Consumer<User> userPrinterConsumerWithFriends = user -> {
             userPrinterConsumer.accept(user);
             System.out.println("Friends: ");
@@ -234,7 +237,8 @@ public class ConsoleApplicationInterface {
         long idOfFirstUser = readLongFromUser("Invalid value for id of the first user");
         System.out.print("Id of second user: ");
         long idOfSecondUser = readLongFromUser("Invalid value for id of the second user");
-        Optional<Friendship> existingFriendShipOptional = networkController.addFriendship(idOfFirstUser, idOfSecondUser);
+        LocalDateTime date = LocalDateTime.now();
+        Optional<Friendship> existingFriendShipOptional = networkController.addFriendship(idOfFirstUser, idOfSecondUser, date);
         if(existingFriendShipOptional.isPresent())
             System.out.printf("Friendship between %d and %d already exists\n", idOfFirstUser, idOfSecondUser);
         else

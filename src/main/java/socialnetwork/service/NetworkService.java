@@ -9,6 +9,7 @@ import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UndirectedGraph;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -42,15 +43,16 @@ public class NetworkService {
      * Adds a new friendship between the users with the given identifiers
      * @param idOfFirstUser id of first user
      * @param idOfSecondUser id of second user
+     * @param date LocalDateTime of when the friendship was created
      * @return empty Optional if the relationship was added, empty Optional if the relationship already exists
      * @throws InvalidEntityException if one of the users is not found in the repository
      */
-    public Optional<Friendship> addFriendshipService(Long idOfFirstUser, Long idOfSecondUser){
+    public Optional<Friendship> addFriendshipService(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){
         UnorderedPair<Long, Long> idOfNewFriendship = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
         Optional<Friendship> existingFriendshipOptional = friendshipRepository.findById(idOfNewFriendship);
 
         if(existingFriendshipOptional.isEmpty()){
-            Friendship friendship = new Friendship(idOfFirstUser, idOfSecondUser);
+            Friendship friendship = new Friendship(idOfFirstUser, idOfSecondUser, date);
             friendshipValidator.validate(friendship);
             friendshipRepository.save(friendship);
         }

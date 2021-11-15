@@ -18,6 +18,7 @@ import socialnetwork.repository.database.UserDatabaseTableSetter;
 import socialnetwork.utils.containers.UndirectedGraph;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class NetworkServiceCrudTest {
@@ -46,18 +47,18 @@ public class NetworkServiceCrudTest {
 
     @Test
     void addExistingFriendship(){
-        Assertions.assertTrue(testService.addFriendshipService(2L, 1L).isPresent());
+        Assertions.assertTrue(testService.addFriendshipService(2L, 1L, LocalDateTime.now()).isPresent());
     }
 
     @Test
     void addNewFriendship(){
-        Assertions.assertTrue(testService.addFriendshipService(12L, 11L).isEmpty());
+        Assertions.assertTrue(testService.addFriendshipService(12L, 11L, LocalDateTime.now()).isEmpty());
     }
 
     @Test
     void addWithNonExistingUsers(){
         Assertions.assertThrows(InvalidEntityException.class,
-                ()->testService.addFriendshipService(1000L, 2000L));
+                ()->testService.addFriendshipService(1000L, 2000L, LocalDateTime.now()));
     }
 
     @Test

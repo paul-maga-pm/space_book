@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public abstract class FriendshipRepositoryTestSetter
         extends RepositoryAbstractTest<UnorderedPair<Long, Long>, Friendship> {
     @Override
     public Friendship createValidEntity() {
-        return new Friendship(1234L, 5678L);
+        return new Friendship(1234L, 5678L, LocalDateTime.of(2021, 10, 20, 10, 30));
     }
 
 
@@ -29,9 +30,9 @@ public abstract class FriendshipRepositoryTestSetter
     @Override
     public List<Friendship> getTestData() {
         return Arrays.asList(
-                new Friendship(1L, 2L),
-                new Friendship(1L, 3L),
-                new Friendship(2L, 3L)
+                new Friendship(1L, 2L, LocalDateTime.of(2021, 10, 20, 10, 30)),
+                new Friendship(1L, 3L, LocalDateTime.of(2021, 10, 20, 10, 30)),
+                new Friendship(2L, 3L, LocalDateTime.of(2021, 10, 20, 10, 30))
         );
     }
 
