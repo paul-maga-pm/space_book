@@ -6,6 +6,8 @@ import socialnetwork.exceptions.CorruptedDataException;
 import socialnetwork.exceptions.IoFileException;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDateTime;
+
 /**
  * Implementation of AbstractCSVFileRepository for Friendship model
  */
@@ -28,7 +30,9 @@ public class FriendshipCSVFileRepository
      */
     @Override
     public String entityToString(Friendship friendship) {
-        return "" + friendship.getId().first + "," + friendship.getId().second;
+        return "" + friendship.getId().first +
+                "," + friendship.getId().second +
+                "," + friendship.getDate().toString();
     }
 
     /**
@@ -40,16 +44,18 @@ public class FriendshipCSVFileRepository
     public Friendship stringToEntity(String rawFriendshipString) {
         String[] attributes = rawFriendshipString.split(",");
 
-        if(attributes.length != 2)
-            throw new CorruptedDataException("friendship csv file is corrupted");
+        if(attributes.length != 3)
+            throw new CorruptedDataException(getFilePath() + " csv file is corrupted");
         Long idOfFirstUser;
         Long idOfSecondUser;
+        LocalDateTime date;
         try {
             idOfFirstUser = Long.parseLong(attributes[0].stripLeading().stripTrailing());
             idOfSecondUser = Long.parseLong(attributes[1].stripLeading().stripTrailing());
+            date = LocalDateTime.parse(attributes[2].stripLeading().stripTrailing());
         } catch (NumberFormatException exception) {
             throw new CorruptedDataException("friendship csv file is corrupted");
         }
-        return new Friendship(idOfFirstUser, idOfSecondUser);
+        return new Friendship(idOfFirstUser, idOfSecondUser, date);
     }
 }

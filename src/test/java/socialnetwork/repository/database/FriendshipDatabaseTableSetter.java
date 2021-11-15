@@ -4,10 +4,8 @@ import socialnetwork.config.ApplicationContext;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.User;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FriendshipDatabaseTableSetter {
@@ -28,11 +26,13 @@ public class FriendshipDatabaseTableSetter {
         tearDown();
 
         try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            String insertStatementString = "INSERT INTO friendships(id_first_user, id_second_user) VALUES (?,?)";
+            String insertStatementString = "INSERT INTO friendships(id_first_user, id_second_user, friendship_date) VALUES (?,?,?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertStatementString);
             for(Friendship friendship : testData) {
                 insertStatement.setLong(1, friendship.getId().first);
                 insertStatement.setLong(2, friendship.getId().second);
+                Timestamp time = Timestamp.valueOf(friendship.getDate());
+                insertStatement.setTimestamp(3, time);
                 insertStatement.executeUpdate();
             }
         } catch (SQLException exception) {

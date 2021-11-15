@@ -7,6 +7,7 @@ import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.service.NetworkService;
 import socialnetwork.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,15 +68,8 @@ public class NetworkController {
         return userService.updateUserService(id, newFirstName, newLastName);
     }
 
-    /**
-     * Adds a new friendship between the users with the given identifiers
-     * @param idOfFirstUser id of first user
-     * @param idOfSecondUser id of second user
-     * @return empty Optional if the relationship was added, empty Optional if the relationship already exists
-     * @throws InvalidEntityException if one of the users is not found in the repository
-     */
-    public Optional<Friendship> addFriendship(Long idOfFirstUser, Long idOfSecondUser){
-        return networkService.addFriendshipService(idOfFirstUser, idOfSecondUser);
+    public Optional<Friendship> addFriendship(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){
+        return networkService.addFriendshipService(idOfFirstUser, idOfSecondUser, date);
     }
 
     /**

@@ -6,6 +6,7 @@ import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -103,7 +104,8 @@ public class FriendshipDatabaseRepository
         try{
             Long id1 = resultSet.getLong("id_first_user");
             Long id2 = resultSet.getLong("id_second_user");
-            return new Friendship(id1, id2);
+            LocalDateTime date = resultSet.getTimestamp("friendship_date").toLocalDateTime();
+            return new Friendship(id1, id2, date);
         } catch (SQLException exception) {
             throw new DatabaseException(exception.getMessage());
         }
@@ -117,10 +119,11 @@ public class FriendshipDatabaseRepository
      */
     private PreparedStatement createInsertStatementForFriendship(Friendship friendship, Connection connection){
         try {
-            String insertStringStatement = "INSERT INTO friendships(id_first_user, id_second_user) VALUES (?,?)";
+            String insertStringStatement = "INSERT INTO friendships(id_first_user, id_second_user, friendship_date) VALUES (?,?,?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertStringStatement);
             insertStatement.setLong(1, friendship.getId().first);
             insertStatement.setLong(2, friendship.getId().second);
+            insertStatement.setTimestamp(3, Timestamp.valueOf(friendship.getDate()));
             return insertStatement;
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage());

@@ -8,6 +8,7 @@ import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.repository.memory.InMemoryRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,21 +40,21 @@ class FriendshipValidatorTest {
     void usersDontExist(){
         var strategy = createStrategy();
         assertThrows(EntityNotFoundValidationException.class,
-                () -> strategy.validate(new Friendship(1000L, 2000L)));
+                () -> strategy.validate(new Friendship(1000L, 2000L, LocalDateTime.now())));
     }
 
     @Test
     void oneUserDoesntExist(){
         var strategy = createStrategy();
         assertThrows(EntityNotFoundValidationException.class,
-                () -> strategy.validate(new Friendship(1L, 2000L)));
+                () -> strategy.validate(new Friendship(1L, 2000L, LocalDateTime.now())));
         assertThrows(EntityNotFoundValidationException.class,
-                () -> strategy.validate(new Friendship(1000L, 2L)));
+                () -> strategy.validate(new Friendship(1000L, 2L, LocalDateTime.now())));
     }
 
     @Test
     void usersExist(){
         var strategy = createStrategy();
-        strategy.validate(new Friendship(1L, 2L));
+        strategy.validate(new Friendship(1L, 2L, LocalDateTime.now()));
     }
 }

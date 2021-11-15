@@ -38,7 +38,10 @@ public class FriendshipCSVFileRepositoryTest extends FriendshipRepositoryTestSet
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(TEST_FILE_PATH))) {
             for(Friendship friendship : getTestData()){
-                String line = "" + friendship.getId().first + "," + friendship.getId().second;
+                String line = "" +
+                        friendship.getId().first + "," +
+                        friendship.getId().second + "," +
+                        friendship.getDate().toString();
                 writer.write(line);
                 writer.newLine();
             }

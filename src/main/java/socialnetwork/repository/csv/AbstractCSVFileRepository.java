@@ -29,6 +29,14 @@ public abstract class AbstractCSVFileRepository<ID, E extends Entity<ID>> extend
     }
 
     /**
+     * Getter method for the path to the csv file
+     * @return String representing the path
+     */
+    public String getFilePath(){
+        return filePath;
+    }
+
+    /**
      * Parses the given entity into CSV format
      * @return a String in CSV format containing the fields of entity
      */

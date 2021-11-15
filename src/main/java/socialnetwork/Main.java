@@ -20,18 +20,20 @@ import socialnetwork.service.UserService;
 import socialnetwork.ui.ConsoleApplicationInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class Main {
 
-    public static void loadToDatabase(){
+    public static void loadToDatabase(String url, String user, String password){
         UserCSVFileRepository userRepository = new UserCSVFileRepository(
                 ApplicationContext.getProperty("socialnetwork.csv.users"));
         FriendshipCSVFileRepository friendshipRepository = new FriendshipCSVFileRepository(
                 ApplicationContext.getProperty("socialnetwork.csv.friendships")
         );
 
-        String url = ApplicationContext.getProperty("socialnetwork.database.url");
-        String user = ApplicationContext.getProperty("socialnetwork.database.user");
-        String password = ApplicationContext.getProperty("socialnetwork.database.password");
         UserDatabaseRepository userDb = new UserDatabaseRepository(url, user, password);
         FriendshipDatabaseRepository friendshipDb = new FriendshipDatabaseRepository(url, user, password);
 
@@ -42,12 +44,14 @@ public class Main {
             friendshipDb.save(f);
     }
 
+
     public static void main(String[] args) {
         String url = ApplicationContext.getProperty("socialnetwork.database.url");
         String user = ApplicationContext.getProperty("socialnetwork.database.user");
         String password = ApplicationContext.getProperty("socialnetwork.database.password");
         RepositoryInterface<Long, User> userRepository = new UserDatabaseRepository(url, user,password);
         EntityValidatorInterface<Long, User> userValidator = new UserValidator();
+
         try {
             var userDataSetValidator = new EntityDataSetValidator<>(userValidator, userRepository);
             userDataSetValidator.validateDataSet("Network data is corrupted.\nNetwork contains users that" +
