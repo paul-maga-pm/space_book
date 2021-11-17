@@ -34,6 +34,15 @@ public class Main {
                 ApplicationContext.getProperty("socialnetwork.csv.friendships")
         );
 
+        try(Connection connection = DriverManager.getConnection(url, user, password)){
+            PreparedStatement deleteFriendshipsStatement = connection.prepareStatement("DELETE FROM friendships");
+            PreparedStatement deleteUsersStatement = connection.prepareStatement("DELETE  FROM users");
+            deleteFriendshipsStatement.executeUpdate();
+            deleteUsersStatement.executeUpdate();
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
         UserDatabaseRepository userDb = new UserDatabaseRepository(url, user, password);
         FriendshipDatabaseRepository friendshipDb = new FriendshipDatabaseRepository(url, user, password);
 
@@ -46,6 +55,7 @@ public class Main {
 
 
     public static void main(String[] args) {
+
         String url = ApplicationContext.getProperty("socialnetwork.database.url");
         String user = ApplicationContext.getProperty("socialnetwork.database.user");
         String password = ApplicationContext.getProperty("socialnetwork.database.password");

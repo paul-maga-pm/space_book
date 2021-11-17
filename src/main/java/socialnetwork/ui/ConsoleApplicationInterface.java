@@ -26,6 +26,7 @@ class Command{
     public static final String REMOVE_FRIENDSHIP = "remove friendship";
     public static final String FIND_FRIENDSHIP = "find friendship";
     public static final String FIND_FRIENDS_FOR_USER = "find friends for user";
+    public static final String FIND_FRIENDS_FOR_USER_FROM_MONTH = "find friends for user from month";
 
     public static final String COUNT_COMMUNITIES = "count communities";
     public static final String MOST_SOCIAL = "most social";
@@ -83,6 +84,7 @@ public class ConsoleApplicationInterface {
         System.out.printf(menuCommandsFormat, Command.REMOVE_FRIENDSHIP);
         System.out.printf(menuCommandsFormat, Command.FIND_FRIENDSHIP);
         System.out.printf(menuCommandsFormat, Command.FIND_FRIENDS_FOR_USER);
+        System.out.printf(menuCommandsFormat, Command.FIND_FRIENDS_FOR_USER_FROM_MONTH);
         System.out.printf(menuCommandsFormat, Command.COUNT_COMMUNITIES);
         System.out.printf(menuCommandsFormat, Command.MOST_SOCIAL);
         System.out.printf(menuCommandsFormat, Command.EXIT);
@@ -99,8 +101,28 @@ public class ConsoleApplicationInterface {
         commandMap.put(Command.REMOVE_FRIENDSHIP, this::removeFriendship);
         commandMap.put(Command.FIND_FRIENDSHIP, this::findFriendship);
         commandMap.put(Command.FIND_FRIENDS_FOR_USER, this::findFriendsForUser);
+        commandMap.put(Command.FIND_FRIENDS_FOR_USER_FROM_MONTH, this::findFriendsForUserFromMonth);
         commandMap.put(Command.COUNT_COMMUNITIES, this::countCommunities);
         commandMap.put(Command.MOST_SOCIAL, this::findMostSocialCommunity);
+    }
+
+    private void findFriendsForUserFromMonth() {
+        System.out.print("Id: ");
+        Long idOfUser = readLongFromUser("Invalid value for id");
+        System.out.print("Month: ");
+        int month = readIntFromUser("Invalid numerical value for month");
+
+        var friendsOfUserFromMonth = networkController.findAllFriendsForUserFromMonth(idOfUser, month);
+
+        if(friendsOfUserFromMonth.isEmpty())
+            System.out.println("User doesn't have friends from the given month");
+        else
+            friendsOfUserFromMonth.forEach((friend, date) -> {
+                System.out.printf("%s | %s | %s\n",
+                        friend.get().getFirstName(),
+                        friend.get().getLastName(),
+                        date.format(DATE_TIME_FORMATTER));
+            });
     }
 
     private void findFriendsForUser(){
@@ -192,6 +214,18 @@ public class ConsoleApplicationInterface {
         long userInput;
         try{
             userInput = readLongFromUser();
+        } catch (InputMismatchException exception){
+            inputReader.nextLine();
+            throw new InvalidNumericalValueException(invalidNumericalValueExceptionMessage);
+        }
+        return userInput;
+    }
+
+    private int readIntFromUser(String invalidNumericalValueExceptionMessage){
+        int userInput;
+        try{
+            userInput = inputReader.nextInt();
+            inputReader.nextLine();
         } catch (InputMismatchException exception){
             inputReader.nextLine();
             throw new InvalidNumericalValueException(invalidNumericalValueExceptionMessage);
