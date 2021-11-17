@@ -111,4 +111,22 @@ public class UserService {
                 });
         return friendsForUser;
     }
+
+    /**
+     * Finds all friends of the user that became friends in the given month
+     * @param idOfUser identifier of user we find the friends
+     * @param month month when the users became friends
+     * @return a Map with the key representing the friend of the user and the value the date when the users became
+     * friends
+     */
+    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
+        Map<Optional<User>, LocalDateTime> friendsOfUserMap = findAllFriendsForUserService(idOfUser);
+        int year = LocalDateTime.now().getYear();
+        Map<Optional<User>, LocalDateTime> friendsOfUserFromMonthMap = new HashMap<>();
+        friendsOfUserMap.forEach((user, date) -> {
+            if(date.getYear() == year && date.getMonth().getValue() == month)
+                friendsOfUserFromMonthMap.put(user, date);
+        });
+        return friendsOfUserFromMonthMap;
+    }
 }
