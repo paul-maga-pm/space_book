@@ -8,7 +8,11 @@ import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -86,5 +90,25 @@ public class UserService {
         User newValue = new User(id, newFirstName, newLastName);
         userValidator.validate(newValue);
         return userRepository.update(newValue);
+    }
+
+    /**
+     *  Finds all the friends for a given user
+     * @param id identifier of the user we want to find the friends for
+     * @return map containing the friends of the given user (as keys) and the date since when they have been friends (as values)
+     */
+    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserService(Long id){
+        Map<Optional<User>, LocalDateTime> friendsForUser = new HashMap<>();
+        List<Friendship> friendships = friendshipRepository.getAll();
+        friendships.stream().filter(friendship -> friendship.hasUser(id))
+                .forEach(friendship -> {
+                    Long idOfFriend;
+                    if(friendship.getId().first == id)
+                        idOfFriend = friendship.getId().second;
+                    else
+                        idOfFriend = friendship.getId().first;
+                    friendsForUser.put(userRepository.findById(idOfFriend), friendship.getDate());
+                });
+        return friendsForUser;
     }
 }
