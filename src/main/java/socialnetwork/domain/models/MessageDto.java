@@ -4,25 +4,25 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class MessageDto extends Entity<Long>{
-    private String message;
+    private String text;
     private LocalDateTime date;
 
-    public MessageDto(Long messageId, String message, LocalDateTime date) {
+    public MessageDto(Long messageId, String text, LocalDateTime date) {
         super(messageId);
-        this.message = message;
+        this.text = text;
         this.date = date;
     }
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void setDate(LocalDateTime date) {
@@ -34,12 +34,12 @@ public class MessageDto extends Entity<Long>{
         if (this == o) return true;
         if (!(o instanceof  MessageDto messageDto)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(message, messageDto.getMessage()) &&
+        return Objects.equals(text, messageDto.getText()) &&
                 Objects.equals(date, messageDto.getDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), message, date);
+        return Objects.hash(super.hashCode(), text, date);
     }
 }

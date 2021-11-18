@@ -1,33 +1,33 @@
-package socialnetwork.utils.containers;
+package socialnetwork.domain.models;
 
 import java.util.Objects;
 
-public class MessageSenderReceiverDtoId<T1, T2, T3>{
-    private T1 messageId;
-    private T2 senderId;
-    private T3 receiverId;
+public class MessageSenderReceiverDtoId{
+    private Long messageId;
+    private Long senderId;
+    private Long receiverId;
 
-    public MessageSenderReceiverDtoId(T1 messageId, T2 senderId, T3 receiverId) {
+    public MessageSenderReceiverDtoId(Long messageId, Long senderId, Long receiverId) {
         this.messageId = messageId;
         this.senderId = senderId;
         this.receiverId = receiverId;
     }
 
-    public MessageSenderReceiverDtoId(MessageSenderReceiverDtoId<T1, T2, T3> other){
+    public MessageSenderReceiverDtoId(MessageSenderReceiverDtoId other){
         this.messageId = other.getMessageId();
         this.senderId = other.getSenderId();
         this.receiverId = other.getReceiverId();
     }
 
-    public T1 getMessageId() {
+    public Long getMessageId() {
         return messageId;
     }
 
-    public T2 getSenderId() {
+    public Long getSenderId() {
         return senderId;
     }
 
-    public T3 getReceiverId() {
+    public Long getReceiverId() {
         return receiverId;
     }
 
@@ -35,7 +35,7 @@ public class MessageSenderReceiverDtoId<T1, T2, T3>{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MessageSenderReceiverDtoId)) return false;
-        MessageSenderReceiverDtoId<?, ?, ?> id = (MessageSenderReceiverDtoId<?, ?, ?>) o;
+        MessageSenderReceiverDtoId id = (MessageSenderReceiverDtoId) o;
         return Objects.equals(messageId, id.getMessageId()) && Objects.equals(senderId, id.getSenderId()) &&
                 Objects.equals(receiverId, id.getReceiverId());
     }

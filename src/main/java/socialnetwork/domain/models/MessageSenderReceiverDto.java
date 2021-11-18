@@ -1,7 +1,5 @@
 package socialnetwork.domain.models;
 
-import socialnetwork.utils.containers.MessageSenderReceiverDtoId;
-
 import java.util.Objects;
 
 public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>{

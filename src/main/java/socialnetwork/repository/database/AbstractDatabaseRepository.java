@@ -80,7 +80,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
             insertStatement.executeUpdate();
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -94,7 +94,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
                 entities.add(createEntityFromResultSet(resultSet));
             return entities;
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
                 return Optional.of(createEntityFromResultSet(resultSet));
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
             }
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
             }
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 }

@@ -34,7 +34,7 @@ public class FriendshipDatabaseRepository
             LocalDateTime date = resultSet.getTimestamp("friendship_date").toLocalDateTime();
             return new Friendship(id1, id2, date);
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -54,7 +54,7 @@ public class FriendshipDatabaseRepository
             insertStatement.setTimestamp(3, Timestamp.valueOf(friendship.getDate()));
             return insertStatement;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e);
         }
     }
 
@@ -76,7 +76,7 @@ public class FriendshipDatabaseRepository
             deleteStatement.setLong(4, id.second);
             return deleteStatement;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -98,7 +98,7 @@ public class FriendshipDatabaseRepository
             findStatement.setLong(4, id.second);
             return findStatement;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage());
+            throw new DatabaseException(e);
         }
     }
 
@@ -112,7 +112,7 @@ public class FriendshipDatabaseRepository
         try{
             return connection.prepareStatement("SELECT * FROM friendships");
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -135,7 +135,7 @@ public class FriendshipDatabaseRepository
             updateSql.setLong(5, newValue.getId().second);
             return updateSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 }

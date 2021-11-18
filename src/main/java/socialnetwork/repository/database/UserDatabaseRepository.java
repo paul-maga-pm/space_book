@@ -36,7 +36,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             findSql.setLong(1, id);
             return findSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -51,7 +51,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             String selectAllStatementString = "SELECT * FROM users";
             return connection.prepareStatement(selectAllStatementString);
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -69,7 +69,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             updateSql.setLong(1, id);
             return updateSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -90,7 +90,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             updateSql.setLong(3, newValue.getId());
             return updateSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -110,7 +110,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             insertSql.setString(3, user.getLastName());
             return insertSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
@@ -126,7 +126,7 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             String lastName = resultSet.getString("last_name");
             return new User(id, firstName, lastName);
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
