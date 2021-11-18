@@ -1,28 +1,14 @@
 package socialnetwork.repository;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import socialnetwork.domain.models.User;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class UserRepositoryTestSetter extends RepositoryAbstractTest<Long, User> {
-    private static final List<User> testDataList = Arrays.asList(
-            new User(1L, "Michael", "Michael"),
-            new User(2L, "John", "John"),
-            new User(3L, "Marcel", "Marcel"),
-            new User(1234L, "John", "John"),
-            new User(5678L, "John", "John"));
-
-    private static final HashMap<Long, User> testDataMap = new HashMap<>(){{
-        for(var data : testDataList)
-            put(data.getId(), data);
-    }};
-
-    private static final User validUserThatIsNotInRepository = new User(10L, "Snow", "Snow");
-    private static final User updateOldValue = new User(1L, "Michael", "Michael");
-    private static final User updateNewValue = new User(1L, "Snow", "Snow");
 
     @Override
     public Long getExistingId(){
@@ -30,31 +16,22 @@ public abstract class UserRepositoryTestSetter extends RepositoryAbstractTest<Lo
     }
 
     @Override
-    public Long getNotExistingId(){
+    public Long createNotExistingId(){
         return 4L;
     }
     @Override
     public List<User> getTestData(){
-        return testDataList;
+        return new ArrayList<>(Arrays.asList(
+                new User(1L, "Michael", "Michael"),
+                new User(2L, "John", "John"),
+                new User(3L, "Marcel", "Marcel"),
+                new User(1234L, "John", "John"),
+                new User(5678L, "John", "John")));
     }
 
     @Override
-    public User getValidEntityThatIsNotInRepository() {
-        return validUserThatIsNotInRepository;
+    public User createValidEntityThatIsNotInRepository() {
+        return new User(10L, "Snow", "Snow");
     }
 
-    @Override
-    public User getOldValueOfEntityForUpdateTest() {
-        return updateOldValue;
-    }
-
-    @Override
-    public User getNewValueForEntityForUpdateTest() {
-        return updateNewValue;
-    }
-
-    @Override
-    public User getEntityWithId(Long id) {
-        return testDataMap.get(id);
-    }
 }

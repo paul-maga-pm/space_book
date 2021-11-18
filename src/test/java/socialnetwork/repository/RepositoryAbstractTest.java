@@ -11,18 +11,15 @@ import java.util.function.Predicate;
 
 public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
 
-    public abstract E getValidEntityThatIsNotInRepository();
-    public abstract E getOldValueOfEntityForUpdateTest();
-    public abstract E getNewValueForEntityForUpdateTest();
-    public abstract ID getNotExistingId();
+    public abstract E createValidEntityThatIsNotInRepository();
+    public abstract ID createNotExistingId();
     public abstract ID getExistingId();
-    public abstract E getEntityWithId(ID id);
     public abstract RepositoryInterface<ID, E> getRepository();
     public abstract List<E>  getTestData();
 
     @Test
     void findReturnsEmptyOptional(){
-        var entityOptional = getRepository().findById(getNotExistingId());
+        var entityOptional = getRepository().findById(createNotExistingId());
         Assertions.assertTrue(entityOptional.isEmpty());
     }
 
@@ -31,46 +28,53 @@ public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
         var id = getExistingId();
         var foundEntityOptional = getRepository().findById(id);
         Assertions.assertTrue(foundEntityOptional.isPresent());
-        var actualFoundEntity = foundEntityOptional.get();
-        var expectedFoundEntity = getEntityWithId(id);
-        Assertions.assertEquals(expectedFoundEntity, actualFoundEntity);
+        var foundEntity = foundEntityOptional.get();
+        Predicate<E> areEntitiesEqual = entity -> entity.equals(foundEntity);
+        boolean isFoundEntityInTestData = getTestData()
+                .stream()
+                .anyMatch(areEntitiesEqual);
+        Assertions.assertTrue(isFoundEntityInTestData);
     }
 
     @Test
     void saveShouldAddTheEntity(){
-        E validEntity = getValidEntityThatIsNotInRepository();
+        E validEntity = createValidEntityThatIsNotInRepository();
         Optional<E> existingEntityOptional = getRepository().save(validEntity);
         Assertions.assertTrue(existingEntityOptional.isEmpty());
     }
 
     @Test
     void entityWithSameIdAlreadyExistsWhenSaving(){
-        E validEntity = getValidEntityThatIsNotInRepository();
+        E validEntity = createValidEntityThatIsNotInRepository();
         Assertions.assertTrue(getRepository().save(validEntity).isEmpty());
         Optional<E> existingEntity = getRepository().save(validEntity);
         Assertions.assertTrue(existingEntity.isPresent());
-        Assertions.assertEquals(validEntity, existingEntity.get());
     }
 
     @Test
     void testGetAll(){
         List<E> expectedEntities = getTestData();
         List<E> actualEntities = getRepository().getAll();
-        Assertions.assertTrue(actualEntities.containsAll(expectedEntities));
-        Assertions.assertTrue(expectedEntities.containsAll(actualEntities));
+
+        Assertions.assertEquals(expectedEntities.size(), actualEntities.size());
+        for(E entity : actualEntities)
+            Assertions.assertTrue(expectedEntities.contains(entity));
     }
 
     @Test
     void updateReturnsEmptyOptional(){
-        var newEntity = getValidEntityThatIsNotInRepository();
+        var newEntity = createValidEntityThatIsNotInRepository();
+        newEntity.setId(createNotExistingId());
         var entityOptional = getRepository().update(newEntity);
         Assertions.assertTrue(entityOptional.isEmpty());
     }
 
     @Test
     void updateShouldReturnOldValue(){
-        var newEntity = getNewValueForEntityForUpdateTest();
-        var oldValue = getOldValueOfEntityForUpdateTest();
+        var newEntity = createValidEntityThatIsNotInRepository();
+        List<E> testData = getTestData();
+        newEntity.setId(testData.get(0).getId());
+        var oldValue = testData.get(0);
         var entityOptional = getRepository().update(newEntity);
         Assertions.assertTrue(entityOptional.isPresent());
         Assertions.assertEquals(oldValue, entityOptional.get());
@@ -84,14 +88,18 @@ public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
     void removeShouldDeleteExistingEntity(){
         var removedEntityOptional = getRepository().remove(getExistingId());
         Assertions.assertTrue(removedEntityOptional.isPresent());
-        var actualRemovedEntity = removedEntityOptional.get();
-        var expectedRemovedEntity = getEntityWithId(getExistingId());
-        Assertions.assertEquals(expectedRemovedEntity, actualRemovedEntity);
+        var removedEntity = removedEntityOptional.get();
+        var testData = getTestData();
+        Predicate<E> isEntityEqualTo = entity -> entity.equals(removedEntity);
+        var isRemovedEntityInTestData = testData
+                .stream()
+                .anyMatch(isEntityEqualTo);
+        Assertions.assertTrue(isRemovedEntityInTestData);
     }
 
     @Test
     void removeShouldNotDeleteAnyEntity(){
-        var removedEntityOptional = getRepository().remove(getNotExistingId());
+        var removedEntityOptional = getRepository().remove(createNotExistingId());
         Assertions.assertTrue(removedEntityOptional.isEmpty());
     }
 

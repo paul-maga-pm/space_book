@@ -15,8 +15,18 @@ public class Friendship extends Entity<UnorderedPair<Long, Long>>{
      * Constructor that creates a new relationship between the users with the given id
      * @param idOfFirstUser identifier of first user
      * @param idOfSecondUser identifier of second user
+     */
+    public Friendship(Long idOfFirstUser, Long idOfSecondUser){
+        super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
+    }
+
+    /**
+     * Constructor that creates a new relationship between the users with the given id
+     * @param idOfFirstUser identifier of first user
+     * @param idOfSecondUser identifier of second user
      * @param date LocalDateTime when the two users became friends
      */
+
     public Friendship(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
         this.date = date;
