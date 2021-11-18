@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 class FriendshipDataBaseRepositoryTest extends FriendshipRepositoryTestSetter {
-    FriendshipDatabaseRepository testRepository;
+    private static FriendshipDatabaseRepository testRepository;
     private String url = ApplicationContext.getProperty("network.database.url");
     private String user = ApplicationContext.getProperty("network.database.user");
     private String password = ApplicationContext.getProperty("network.database.password");
