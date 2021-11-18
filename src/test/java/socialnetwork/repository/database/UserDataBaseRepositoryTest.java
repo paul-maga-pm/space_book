@@ -1,6 +1,7 @@
 package socialnetwork.repository.database;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import socialnetwork.config.ApplicationContext;
@@ -26,13 +27,13 @@ class UserDataBaseRepositoryTest extends UserRepositoryTestSetter {
         return testRepository;
     }
 
-    @BeforeEach
-    public void setUp(){
-        UserDatabaseTableSetter.setUp(getTestData());
+    @BeforeAll
+    static void setUpDatabase(){
+        DatabaseCleaner.clearDatabase();
     }
 
-    @AfterAll
-    public void restoreDataBase(){
+    @BeforeEach
+    public void setUp(){
         UserDatabaseTableSetter.setUp(getTestData());
     }
 }
