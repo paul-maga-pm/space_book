@@ -11,7 +11,10 @@ import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.repository.csv.FriendshipCSVFileRepository;
 import socialnetwork.repository.csv.UserCSVFileRepository;
-import socialnetwork.repository.database.*;
+import socialnetwork.repository.database.FriendshipDatabaseRepository;
+import socialnetwork.repository.database.FriendshipDatabaseTableSetter;
+import socialnetwork.repository.database.UserDatabaseRepository;
+import socialnetwork.repository.database.UserDatabaseTableSetter;
 import socialnetwork.repository.memory.InMemoryRepository;
 import socialnetwork.utils.containers.UnorderedPair;
 
@@ -30,7 +33,8 @@ public class UserServiceCrudTest {
 
     @BeforeEach
     void setUp(){
-        DatabaseCleaner.clearDatabase();
+        FriendshipDatabaseTableSetter.tearDown();
+        UserDatabaseTableSetter.tearDown();
         UserDatabaseTableSetter.setUp(localUsers.getAll());
         FriendshipDatabaseTableSetter.setUp(localFriendships.getAll());
     }
