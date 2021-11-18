@@ -30,7 +30,7 @@ public abstract class UserRepositoryTestSetter extends RepositoryAbstractTest<Lo
     }
 
     @Override
-    public User createValidEntity() {
+    public User createValidEntityThatIsNotInRepository() {
         return new User(10L, "Snow", "Snow");
     }
 

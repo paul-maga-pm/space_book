@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class FriendshipRepositoryTestSetter
         extends RepositoryAbstractTest<UnorderedPair<Long, Long>, Friendship> {
     @Override
-    public Friendship createValidEntity() {
+    public Friendship createValidEntityThatIsNotInRepository() {
         return new Friendship(1234L, 5678L, LocalDateTime.of(2021, 10, 20, 10, 30));
     }
 

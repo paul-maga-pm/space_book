@@ -29,14 +29,16 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @return a PreparedStatement object representing the query for selecting the user from database
      */
     @Override
-    public PreparedStatement createFindStatementForEntityWithId(Connection connection, Long id){
+    public PreparedStatement createFindStatementForEntityWithId(Connection connection, Long id) throws SQLException {
+        String findSqlString = "SELECT id, first_name, last_name FROM users WHERE id = ?";
+        PreparedStatement findSql = null;
         try{
-            String findSqlString = "SELECT id, first_name, last_name FROM users WHERE id = ?";
-            PreparedStatement findSql = connection.prepareStatement(findSqlString);
+            findSql = connection.prepareStatement(findSqlString);
             findSql.setLong(1, id);
             return findSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            closePreparedStatement(findSql);
+            throw new SQLException(exception);
         }
     }
 
@@ -46,12 +48,12 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @return a Preparedstatement object representing the query for selecting all users from the database
      */
     @Override
-    public PreparedStatement createSelectAllStatement(Connection connection) {
+    public PreparedStatement createSelectAllStatement(Connection connection) throws SQLException {
         try{
             String selectAllStatementString = "SELECT * FROM users";
             return connection.prepareStatement(selectAllStatementString);
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new SQLException(exception);
         }
     }
 
@@ -62,14 +64,16 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @return PreparedStatement representing a query that will remove the user with the given id
      */
     @Override
-    public PreparedStatement createDeleteStatementForEntityWithId(Connection connection, Long id){
+    public PreparedStatement createDeleteStatementForEntityWithId(Connection connection, Long id) throws SQLException {
+        String deleteSqlStr = "DELETE FROM users WHERE id=?";
+        PreparedStatement deleteSql = null;
         try{
-            String deleteSqlStr = "DELETE FROM users WHERE id=?";
-            PreparedStatement updateSql = connection.prepareStatement(deleteSqlStr);
-            updateSql.setLong(1, id);
-            return updateSql;
+            deleteSql = connection.prepareStatement(deleteSqlStr);
+            deleteSql.setLong(1, id);
+            return deleteSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            closePreparedStatement(deleteSql);
+            throw new SQLException(exception);
         }
     }
 
@@ -81,16 +85,18 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @return PreparedStatement representing a query that will update the user with the same id as newValue
      */
     @Override
-    public PreparedStatement createUpdateStatementForEntity(Connection connection, User newValue){
+    public PreparedStatement createUpdateStatementForEntity(Connection connection, User newValue) throws SQLException {
+        String updateSqlStr = "UPDATE users SET first_name=?, last_name=? WHERE id=?";
+        PreparedStatement updateSql = null;
         try{
-            String updateSqlStr = "UPDATE users SET first_name=?, last_name=? WHERE id=?";
-            PreparedStatement updateSql = connection.prepareStatement(updateSqlStr);
+            updateSql = connection.prepareStatement(updateSqlStr);
             updateSql.setString(1, newValue.getFirstName());
             updateSql.setString(2, newValue.getLastName());
             updateSql.setLong(3, newValue.getId());
             return updateSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            closePreparedStatement(updateSql);
+            throw new SQLException(exception);
         }
     }
 
@@ -101,16 +107,18 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @return a PreparedStatement that represent a query that will add the user into the database
      */
     @Override
-    public PreparedStatement createInsertStatementForEntity(Connection connection, User user){
+    public PreparedStatement createInsertStatementForEntity(Connection connection, User user) throws SQLException {
+        String insertSqlStr = "INSERT INTO users(id, first_name, last_name) values (?,?,?)";
+        PreparedStatement insertSql = null;
         try{
-            String insertSqlStr = "INSERT INTO users(id, first_name, last_name) values (?,?,?)";
-            PreparedStatement insertSql = connection.prepareStatement(insertSqlStr);
+            insertSql = connection.prepareStatement(insertSqlStr);
             insertSql.setLong(1, user.getId());
             insertSql.setString(2, user.getFirstName());
             insertSql.setString(3, user.getLastName());
             return insertSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            closePreparedStatement(insertSql);
+            throw new SQLException(exception);
         }
     }
 
@@ -119,16 +127,15 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      * @param resultSet contains id, firstName, lastName of the user and must point to a valid row
      * @return User with the given data
      */
-    public User createEntityFromResultSet(ResultSet resultSet){
+    public User createEntityFromResultSet(ResultSet resultSet) throws SQLException {
         try{
             Long id = resultSet.getLong("id");
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
             return new User(id, firstName, lastName);
         } catch (SQLException exception){
-            throw new DatabaseException(exception.getMessage());
+            throw new SQLException(exception);
         }
     }
-
 
 }

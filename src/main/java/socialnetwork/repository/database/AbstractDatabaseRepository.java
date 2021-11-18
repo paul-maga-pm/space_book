@@ -28,7 +28,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
      * @param resultSet contains fields of the entity
      * @return entity with the given data
      */
-    public abstract E createEntityFromResultSet(ResultSet resultSet);
+    public abstract E createEntityFromResultSet(ResultSet resultSet) throws SQLException;
 
     /**
      * Creates an insert statement for the given entity on the given connection
@@ -36,7 +36,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
      * @param connection Connection object to a database
      * @return a PreparedStatement that represent a query that will add the entity into the database
      */
-    public abstract PreparedStatement createInsertStatementForEntity(Connection connection, E entity);
+    public abstract PreparedStatement createInsertStatementForEntity(Connection connection, E entity) throws SQLException;
 
     /**
      * Creates a PreparedStatement that removes the entity with the given id
@@ -44,7 +44,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
      * @param connection Connection object to a database
      * @return PreparedStatement representing a query that will remove the entity with the given id
      */
-    public abstract PreparedStatement createDeleteStatementForEntityWithId(Connection connection, ID id);
+    public abstract PreparedStatement createDeleteStatementForEntityWithId(Connection connection, ID id) throws SQLException;
 
     /**
      * Creates a query for selecting id, firstName and lastName of a entity
@@ -52,14 +52,14 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
      * @param connection Connection to database
      * @return a PreparedStatement object representing the query for selecting the entity from database
      */
-    public abstract PreparedStatement createFindStatementForEntityWithId(Connection connection, ID id);
+    public abstract PreparedStatement createFindStatementForEntityWithId(Connection connection, ID id) throws SQLException;
 
     /**
      * Creates a query that selects all entity objects from database
      * @param connection Connection to database
      * @return a PreparedStatement object representing the query for selecting all entities from the database
      */
-    public abstract PreparedStatement createSelectAllStatement(Connection connection);
+    public abstract PreparedStatement createSelectAllStatement(Connection connection) throws SQLException;
 
     /**
      * Creates a PreparedStatement that updates the entity with the same id as newValue
@@ -67,56 +67,66 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
      * @param connection Connection object to a database
      * @return PreparedStatement representing a query that will update the entity with the same id as newValue
      */
-    public abstract PreparedStatement createUpdateStatementForEntity(Connection connection, E newValue);
+    public abstract PreparedStatement createUpdateStatementForEntity(Connection connection, E newValue) throws SQLException;
+
+    protected void closePreparedStatement(PreparedStatement statement){
+        if(statement != null){
+            try{
+                statement.close();
+            } catch (SQLException exception) {
+                throw new DatabaseException(exception);
+            }
+        }
+    }
 
     @Override
     public Optional<E> save(E entity) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement findStatement = createFindStatementForEntityWithId(connection, entity.getId());
-            ResultSet resultSet = findStatement.executeQuery();
+            ResultSet resultSet = findStatement.executeQuery() ){
             if(resultSet.next())
                 return Optional.of(createEntityFromResultSet(resultSet));
             PreparedStatement insertStatement = createInsertStatementForEntity(connection, entity);
             insertStatement.executeUpdate();
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
     @Override
     public List<E> getAll() {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
-            List<E> entities = new ArrayList<>();
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement selectAllStatement = createSelectAllStatement(connection);
-            ResultSet resultSet = selectAllStatement.executeQuery();
+            ResultSet resultSet = selectAllStatement.executeQuery()){
+            List<E> entities = new ArrayList<>();
             while(resultSet.next())
                 entities.add(createEntityFromResultSet(resultSet));
             return entities;
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
     @Override
     public Optional<E> findById(ID id) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement findEntityStatement = createFindStatementForEntityWithId(connection, id);
-            ResultSet resultSet = findEntityStatement.executeQuery();
+            ResultSet resultSet = findEntityStatement.executeQuery()){
             if(resultSet.next())
                 return Optional.of(createEntityFromResultSet(resultSet));
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
     @Override
     public Optional<E> update(E newValue) {
 
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement findSql = createFindStatementForEntityWithId(connection, newValue.getId());
-            ResultSet resultSet = findSql.executeQuery();
+            ResultSet resultSet = findSql.executeQuery()){
             if(resultSet.next()){
                 E oldValue = createEntityFromResultSet(resultSet);
                 PreparedStatement updateSql = createUpdateStatementForEntity(connection, newValue);
@@ -125,15 +135,15 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
             }
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 
     @Override
     public Optional<E> remove(ID id) {
-        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement findEntityStatement = createFindStatementForEntityWithId(connection, id);
-            ResultSet resultSet = findEntityStatement.executeQuery();
+            ResultSet resultSet = findEntityStatement.executeQuery()) {
             if(resultSet.next()){
                 PreparedStatement deleteStatement = createDeleteStatementForEntityWithId(connection, id);
                 deleteStatement.executeUpdate();
@@ -141,7 +151,7 @@ public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
             }
             return Optional.empty();
         } catch (SQLException exception) {
-            throw new DatabaseException(exception.getMessage());
+            throw new DatabaseException(exception);
         }
     }
 }
