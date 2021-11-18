@@ -10,11 +10,12 @@ import socialnetwork.domain.models.User;
 import socialnetwork.repository.MessageSenderReceiverDtoRepositoryTestSetter;
 import socialnetwork.repository.RepositoryInterface;
 
+import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-public class MessageSenderReceiverDatabaseRepositoryTest
+public class MessageSenderReceiverDtoDatabaseRepositoryTest
 extends MessageSenderReceiverDtoRepositoryTestSetter {
     String url = ApplicationContext.getProperty("network.database.url");
     String user = ApplicationContext.getProperty("network.database.user");
@@ -30,11 +31,7 @@ extends MessageSenderReceiverDtoRepositoryTestSetter {
 
     @BeforeAll
     static void setUpDatabase(){
-        FriendshipDatabaseTableSetter.tearDown();
-        MessagesSenderReceiverDatabaseTableSetter.tearDown();
-        UserDatabaseTableSetter.tearDown();
-        MessageDatabaseTableSetter.tearDown();
-
+        DatabaseCleaner.clearDatabase();
         setUpUsersTable();
         setUpMessagesTable();
     }

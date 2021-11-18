@@ -9,7 +9,7 @@ import socialnetwork.repository.RepositoryInterface;
 
 import java.sql.*;
 
-public class MessageDatabaseRepositoryTest extends MessageDtoRepositoryTestSetter {
+public class MessageDtoDatabaseRepositoryTest extends MessageDtoRepositoryTestSetter {
     String url = ApplicationContext.getProperty("network.database.url");
     String user = ApplicationContext.getProperty("network.database.user");
     String password = ApplicationContext.getProperty("network.database.password");
@@ -25,10 +25,7 @@ public class MessageDatabaseRepositoryTest extends MessageDtoRepositoryTestSette
 
     @BeforeAll
     static void setUpDataBase(){
-        FriendshipDatabaseTableSetter.tearDown();
-        MessagesSenderReceiverDatabaseTableSetter.tearDown();
-        UserDatabaseTableSetter.tearDown();
-        MessageDatabaseTableSetter.tearDown();
+        DatabaseCleaner.clearDatabase();
     }
 
     @BeforeEach
