@@ -1,4 +1,4 @@
-package socialnetwork.repository.csv;
+package socialnetwork.repository;
 
 import socialnetwork.domain.models.MessageDto;
 import socialnetwork.repository.RepositoryAbstractTest;

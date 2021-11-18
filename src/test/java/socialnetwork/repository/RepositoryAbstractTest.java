@@ -2,7 +2,6 @@ package socialnetwork.repository;
 
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import socialnetwork.domain.models.Entity;
 
@@ -12,7 +11,7 @@ import java.util.function.Predicate;
 
 public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
 
-    public abstract E createValidEntity();
+    public abstract E createValidEntityThatIsNotInRepository();
     public abstract ID createNotExistingId();
     public abstract ID getExistingId();
     public abstract RepositoryInterface<ID, E> getRepository();
@@ -39,14 +38,14 @@ public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
 
     @Test
     void saveShouldAddTheEntity(){
-        E validEntity = createValidEntity();
+        E validEntity = createValidEntityThatIsNotInRepository();
         Optional<E> existingEntityOptional = getRepository().save(validEntity);
         Assertions.assertTrue(existingEntityOptional.isEmpty());
     }
 
     @Test
     void entityWithSameIdAlreadyExistsWhenSaving(){
-        E validEntity = createValidEntity();
+        E validEntity = createValidEntityThatIsNotInRepository();
         Assertions.assertTrue(getRepository().save(validEntity).isEmpty());
         Optional<E> existingEntity = getRepository().save(validEntity);
         Assertions.assertTrue(existingEntity.isPresent());
@@ -64,7 +63,7 @@ public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
 
     @Test
     void updateReturnsEmptyOptional(){
-        var newEntity = createValidEntity();
+        var newEntity = createValidEntityThatIsNotInRepository();
         newEntity.setId(createNotExistingId());
         var entityOptional = getRepository().update(newEntity);
         Assertions.assertTrue(entityOptional.isEmpty());
@@ -72,7 +71,7 @@ public abstract class RepositoryAbstractTest<ID, E extends Entity<ID>> {
 
     @Test
     void updateShouldReturnOldValue(){
-        var newEntity = createValidEntity();
+        var newEntity = createValidEntityThatIsNotInRepository();
         List<E> testData = getTestData();
         newEntity.setId(testData.get(0).getId());
         var oldValue = testData.get(0);

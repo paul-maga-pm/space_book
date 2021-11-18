@@ -2,7 +2,6 @@ package socialnetwork.repository.database;
 
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.exceptions.DatabaseException;
-import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.*;
@@ -27,14 +26,14 @@ public class FriendshipDatabaseRepository
      * @return a Friendship with the given data
      */
     @Override
-    public Friendship createEntityFromResultSet(ResultSet resultSet){
+    public Friendship createEntityFromResultSet(ResultSet resultSet) throws SQLException {
         try{
             Long id1 = resultSet.getLong("id_first_user");
             Long id2 = resultSet.getLong("id_second_user");
             LocalDateTime date = resultSet.getTimestamp("friendship_date").toLocalDateTime();
             return new Friendship(id1, id2, date);
         } catch (SQLException exception) {
-            throw new DatabaseException(exception);
+            throw new SQLException(exception);
         }
     }
 
@@ -45,16 +44,18 @@ public class FriendshipDatabaseRepository
      * @return a PreparedStatement object representing the query for inserting the friendship into database
      */
     @Override
-    public PreparedStatement createInsertStatementForEntity(Connection connection, Friendship friendship){
+    public PreparedStatement createInsertStatementForEntity(Connection connection, Friendship friendship) throws SQLException {
+        String insertStringStatement = "INSERT INTO friendships(id_first_user, id_second_user, friendship_date) VALUES (?,?,?)";
+        PreparedStatement insertStatement = null;
         try {
-            String insertStringStatement = "INSERT INTO friendships(id_first_user, id_second_user, friendship_date) VALUES (?,?,?)";
-            PreparedStatement insertStatement = connection.prepareStatement(insertStringStatement);
+            insertStatement = connection.prepareStatement(insertStringStatement);
             insertStatement.setLong(1, friendship.getId().first);
             insertStatement.setLong(2, friendship.getId().second);
             insertStatement.setTimestamp(3, Timestamp.valueOf(friendship.getDate()));
             return insertStatement;
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            closePreparedStatement(insertStatement);
+            throw new SQLException(e);
         }
     }
 
@@ -65,18 +66,20 @@ public class FriendshipDatabaseRepository
      * @return a PreparedStatement object representing the query for removing the friendship from database
      */
     @Override
-    public PreparedStatement createDeleteStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id){
+    public PreparedStatement createDeleteStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id) throws SQLException {
+        String deleteStringStatement = "DELETE FROM friendships WHERE id_first_user=? AND id_second_user=? OR " +
+                "id_second_user=? AND id_first_user=?";
+        PreparedStatement deleteStatement = null;
         try{
-            String deleteStringStatement = "DELETE FROM friendships WHERE id_first_user=? AND id_second_user=? OR " +
-                    "id_second_user=? AND id_first_user=?";
-            PreparedStatement deleteStatement = connection.prepareStatement(deleteStringStatement);
+            deleteStatement = connection.prepareStatement(deleteStringStatement);
             deleteStatement.setLong(1, id.first);
             deleteStatement.setLong(2, id.second);
             deleteStatement.setLong(3, id.first);
             deleteStatement.setLong(4, id.second);
             return deleteStatement;
         } catch (SQLException exception){
-            throw new DatabaseException(exception);
+            closePreparedStatement(deleteStatement);
+            throw new SQLException(exception);
         }
     }
 
@@ -87,18 +90,20 @@ public class FriendshipDatabaseRepository
      * @return a PreparedStatement object representing the query for selecting the friendship from database
      */
     @Override
-    public PreparedStatement createFindStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id){
+    public PreparedStatement createFindStatementForEntityWithId(Connection connection, UnorderedPair<Long, Long> id) throws SQLException {
+        String findFriendshipByIdStatementString = "SELECT * FROM friendships WHERE id_first_user=? " +
+                "AND id_second_user=? OR id_second_user=? AND id_first_user=?";
+        PreparedStatement findStatement = null;
         try {
-            String findFriendshipByIdStatementString = "SELECT * FROM friendships WHERE id_first_user=? " +
-                    "AND id_second_user=? OR id_second_user=? AND id_first_user=?";
-            PreparedStatement findStatement = connection.prepareStatement(findFriendshipByIdStatementString);
+            findStatement = connection.prepareStatement(findFriendshipByIdStatementString);
             findStatement.setLong(1, id.first);
             findStatement.setLong(2, id.second);
             findStatement.setLong(3, id.first);
             findStatement.setLong(4, id.second);
             return findStatement;
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            closePreparedStatement(findStatement);
+            throw new SQLException(e);
         }
     }
 
@@ -108,11 +113,11 @@ public class FriendshipDatabaseRepository
      * @return a PreparedStatement object representing the query for selecting all friendships from the database
      */
     @Override
-    public PreparedStatement createSelectAllStatement(Connection connection){
+    public PreparedStatement createSelectAllStatement(Connection connection) throws SQLException {
         try{
             return connection.prepareStatement("SELECT * FROM friendships");
         } catch (SQLException exception) {
-            throw new DatabaseException(exception);
+            throw new SQLException(exception);
         }
     }
 
@@ -123,11 +128,12 @@ public class FriendshipDatabaseRepository
      * @return PreparedStatement representing a query that will update the friendship with the same id as newValue
      */
     @Override
-    public PreparedStatement createUpdateStatementForEntity(Connection connection, Friendship newValue) {
+    public PreparedStatement createUpdateStatementForEntity(Connection connection, Friendship newValue) throws SQLException {
+        String updateSqlStr = "UPDATE friendships SET friendship_date=? WHERE id_first_user=? AND id_second_user=? OR " +
+                "id_second_user=? AND id_first_user=?";
+        PreparedStatement updateSql = null;
         try{
-            String updateSqlStr = "UPDATE friendships SET friendship_date=? WHERE id_first_user=? AND id_second_user=? OR " +
-                    "id_second_user=? AND id_first_user=?";
-            PreparedStatement updateSql = connection.prepareStatement(updateSqlStr);
+            updateSql = connection.prepareStatement(updateSqlStr);
             updateSql.setTimestamp(1, Timestamp.valueOf(newValue.getDate()));
             updateSql.setLong(2, newValue.getId().first);
             updateSql.setLong(3, newValue.getId().second);
@@ -135,7 +141,8 @@ public class FriendshipDatabaseRepository
             updateSql.setLong(5, newValue.getId().second);
             return updateSql;
         } catch (SQLException exception){
-            throw new DatabaseException(exception);
+            closePreparedStatement(updateSql);
+            throw new SQLException(exception);
         }
     }
 }
