@@ -3,15 +3,13 @@ package socialnetwork;
 
 import socialnetwork.config.ApplicationContext;
 import socialnetwork.controllers.NetworkController;
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.models.*;
 import socialnetwork.domain.validators.*;
 import socialnetwork.exceptions.CorruptedDataException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.repository.csv.FriendshipCSVFileRepository;
 import socialnetwork.repository.csv.UserCSVFileRepository;
-import socialnetwork.repository.database.FriendshipDatabaseRepository;
-import socialnetwork.repository.database.UserDatabaseRepository;
+import socialnetwork.repository.database.*;
 import socialnetwork.service.NetworkService;
 import socialnetwork.service.UserService;
 import socialnetwork.ui.ConsoleApplicationInterface;
