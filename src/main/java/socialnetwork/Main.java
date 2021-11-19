@@ -10,6 +10,7 @@ import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.repository.csv.FriendshipCSVFileRepository;
 import socialnetwork.repository.csv.UserCSVFileRepository;
 import socialnetwork.repository.database.*;
+import socialnetwork.service.ConversationService;
 import socialnetwork.service.NetworkService;
 import socialnetwork.service.UserService;
 import socialnetwork.ui.ConsoleApplicationInterface;
@@ -77,9 +78,15 @@ public class Main {
             return;
         }
 
+        RepositoryInterface<Long, MessageDto> messageDtoRepository = new MessageDtoDatabaseRepository(url, user, password);
+        RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository = new MessageSenderReceiverDtoDatabaseRepository(url, user, password);
+        RepositoryInterface<Long, ReplyDto> replyDtoRepository = new ReplyDtoDatabaseRepository(url, user, password);
+        EntityValidatorInterface<Long, Message> messageValidator = new MessageValidator(userRepository);
+
         UserService userService = new UserService(userRepository, friendshipRepository, userValidator);
         NetworkService networkService = new NetworkService(friendshipRepository, userRepository, friendshipValidator);
-        NetworkController networkController = new NetworkController(userService, networkService);
+        ConversationService conversationService = new ConversationService(messageDtoRepository, messageSenderReceiverDtoRepository, replyDtoRepository, userRepository, messageValidator);
+        NetworkController networkController = new NetworkController(userService, networkService, conversationService);
         ConsoleApplicationInterface ui = new ConsoleApplicationInterface(networkController);
         ui.run();
     }

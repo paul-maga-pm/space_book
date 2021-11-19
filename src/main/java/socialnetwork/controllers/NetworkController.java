@@ -1,9 +1,9 @@
 package socialnetwork.controllers;
 
 
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.InvalidEntityException;
+import socialnetwork.service.ConversationService;
 import socialnetwork.service.NetworkService;
 import socialnetwork.service.UserService;
 
@@ -18,15 +18,17 @@ import java.util.Optional;
 public class NetworkController {
     private UserService userService;
     private NetworkService networkService;
+    private ConversationService conversationService;
 
     /**
      * Constructor that creates a controller that accesses the given services
      * @param userService service for User model
      * @param networkService service for Friendship model
      */
-    public NetworkController(UserService userService, NetworkService networkService) {
+    public NetworkController(UserService userService, NetworkService networkService, ConversationService conversationService) {
         this.userService = userService;
         this.networkService = networkService;
+        this.conversationService = conversationService;
     }
 
     /**
@@ -129,5 +131,60 @@ public class NetworkController {
 
     public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonth(Long idOfUser, int month){
         return userService.findAllFriendsForUserFromMonthService(idOfUser, month);
+    }
+
+    /**
+     * Add a new message
+     * @param senderId identifier of sender
+     * @param receiverIds identifiers of receivers
+     * @param text content of the message
+     * @param date date when the message was sent
+     */
+    public void sendMessageFromUserTo(Long senderId, List<Long> receiverIds, String text, LocalDateTime date){
+        conversationService.sendMessageFromUserToService(senderId, receiverIds, text, date);
+    }
+
+    /**
+     * Add a new reply
+     * @param messageRepliedToId identifier of the message that we reply to
+     * @param senderId identifier of the sender
+     * @param text content of the reply
+     * @param date date when the reply was sent
+     * @throws InvalidEntityException if there is no message with messageRepliedToId or
+     *                                if senderId is not part of the receivers of the message with messageRepliedToId
+     */
+    public void replyToMessage(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
+        conversationService.replyToMessageService(messageRepliedToId, senderId, text, date);
+    }
+
+    /**
+     * Get conversation between two users
+     * @param idOfFirstUser identifier of the first user that is part of the conversation
+     * @param idOfSecondUser identifier of the second user that is part of the conversation
+     * @return the conversation (list of messages) between the two users
+     */
+    public List<Message> getConversationBetweenTwoUsers(Long idOfFirstUser, Long idOfSecondUser){
+        return conversationService.getConversationBetweenTwoUsersService(idOfFirstUser, idOfSecondUser);
+    }
+
+    /**
+     * @return all messageDto objects
+     */
+    public List<MessageDto> getAllMessageDto(){
+        return conversationService.getAllMessageDtoService();
+    }
+
+    /**
+     * @return all messageSenderReceiverDto objects
+     */
+    public List<MessageSenderReceiverDto> getAllMessageSenderReceiverDto(){
+        return conversationService.getAllMessageSenderReceiverDtoService();
+    }
+
+    /**
+     * @return all replyDto objects
+     */
+    public List<ReplyDto> getAllReplyDto(){
+        return conversationService.getAllReplyDtoService();
     }
 }
