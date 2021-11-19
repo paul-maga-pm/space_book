@@ -148,4 +148,16 @@ public class ConversationService {
 
         return conversation;
     }
+
+    public List<MessageDto> getAllMessageDtoService(){
+        return messageDtoRepository.getAll();
+    }
+
+    public List<MessageSenderReceiverDto> getAllMessageSenderReceiverDtoService(){
+        return messageSenderReceiverDtoRepository.getAll();
+    }
+
+    public List<ReplyDto> getAllReplyDtoService(){
+        return replyDtoRepository.getAll();
+    }
 }
