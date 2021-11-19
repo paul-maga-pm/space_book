@@ -2,6 +2,9 @@ package socialnetwork.domain.models;
 
 import java.time.LocalDateTime;
 
+/**
+ * Abstraction of a reply in a conversation between users in a network
+ */
 public class ReplyMessage extends Message{
     private Message messagedRepliedTo;
 
