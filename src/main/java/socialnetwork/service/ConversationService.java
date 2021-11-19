@@ -127,4 +127,25 @@ public class ConversationService {
         });
         replyDtoRepository.save(new ReplyDto(replyId, messageRepliedToId));
     }
+
+    public List<Message> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
+        List<Message> conversation = new ArrayList<>();
+
+        List<MessageSenderReceiverDto>messagesAndRepliesBetweenTheUsers = messageSenderReceiverDtoRepository.getAll().stream().
+                filter(messageSenderReceiverDto -> {
+                    return (messageSenderReceiverDto.getId().getSenderId() == idOfFirstUser && messageSenderReceiverDto.getId().getReceiverId() == idOfSecondUser) ||
+                            (messageSenderReceiverDto.getId().getSenderId() == idOfSecondUser && messageSenderReceiverDto.getId().getReceiverId() == idOfFirstUser);
+                }).collect(Collectors.toList());
+
+        messagesAndRepliesBetweenTheUsers.forEach(messageAndReply -> {
+            MessageDto messageDto = messageDtoRepository.findById(messageAndReply.getId().getMessageId()).get();
+            Message message = new Message(messageDto.getId(), userRepository.findById(messageAndReply.getId().getSenderId()).get(),
+                    messageDto.getText(), messageDto.getDate());
+            conversation.add(message);
+        });
+
+        conversation.stream().sorted((message1, message2) -> message1.getDate().compareTo(message2.getDate()));
+
+        return conversation;
+    }
 }
