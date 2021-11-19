@@ -6,9 +6,7 @@ import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -191,10 +189,23 @@ public class ConversationService {
                             (messageSenderReceiverDto.getId().getSenderId() == idOfSecondUser && messageSenderReceiverDto.getId().getReceiverId() == idOfFirstUser);
                 }).collect(Collectors.toList());
 
-        messagesAndRepliesBetweenTheUsers.forEach(messageAndReply -> {
-            MessageDto messageDto = messageDtoRepository.findById(messageAndReply.getId().getMessageId()).get();
-            Message message = new Message(messageDto.getId(), userRepository.findById(messageAndReply.getId().getSenderId()).get(),
-                    messageDto.getText(), messageDto.getDate());
+
+        messagesAndRepliesBetweenTheUsers.forEach(msg -> {
+            Message message;
+            Long messageId = msg.getId().getMessageId();
+            Long senderId = msg.getId().getSenderId();
+            Optional<ReplyDto> optionalOfReply = replyDtoRepository.findById(messageId);
+            Optional<MessageDto> messageDto = messageDtoRepository.findById(messageId);
+            String textOfMessage = messageDto.get().getText();
+            LocalDateTime date = messageDto.get().getDate();
+            User sender = userRepository.findById(senderId).get();
+            if(optionalOfReply.isPresent()) {
+                Long idOfMessageThatIsRepliedTo = optionalOfReply.get().getIdOfMessageThatIsRepliedTo();
+                MessageDto messageThatRepliesTo = messageDtoRepository.findById(idOfMessageThatIsRepliedTo).get();
+                message = new ReplyMessage(messageId, sender, textOfMessage, date, messageThatRepliesTo);
+            }
+            else
+                message = new Message(messageId, sender, textOfMessage, date);
             conversation.add(message);
         });
 

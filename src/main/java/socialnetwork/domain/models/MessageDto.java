@@ -13,6 +13,12 @@ public class MessageDto extends Entity<Long>{
         this.date = date;
     }
 
+    @Override
+    public String toString() {
+        return  text + " " +
+                "from " + date.toString();
+    }
+
     public String getText() {
         return text;
     }

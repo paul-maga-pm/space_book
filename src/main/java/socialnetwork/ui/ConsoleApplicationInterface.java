@@ -5,6 +5,7 @@ package socialnetwork.ui;
 import socialnetwork.controllers.NetworkController;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.Message;
+import socialnetwork.domain.models.ReplyMessage;
 import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.exceptions.InvalidNumericalValueException;
@@ -131,7 +132,7 @@ public class ConsoleApplicationInterface {
         List<Long> listOfIdsOfReceivers = new ArrayList<>();
         System.out.println("Enter id of receivers. Enter exit after you entered the desired receivers");
         while(true){
-            System.out.println(">> ");
+            System.out.print(">> ");
             String userInput = readStringFromUser();
             userInput = userInput.trim();
             if(userInput.equals(Command.EXIT))
@@ -172,16 +173,17 @@ public class ConsoleApplicationInterface {
         List<Message> conversation = networkController.getConversationBetweenTwoUsers(idOfFirstUser,
                 idOfSecondUser);
 
-        String messageStringFormat = "Id: %d, Date: %s\n" + "%s %s: %s\n".indent(MENU_INDENTATION);
-        conversation.forEach( message -> {
-                System.out.printf(messageStringFormat,
-                        message.getId(),
-                        message.getDate().format(DATE_TIME_FORMATTER),
-                        message.getFrom().getFirstName(),
-                        message.getFrom().getLastName(),
-                        message.getText());
+        for(Message message : conversation){
+            if(message instanceof ReplyMessage){
+                ReplyMessage reply = (ReplyMessage)message;
+                System.out.printf("Reply to %s\n%s\n",
+                        reply.getMessageThatRepliesTo().toString(),
+                        reply);
             }
-        );
+            else
+                System.out.println(message);
+            System.out.println();
+        }
     }
 
     private void findFriendsForUserFromMonth() {
