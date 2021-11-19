@@ -4,11 +4,11 @@ package socialnetwork.ui;
 
 import socialnetwork.controllers.NetworkController;
 import socialnetwork.domain.models.Friendship;
+import socialnetwork.domain.models.Message;
 import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.exceptions.InvalidNumericalValueException;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -31,6 +31,9 @@ class Command{
     public static final String COUNT_COMMUNITIES = "count communities";
     public static final String MOST_SOCIAL = "most social";
 
+    public static final String SEND_MESSAGE = "send message";
+    public static final String REPLY_TO_MESSAGE = "reply to message";
+    public static final String SEE_CONVERSATION = "see conversation";
 }
 
 public class ConsoleApplicationInterface {
@@ -49,8 +52,8 @@ public class ConsoleApplicationInterface {
     }
 
     public void run(){
+        printMainMenu();
         while(true){
-            printMainMenu();
             System.out.print(">> ");
             String userCommand = readStringFromUser();
 
@@ -78,7 +81,6 @@ public class ConsoleApplicationInterface {
         System.out.printf(menuCommandsFormat, Command.REMOVE_USER);
         System.out.printf(menuCommandsFormat, Command.FIND_USER);
         System.out.printf(menuCommandsFormat, Command.UPDATE_USER);
-
         System.out.printf(menuCommandsFormat, Command.GET_ALL_USERS);
         System.out.printf(menuCommandsFormat, Command.ADD_FRIENDSHIP);
         System.out.printf(menuCommandsFormat, Command.REMOVE_FRIENDSHIP);
@@ -87,6 +89,9 @@ public class ConsoleApplicationInterface {
         System.out.printf(menuCommandsFormat, Command.FIND_FRIENDS_FOR_USER_FROM_MONTH);
         System.out.printf(menuCommandsFormat, Command.COUNT_COMMUNITIES);
         System.out.printf(menuCommandsFormat, Command.MOST_SOCIAL);
+        System.out.printf(menuCommandsFormat, Command.SEND_MESSAGE);
+        System.out.printf(menuCommandsFormat, Command.REPLY_TO_MESSAGE);
+        System.out.printf(menuCommandsFormat, Command.SEE_CONVERSATION);
         System.out.printf(menuCommandsFormat, Command.EXIT);
     }
 
@@ -104,6 +109,79 @@ public class ConsoleApplicationInterface {
         commandMap.put(Command.FIND_FRIENDS_FOR_USER_FROM_MONTH, this::findFriendsForUserFromMonth);
         commandMap.put(Command.COUNT_COMMUNITIES, this::countCommunities);
         commandMap.put(Command.MOST_SOCIAL, this::findMostSocialCommunity);
+        
+        commandMap.put(Command.SEND_MESSAGE, this::sendMessageToUsersFromUser);
+        commandMap.put(Command.REPLY_TO_MESSAGE, this::replyToMessageOfUser);
+        commandMap.put(Command.SEE_CONVERSATION, this::seeConversationBetweenTwoUsers);
+    }
+
+    private void sendMessageToUsersFromUser() {
+        System.out.print("Id of sender: ");
+        long idOfSender = readLongFromUser("Invalid numeric value for id of the sender");
+        List<Long> idListOfReceivers = readListOfReceiverIdsFromUser();
+        System.out.print("Text of message: ");
+        String textOfMessage = readStringFromUser();
+        networkController.sendMessageFromUserTo(idOfSender,
+                idListOfReceivers,
+                textOfMessage,
+                LocalDateTime.now());
+    }
+
+    private List<Long> readListOfReceiverIdsFromUser() {
+        List<Long> listOfIdsOfReceivers = new ArrayList<>();
+        System.out.println("Enter id of receivers. Enter exit after you entered the desired receivers");
+        while(true){
+            System.out.println(">> ");
+            String userInput = readStringFromUser();
+            userInput = userInput.trim();
+            if(userInput.equals(Command.EXIT))
+                break;
+            try{
+                Long idOfReceiver = Long.parseLong(userInput);
+                listOfIdsOfReceivers.add(idOfReceiver);
+            } catch (NumberFormatException exception) {
+                throw new InvalidNumericalValueException("Invalid numerical value for receiver id");
+            }
+        }
+        return listOfIdsOfReceivers;
+    }
+
+    private void replyToMessageOfUser() {
+        System.out.print("Id of message: ");
+        Long idOfMessageRepliedTo = readLongFromUser("Invalid numerical value" +
+                "for id of message");
+
+        System.out.print("Id of sender: ");
+        Long idOfSender = readLongFromUser("Invalid numerical value for id " +
+                "of sender");
+
+        System.out.print("Text of message: ");
+        String text = readStringFromUser();
+        networkController.replyToMessage(idOfMessageRepliedTo,
+                idOfSender, text,
+                LocalDateTime.now());
+    }
+
+    private void seeConversationBetweenTwoUsers() {
+        System.out.print("Id of first user: ");
+        Long idOfFirstUser = readLongFromUser();
+
+        System.out.print("Id of second user: ");
+        Long idOfSecondUser = readLongFromUser();
+
+        List<Message> conversation = networkController.getConversationBetweenTwoUsers(idOfFirstUser,
+                idOfSecondUser);
+
+        String messageStringFormat = "Id: %d, Date: %s\n" + "%s %s: %s\n".indent(MENU_INDENTATION);
+        conversation.forEach( message -> {
+                System.out.printf(messageStringFormat,
+                        message.getId(),
+                        message.getDate().format(DATE_TIME_FORMATTER),
+                        message.getFrom().getFirstName(),
+                        message.getFrom().getLastName(),
+                        message.getText());
+            }
+        );
     }
 
     private void findFriendsForUserFromMonth() {
@@ -199,8 +277,7 @@ public class ConsoleApplicationInterface {
     private String readStringFromUser(){
         return inputReader
                 .nextLine()
-                .stripLeading()
-                .stripTrailing();
+                .trim();
     }
 
     private long readLongFromUser(){
