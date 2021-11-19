@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
  * Abstraction of a reply in a conversation between users in a network
  */
 public class ReplyMessage extends Message{
+    private MessageDto messageThatRepliesTo;
     private Long messagedRepliedToId;
 
     /**
@@ -18,6 +19,12 @@ public class ReplyMessage extends Message{
     public ReplyMessage(Long id, User from, String text, LocalDateTime date, Long messagedRepliedToId) {
         super(id, from, text, date);
         this.messagedRepliedToId = messagedRepliedToId;
+    }
+
+    public ReplyMessage(Long id, User sender, String text, LocalDateTime date, MessageDto messageThatRepliesTo){
+        super(id, sender, text, date);
+        this.messageThatRepliesTo = messageThatRepliesTo;
+        this.messagedRepliedToId = messageThatRepliesTo.getId();
     }
 
     /**
@@ -34,5 +41,9 @@ public class ReplyMessage extends Message{
      */
     public void setMessagedRepliedTo(Long messagedRepliedTo) {
         this.messagedRepliedToId = messagedRepliedToId;
+    }
+
+    public MessageDto getMessageThatRepliesTo() {
+        return messageThatRepliesTo;
     }
 }
