@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Bussines Layer for Message and ReplyMessage models
+ */
 public class ConversationService {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
     private RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository;
@@ -20,6 +23,14 @@ public class ConversationService {
 
     private static long idAvailable = 0;
 
+    /**
+     * Creates a new service that accesses the given repositories and validates the messages by the given validator's rules
+     * @param messageDtoRepository repository containing the messageDtos
+     * @param messageSenderReceiverDtoRepository repository containing the messageSenderReceiverDtos
+     * @param replyDtoRepository repository containing the replyDtos
+     * @param userRepository repository containing the users
+     * @param messageValidator validator for Message model
+     */
     public ConversationService(RepositoryInterface<Long, MessageDto> messageDtoRepository,
                                RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
                                RepositoryInterface<Long, ReplyDto> replyDtoRepository,
@@ -34,6 +45,9 @@ public class ConversationService {
         getIdAvailable();
     }
 
+    /**
+     * finds an id that can be used in the future for a new Message object
+     */
     private void getIdAvailable(){
         List<MessageDto> messageDtos = messageDtoRepository.getAll();
         if(messageDtos.isEmpty())
@@ -43,16 +57,29 @@ public class ConversationService {
 
     }
 
+    /**
+     * sets idAvailable to the next free value for a message id
+     */
     private void setIdAvailable(){
         idAvailable++;
     }
 
+    /**
+     * gets and available id for a new Message object
+     * @return identifier of a new message
+     */
     private Long createMessageId(){
         Long messageId = idAvailable;
         setIdAvailable();
         return messageId;
     }
 
+    /**
+     * creates a user based on whether it exists or not
+     * @param senderId identifier of a user
+     * @return the user with the  given id (if it exists)
+     *         a mockup user otherwise
+     */
     private User createSenderUserForMessage(Long senderId){
         Optional<User> existingSenderOptional = userRepository.findById(senderId);
         User sender;
@@ -63,6 +90,11 @@ public class ConversationService {
         return sender;
     }
 
+    /**
+     * creates a list of users based on a list of their ids
+     * @param receiverIds list of identifier of users
+     * @return the list of users
+     */
     private List<User> createReceiverUsersListForMessage(List<Long> receiverIds){
         List<User> receivers = new ArrayList<>();
         for(Long receiverId: receiverIds){
@@ -75,6 +107,13 @@ public class ConversationService {
         return receivers;
     }
 
+    /**
+     * Add a new message
+     * @param senderId identifier of sender
+     * @param receiverIds identifiers of receivers
+     * @param text content of the message
+     * @param date date when the message was sent
+     */
     public void sendMessageFromUserToService(Long senderId, List<Long> receiverIds, String text, LocalDateTime date){
         Long messageId = createMessageId();
         User sender = createSenderUserForMessage(senderId);
@@ -90,6 +129,15 @@ public class ConversationService {
         });
     }
 
+    /**
+     * Add a new reply
+     * @param messageRepliedToId identifier of the message that we reply to
+     * @param senderId identifier of the sender
+     * @param text content of the reply
+     * @param date date when the reply was sent
+     * @throws InvalidEntityException if there is no message with messageRepliedToId or
+     *                                if senderId is not part of the receivers of the message with messageRepliedToId
+     */
     public void replyToMessageService(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
         Optional<MessageDto> messageRepliedToDto = messageDtoRepository.findById(messageRepliedToId);
         if(messageRepliedToDto.isEmpty())
@@ -128,6 +176,12 @@ public class ConversationService {
         replyDtoRepository.save(new ReplyDto(replyId, messageRepliedToId));
     }
 
+    /**
+     * Get conversation between two users
+     * @param idOfFirstUser identifier of the first user that is part of the conversation
+     * @param idOfSecondUser identifier of the second user that is part of the conversation
+     * @return the conversation (list of messages) between the two users
+     */
     public List<Message> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
         List<Message> conversation = new ArrayList<>();
 
@@ -149,14 +203,23 @@ public class ConversationService {
         return conversation;
     }
 
+    /**
+     * @return all messageDto objects
+     */
     public List<MessageDto> getAllMessageDtoService(){
         return messageDtoRepository.getAll();
     }
 
+    /**
+     * @return all messageSenderReceiverDto objects
+     */
     public List<MessageSenderReceiverDto> getAllMessageSenderReceiverDtoService(){
         return messageSenderReceiverDtoRepository.getAll();
     }
 
+    /**
+     * @return all replyDto objects
+     */
     public List<ReplyDto> getAllReplyDtoService(){
         return replyDtoRepository.getAll();
     }
