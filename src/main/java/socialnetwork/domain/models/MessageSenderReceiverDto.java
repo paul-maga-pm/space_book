@@ -21,4 +21,9 @@ public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>
     public int hashCode() {
         return Objects.hash(super.hashCode());
     }
+
+    public boolean messageIsSentOrReceivedByUser(Long idOfUser) {
+        return getId().getSenderId().equals(idOfUser) ||
+                getId().getReceiverId().equals(idOfUser);
+    }
 }

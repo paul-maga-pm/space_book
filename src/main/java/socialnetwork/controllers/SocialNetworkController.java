@@ -43,12 +43,13 @@ public class SocialNetworkController {
     }
 
     /**
-     * Removes the user with the given id and his friendships with other users
+     * Removes the user with the given id and all dependencies related to the user
      * @param id identifier of user
      * @return Optional with the user that was removed, empty Optional if the user didn't exist
      */
     public Optional<User> removeUser(Long id){
         networkService.removeAllFriendshipsOfUserService(id);
+        conversationService.removeAllConversationsOfUser(id);
         return userService.removeUserService(id);
     }
 
