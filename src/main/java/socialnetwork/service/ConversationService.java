@@ -221,9 +221,7 @@ public class ConversationService {
                 message = new Message(messageId, sender, textOfMessage, date);
             conversation.add(message);
         });
-
-        conversation.stream().sorted((message1, message2) -> message1.getDate().compareTo(message2.getDate()));
-
+        conversation.sort(Comparator.comparing(Message::getDate));
         return conversation;
     }
 
