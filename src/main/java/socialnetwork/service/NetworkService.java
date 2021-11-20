@@ -10,10 +10,7 @@ import socialnetwork.utils.containers.UndirectedGraph;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Business layer for Friendship model
@@ -81,6 +78,48 @@ public class NetworkService {
     public Optional<Friendship> findFriendshipService(Long idOfFirstUser, Long idOfSecondUser){
         UnorderedPair<Long, Long> id = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
         return friendshipRepository.findById(id);
+    }
+
+    public void removeAllFriendshipsOfUserService(Long idOfUser){
+        List<Friendship> friendships = friendshipRepository.getAll();
+
+        friendships.forEach((friendship) -> {
+            if(friendship.hasUser(idOfUser))
+                friendshipRepository.remove(friendship.getId());
+        });
+    }
+
+    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserService(Long id){
+        Map<Optional<User>, LocalDateTime> friendsForUser = new HashMap<>();
+        List<Friendship> friendships = friendshipRepository.getAll();
+        friendships.stream().filter(friendship -> friendship.hasUser(id))
+                .forEach(friendship -> {
+                    Long idOfFriend;
+                    if(friendship.getId().first == id)
+                        idOfFriend = friendship.getId().second;
+                    else
+                        idOfFriend = friendship.getId().first;
+                    friendsForUser.put(userRepository.findById(idOfFriend), friendship.getDate());
+                });
+        return friendsForUser;
+    }
+
+    /**
+     * Finds all friends of the user that became friends in the given month
+     * @param idOfUser identifier of user we find the friends
+     * @param month month when the users became friends
+     * @return a Map with the key representing the friend of the user and the value the date when the users became
+     * friends
+     */
+    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
+        Map<Optional<User>, LocalDateTime> friendsOfUserMap = findAllFriendsForUserService(idOfUser);
+        int year = LocalDateTime.now().getYear();
+        Map<Optional<User>, LocalDateTime> friendsOfUserFromMonthMap = new HashMap<>();
+        friendsOfUserMap.forEach((user, date) -> {
+            if(date.getYear() == year && date.getMonth().getValue() == month)
+                friendsOfUserFromMonthMap.put(user, date);
+        });
+        return friendsOfUserFromMonthMap;
     }
 
     /**
