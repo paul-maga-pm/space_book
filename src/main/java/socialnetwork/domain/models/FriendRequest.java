@@ -8,7 +8,8 @@ import java.util.Objects;
  * Abstraction of a friend request sent from one user to another user in the network
  */
 public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
-    private String status;
+    private Status status;
+
 
     /**
      * Constructor that creates a new friend request between the users with the given id
@@ -16,7 +17,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
      * @param idOfSecondUser identifier of the second user
      * @param status current status of the friend request (pending, approved, rejected)
      */
-    public FriendRequest(Long idOfFirstUser, Long idOfSecondUser, String status) {
+    public FriendRequest(Long idOfFirstUser, Long idOfSecondUser, Status status) {
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
         this.status = status;
     }
@@ -25,7 +26,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
      * Getter method for status
      * @return current status of the friend request
      */
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -33,7 +34,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
      * Setter method for status
      * @param status new value for the status of this friend request
      */
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -65,6 +66,6 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     public String toString() {
         return "Id of first user: " + getId().first +
                 ", Id of second user: " + getId().second +
-                ", Status: " + status;
+                ", Status: " + status.toString();
     }
 }

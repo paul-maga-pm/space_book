@@ -1,6 +1,7 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.models.FriendRequest;
+import socialnetwork.domain.models.StatusSupplier;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.Connection;
@@ -32,7 +33,8 @@ public class FriendRequestDatabaseRepository extends
             Long idOfFirstUser = resultSet.getLong("id_first_user");
             Long idOfSecondUser = resultSet.getLong("id_second_user");
             String status = resultSet.getString("status");
-            return new FriendRequest(idOfFirstUser, idOfSecondUser, status);
+
+            return new FriendRequest(idOfFirstUser, idOfSecondUser, StatusSupplier.getStatus(status));
         } catch (SQLException exception){
             throw new SQLException(exception);
         }
@@ -52,7 +54,7 @@ public class FriendRequestDatabaseRepository extends
             insertStatement = connection.prepareStatement(insertStringStatement);
             insertStatement.setLong(1, friendRequest.getId().first);
             insertStatement.setLong(2, friendRequest.getId().second);
-            insertStatement.setString(3, friendRequest.getStatus());
+            insertStatement.setString(3, friendRequest.getStatus().name());
             return insertStatement;
         } catch (SQLException exception){
             closePreparedStatement(insertStatement);
@@ -135,7 +137,7 @@ public class FriendRequestDatabaseRepository extends
         PreparedStatement updateFriendRequestStatement = null;
         try{
             updateFriendRequestStatement = connection.prepareStatement(updateFriendRequestStringStatement);
-            updateFriendRequestStatement.setString(1, newFriendRequest.getStatus());
+            updateFriendRequestStatement.setString(1, newFriendRequest.getStatus().name());
             updateFriendRequestStatement.setLong(2, newFriendRequest.getId().first);
             updateFriendRequestStatement.setLong(3, newFriendRequest.getId().second);
             updateFriendRequestStatement.setLong(4, newFriendRequest.getId().second);
