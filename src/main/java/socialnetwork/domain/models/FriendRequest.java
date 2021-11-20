@@ -14,7 +14,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
      * Constructor that creates a new friend request between the users with the given id
      * @param idOfFirstUser identifier of the first user
      * @param idOfSecondUser identifier of the second user
-     * @param status current status of the friend request (pending, approved, denied)
+     * @param status current status of the friend request (pending, approved, rejected)
      */
     public FriendRequest(Long idOfFirstUser, Long idOfSecondUser, String status) {
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
