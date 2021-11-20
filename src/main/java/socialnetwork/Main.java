@@ -2,7 +2,7 @@ package socialnetwork;
 
 
 import socialnetwork.config.ApplicationContext;
-import socialnetwork.controllers.NetworkController;
+import socialnetwork.controllers.SocialNetworkController;
 import socialnetwork.domain.models.*;
 import socialnetwork.domain.validators.*;
 import socialnetwork.exceptions.CorruptedDataException;
@@ -16,7 +16,6 @@ import socialnetwork.service.UserService;
 import socialnetwork.ui.ConsoleApplicationInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
-import java.io.PipedReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -96,8 +95,8 @@ public class Main {
         UserService userService = new UserService(userRepository, userValidator);
         NetworkService networkService = new NetworkService(friendshipRepository, userRepository, friendshipValidator);
         ConversationService conversationService = new ConversationService(messageDtoRepository, messageSenderReceiverDtoRepository, replyDtoRepository, userRepository, messageValidator);
-        NetworkController networkController = new NetworkController(userService, networkService, conversationService);
-        ConsoleApplicationInterface ui = new ConsoleApplicationInterface(networkController);
+        SocialNetworkController socialNetworkController = new SocialNetworkController(userService, networkService, conversationService);
+        ConsoleApplicationInterface ui = new ConsoleApplicationInterface(socialNetworkController);
         ui.run();
     }
 }
