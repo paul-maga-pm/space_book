@@ -16,6 +16,7 @@ import socialnetwork.service.UserService;
 import socialnetwork.ui.ConsoleApplicationInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.io.PipedReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -30,9 +31,16 @@ public class Main {
                 ApplicationContext.getProperty("socialnetwork.csv.friendships")
         );
 
-        try(Connection connection = DriverManager.getConnection(url, user, password)){
+        try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement deleteFriendshipsStatement = connection.prepareStatement("DELETE FROM friendships");
             PreparedStatement deleteUsersStatement = connection.prepareStatement("DELETE  FROM users");
+            PreparedStatement deleteMessages = connection.prepareStatement("DELETE FROM messages");
+            PreparedStatement deleteSenderReceivers = connection.prepareStatement("DELETE FROM messages_sender_receiver");
+            PreparedStatement deleteReplies = connection.prepareStatement("DELETE FROM replies");
+            ){
+            deleteReplies.executeUpdate();
+            deleteSenderReceivers.executeUpdate();
+            deleteMessages.executeUpdate();
             deleteFriendshipsStatement.executeUpdate();
             deleteUsersStatement.executeUpdate();
         } catch (SQLException exception) {
@@ -55,6 +63,8 @@ public class Main {
         String url = ApplicationContext.getProperty("socialnetwork.database.url");
         String user = ApplicationContext.getProperty("socialnetwork.database.user");
         String password = ApplicationContext.getProperty("socialnetwork.database.password");
+        loadToDatabase(url, user, password);
+
         RepositoryInterface<Long, User> userRepository = new UserDatabaseRepository(url, user,password);
         EntityValidatorInterface<Long, User> userValidator = new UserValidator();
 
