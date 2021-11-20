@@ -8,7 +8,6 @@ import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 import socialnetwork.utils.containers.UnorderedPair;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -25,16 +24,9 @@ public class UserService {
     private RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository;
     private EntityValidatorInterface<Long, User> userValidator;
 
-    /**
-     * Creates a new service that accesses the given repositories and validates the users by the given validator's rules
-     * @param userRepository repository containing the users
-     * @param friendshipRepository repository containing the friendships
-     * @param userValidator validator for User model
-     */
     public UserService(RepositoryInterface<Long, User> userRepository,
-                       RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository, EntityValidatorInterface<Long, User> userValidator){
+                       EntityValidatorInterface<Long, User> userValidator){
         this.userRepository = userRepository;
-        this.friendshipRepository = friendshipRepository;
         this.userValidator = userValidator;
     }
 
@@ -52,21 +44,11 @@ public class UserService {
     }
 
     /**
-     * Removes the user with the given id and his friendships with other users
+     * Removes the user with the given id
      * @param id identifier of user
      * @return Optional with the user that was removed, empty Optional if the user didn't exist
      */
     public Optional<User> removeUserService(Long id){
-        if(userRepository.findById(id).isEmpty())
-            return Optional.empty();
-
-        List<Friendship> friendships = friendshipRepository.getAll();
-
-        friendships.forEach((friendship) -> {
-            if(friendship.hasUser(id))
-                friendshipRepository.remove(friendship.getId());
-        });
-
         return userRepository.remove(id);
     }
 
@@ -90,43 +72,5 @@ public class UserService {
         User newValue = new User(id, newFirstName, newLastName);
         userValidator.validate(newValue);
         return userRepository.update(newValue);
-    }
-
-    /**
-     *  Finds all the friends for a given user
-     * @param id identifier of the user we want to find the friends for
-     * @return map containing the friends of the given user (as keys) and the date since when they have been friends (as values)
-     */
-    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserService(Long id){
-        Map<Optional<User>, LocalDateTime> friendsForUser = new HashMap<>();
-        List<Friendship> friendships = friendshipRepository.getAll();
-        friendships.stream().filter(friendship -> friendship.hasUser(id))
-                .forEach(friendship -> {
-                    Long idOfFriend;
-                    if(friendship.getId().first == id)
-                        idOfFriend = friendship.getId().second;
-                    else
-                        idOfFriend = friendship.getId().first;
-                    friendsForUser.put(userRepository.findById(idOfFriend), friendship.getDate());
-                });
-        return friendsForUser;
-    }
-
-    /**
-     * Finds all friends of the user that became friends in the given month
-     * @param idOfUser identifier of user we find the friends
-     * @param month month when the users became friends
-     * @return a Map with the key representing the friend of the user and the value the date when the users became
-     * friends
-     */
-    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
-        Map<Optional<User>, LocalDateTime> friendsOfUserMap = findAllFriendsForUserService(idOfUser);
-        int year = LocalDateTime.now().getYear();
-        Map<Optional<User>, LocalDateTime> friendsOfUserFromMonthMap = new HashMap<>();
-        friendsOfUserMap.forEach((user, date) -> {
-            if(date.getYear() == year && date.getMonth().getValue() == month)
-                friendsOfUserFromMonthMap.put(user, date);
-        });
-        return friendsOfUserFromMonthMap;
     }
 }
