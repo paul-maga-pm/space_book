@@ -330,6 +330,13 @@ public class ConsoleApplicationInterface {
     private void removeUser() {
         System.out.print("Id: ");
         long id = readLongFromUser("Invalid value for id");
+
+        System.out.print("All related data to the user will be remove. Are you sure you want to continue? (Y/N)");
+        String userChoice = readStringFromUser();
+
+        if(userChoice.compareTo("N") == 0)
+            return;
+
         Optional<User> removedUserOptional = socialNetworkController.removeUser(id);
 
         if(removedUserOptional.isPresent()){
