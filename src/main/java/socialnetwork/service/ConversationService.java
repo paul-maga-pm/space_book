@@ -245,4 +245,28 @@ public class ConversationService {
     public List<ReplyDto> getAllReplyDtoService(){
         return replyDtoRepository.getAll();
     }
+
+    public void removeAllConversationsOfUser(Long idOfUser) {
+        for(MessageSenderReceiverDto messageSenderReceiverDto : messageSenderReceiverDtoRepository.getAll()){
+            boolean messageWasSentOrReceivedByTheUser = messageSenderReceiverDto.messageIsSentOrReceivedByUser(idOfUser);
+            if(messageWasSentOrReceivedByTheUser)
+                removeMessageAndAllRepliesRelatedToMessage(messageSenderReceiverDto);
+        }
+    }
+
+    private void removeMessageAndAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
+        removeAllRepliesRelatedToMessage(messageSenderReceiverDto);
+        messageSenderReceiverDtoRepository.remove(messageSenderReceiverDto.getId());
+        messageDtoRepository.remove(messageSenderReceiverDto.getId().getMessageId());
+    }
+
+    private void removeAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
+        for(ReplyDto replyDto : replyDtoRepository.getAll()){
+            Long idOfMessage = messageSenderReceiverDto.getId().getMessageId();
+            boolean messageWasAReplyOrWasRepliedTo =
+                    replyDto.messageIsAReplyOrIsRepliedTo(idOfMessage);
+            if(messageWasAReplyOrWasRepliedTo)
+                replyDtoRepository.remove(replyDto.getId());
+        }
+    }
 }
