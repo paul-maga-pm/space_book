@@ -2,10 +2,9 @@ package socialnetwork.ui;
 
 
 
-import socialnetwork.controllers.NetworkController;
+import socialnetwork.controllers.SocialNetworkController;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.Message;
-import socialnetwork.domain.models.ReplyMessage;
 import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.exceptions.InvalidNumericalValueException;
@@ -39,7 +38,7 @@ class Command{
 
 public class ConsoleApplicationInterface {
 
-    private NetworkController networkController;
+    private SocialNetworkController socialNetworkController;
 
     private Scanner inputReader = new Scanner(System.in);
     private Map<String, Runnable> commandMap = new HashMap<>();
@@ -47,8 +46,8 @@ public class ConsoleApplicationInterface {
     private static final int MENU_INDENTATION = 5;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh-mm-ss");
 
-    public ConsoleApplicationInterface(NetworkController networkController){
-        this.networkController = networkController;
+    public ConsoleApplicationInterface(SocialNetworkController socialNetworkController){
+        this.socialNetworkController = socialNetworkController;
         initializeCommandMap();
     }
 
@@ -122,7 +121,7 @@ public class ConsoleApplicationInterface {
         List<Long> idListOfReceivers = readListOfReceiverIdsFromUser();
         System.out.print("Text of message: ");
         String textOfMessage = readStringFromUser();
-        networkController.sendMessageFromUserTo(idOfSender,
+        socialNetworkController.sendMessageFromUserTo(idOfSender,
                 idListOfReceivers,
                 textOfMessage,
                 LocalDateTime.now());
@@ -161,7 +160,7 @@ public class ConsoleApplicationInterface {
 
         System.out.print("Text of message: ");
         String text = readStringFromUser();
-        networkController.replyToMessage(idOfMessageRepliedTo,
+        socialNetworkController.replyToMessage(idOfMessageRepliedTo,
                 idOfSender, text,
                 LocalDateTime.now());
     }
@@ -173,7 +172,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Id of second user: ");
         Long idOfSecondUser = readLongFromUser();
 
-        List<Message> conversation = networkController.getConversationBetweenTwoUsers(idOfFirstUser,
+        List<Message> conversation = socialNetworkController.getConversationBetweenTwoUsers(idOfFirstUser,
                 idOfSecondUser);
 
         for(Message message : conversation){
@@ -188,7 +187,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Month: ");
         int month = readIntFromUser("Invalid numerical value for month");
 
-        var friendsOfUserFromMonth = networkController.findAllFriendsForUserFromMonth(idOfUser, month);
+        var friendsOfUserFromMonth = socialNetworkController.findAllFriendsForUserFromMonth(idOfUser, month);
 
         if(friendsOfUserFromMonth.isEmpty())
             System.out.println("User doesn't have friends from the given month");
@@ -205,7 +204,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Id: ");
         Long id = readLongFromUser("Invalid value for the id");
 
-        Map<Optional<User>, LocalDateTime> friendsForUser = networkController.findAllFriendsForUser(id);
+        Map<Optional<User>, LocalDateTime> friendsForUser = socialNetworkController.findAllFriendsForUser(id);
         if(friendsForUser.isEmpty())
             System.out.println("User doesn't have friends");
         else
@@ -221,7 +220,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Id of second user: ");
         Long idOfSecondUser = readLongFromUser("Invalid value for the id of the second user");
 
-        Optional<Friendship> existingFriendshipOptional = networkController.findFriendship(idOfFirstUser, idOfSecondUser);
+        Optional<Friendship> existingFriendshipOptional = socialNetworkController.findFriendship(idOfFirstUser, idOfSecondUser);
         if(existingFriendshipOptional.isEmpty())
             System.out.printf("Users with id %d and %d are not friends\n", idOfFirstUser, idOfSecondUser);
         else
@@ -236,7 +235,7 @@ public class ConsoleApplicationInterface {
         System.out.print("New last name: ");
         String newLastName = readStringFromUser();
 
-        Optional<User> oldUserOptional = networkController.updateUser(id, newFirstName, newLastName);
+        Optional<User> oldUserOptional = socialNetworkController.updateUser(id, newFirstName, newLastName);
 
         if(oldUserOptional.isEmpty())
             System.out.println("User doesn't exist");
@@ -247,7 +246,7 @@ public class ConsoleApplicationInterface {
     private void findUser() {
         System.out.print("Id: ");
         Long id = readLongFromUser("Invalid value for id");
-        Optional<User> existingUserOptional = networkController.findUserById(id);
+        Optional<User> existingUserOptional = socialNetworkController.findUserById(id);
 
         if(existingUserOptional.isEmpty())
             System.out.printf("User with id %d doesn't exist\n", id);
@@ -256,13 +255,13 @@ public class ConsoleApplicationInterface {
     }
 
     private void findMostSocialCommunity() {
-        List<User> usersOfMostSocialCommunity = networkController.getMostSocialCommunity();
+        List<User> usersOfMostSocialCommunity = socialNetworkController.getMostSocialCommunity();
         System.out.println("Most social community is:");
         usersOfMostSocialCommunity.forEach(System.out::println);
     }
 
     private void countCommunities() {
-        int numberOfCommunities = networkController.getNumberOfCommunitiesInNetwork();
+        int numberOfCommunities = socialNetworkController.getNumberOfCommunitiesInNetwork();
 
         if(numberOfCommunities > 1)
             System.out.printf("%d communities are in the network\n", numberOfCommunities);
@@ -318,7 +317,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Last name: ");
         String lastName = readStringFromUser();
 
-        Optional<User> existingUserOptional = networkController.addUser(id, firstName, lastName);
+        Optional<User> existingUserOptional = socialNetworkController.addUser(id, firstName, lastName);
 
         if(existingUserOptional.isPresent()){
             User existingUser = existingUserOptional.get();
@@ -331,7 +330,7 @@ public class ConsoleApplicationInterface {
     private void removeUser() {
         System.out.print("Id: ");
         long id = readLongFromUser("Invalid value for id");
-        Optional<User> removedUserOptional = networkController.removeUser(id);
+        Optional<User> removedUserOptional = socialNetworkController.removeUser(id);
 
         if(removedUserOptional.isPresent()){
             User removedUser = removedUserOptional.get();
@@ -342,7 +341,7 @@ public class ConsoleApplicationInterface {
     }
 
     private void getAllUsersWithTheirFriends(){
-        List<User> allUserList = networkController.getAllUsersAndTheirFriends();
+        List<User> allUserList = socialNetworkController.getAllUsersAndTheirFriends();
         Consumer<User> userPrinterConsumer = user ->{
             System.out.println(user.toString());
         };
@@ -365,7 +364,7 @@ public class ConsoleApplicationInterface {
         System.out.print("Id of second user: ");
         long idOfSecondUser = readLongFromUser("Invalid value for id of the second user");
         LocalDateTime date = LocalDateTime.now();
-        Optional<Friendship> existingFriendShipOptional = networkController.addFriendship(idOfFirstUser, idOfSecondUser, date);
+        Optional<Friendship> existingFriendShipOptional = socialNetworkController.addFriendship(idOfFirstUser, idOfSecondUser, date);
         if(existingFriendShipOptional.isPresent())
             System.out.printf("Friendship between %d and %d already exists\n", idOfFirstUser, idOfSecondUser);
         else
@@ -377,7 +376,7 @@ public class ConsoleApplicationInterface {
         long idOfFirstUser = readLongFromUser("Invalid value for id of the first user");
         System.out.print("Id of second user: ");
         long idOfSecondUser = readLongFromUser("Invalid value for id of the second user");
-        Optional<Friendship> existingFriendShipOptional = networkController.removeFriendship(idOfFirstUser, idOfSecondUser);
+        Optional<Friendship> existingFriendShipOptional = socialNetworkController.removeFriendship(idOfFirstUser, idOfSecondUser);
         if(existingFriendShipOptional.isPresent())
             System.out.printf("Friendship between %d and %d has been removed\n", idOfFirstUser, idOfSecondUser);
         else

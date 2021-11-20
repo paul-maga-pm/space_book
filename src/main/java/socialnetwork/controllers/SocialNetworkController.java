@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * Controller between ui and business layer
  */
-public class NetworkController {
+public class SocialNetworkController {
     private UserService userService;
     private NetworkService networkService;
     private ConversationService conversationService;
@@ -25,7 +25,7 @@ public class NetworkController {
      * @param userService service for User model
      * @param networkService service for Friendship model
      */
-    public NetworkController(UserService userService, NetworkService networkService, ConversationService conversationService) {
+    public SocialNetworkController(UserService userService, NetworkService networkService, ConversationService conversationService) {
         this.userService = userService;
         this.networkService = networkService;
         this.conversationService = conversationService;
