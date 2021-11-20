@@ -135,6 +135,9 @@ public class ConsoleApplicationInterface {
             System.out.print(">> ");
             String userInput = readStringFromUser();
             userInput = userInput.trim();
+
+            if(userInput.length() == 0)
+                continue;
             if(userInput.equals(Command.EXIT))
                 break;
             try{
@@ -174,14 +177,7 @@ public class ConsoleApplicationInterface {
                 idOfSecondUser);
 
         for(Message message : conversation){
-            if(message instanceof ReplyMessage){
-                ReplyMessage reply = (ReplyMessage)message;
-                System.out.printf("Reply to %s\n%s\n",
-                        reply.getMessageThatRepliesTo().toString(),
-                        reply);
-            }
-            else
-                System.out.println(message);
+            System.out.println(message);
             System.out.println();
         }
     }

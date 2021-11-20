@@ -189,6 +189,14 @@ public class ConversationService {
                             (messageSenderReceiverDto.getId().getSenderId() == idOfSecondUser && messageSenderReceiverDto.getId().getReceiverId() == idOfFirstUser);
                 }).collect(Collectors.toList());
 
+        Map<Long, User> mapBetweenMessageDtoIdAndSender = new HashMap<>();
+
+        for(var msg : messageSenderReceiverDtoRepository.getAll()) {
+            Long senderId = msg.getId().getSenderId();
+            User sender = userRepository.findById(senderId).get();
+            mapBetweenMessageDtoIdAndSender.put(msg.getId().getMessageId(),
+                    sender);
+        }
 
         messagesAndRepliesBetweenTheUsers.forEach(msg -> {
             Message message;
@@ -201,7 +209,12 @@ public class ConversationService {
             User sender = userRepository.findById(senderId).get();
             if(optionalOfReply.isPresent()) {
                 Long idOfMessageThatIsRepliedTo = optionalOfReply.get().getIdOfMessageThatIsRepliedTo();
-                MessageDto messageThatRepliesTo = messageDtoRepository.findById(idOfMessageThatIsRepliedTo).get();
+                MessageDto messageDtoThatRepliesTo = messageDtoRepository.findById(idOfMessageThatIsRepliedTo).get();
+                User receiverOfReply = mapBetweenMessageDtoIdAndSender.get(idOfMessageThatIsRepliedTo);
+                Message messageThatRepliesTo = new Message(idOfMessageThatIsRepliedTo,
+                        receiverOfReply,
+                        messageDtoThatRepliesTo.getText(),
+                        messageDtoThatRepliesTo.getDate());
                 message = new ReplyMessage(messageId, sender, textOfMessage, date, messageThatRepliesTo);
             }
             else
