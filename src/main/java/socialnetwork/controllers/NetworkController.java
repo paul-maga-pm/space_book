@@ -48,6 +48,7 @@ public class NetworkController {
      * @return Optional with the user that was removed, empty Optional if the user didn't exist
      */
     public Optional<User> removeUser(Long id){
+        networkService.removeAllFriendshipsOfUserService(id);
         return userService.removeUserService(id);
     }
 
@@ -126,11 +127,11 @@ public class NetworkController {
      * @return map containing the friends of the given user (as keys) and the date since when they have been friends (as values)
      */
     public Map<Optional<User>, LocalDateTime> findAllFriendsForUser(Long id){
-        return userService.findAllFriendsForUserService(id);
+        return networkService.findAllFriendsForUserService(id);
     }
 
     public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonth(Long idOfUser, int month){
-        return userService.findAllFriendsForUserFromMonthService(idOfUser, month);
+        return networkService.findAllFriendsForUserFromMonthService(idOfUser, month);
     }
 
     /**

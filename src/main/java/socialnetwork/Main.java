@@ -93,7 +93,7 @@ public class Main {
         RepositoryInterface<Long, ReplyDto> replyDtoRepository = new ReplyDtoDatabaseRepository(url, user, password);
         EntityValidatorInterface<Long, Message> messageValidator = new MessageValidator(userRepository);
 
-        UserService userService = new UserService(userRepository, friendshipRepository, userValidator);
+        UserService userService = new UserService(userRepository, userValidator);
         NetworkService networkService = new NetworkService(friendshipRepository, userRepository, friendshipValidator);
         ConversationService conversationService = new ConversationService(messageDtoRepository, messageSenderReceiverDtoRepository, replyDtoRepository, userRepository, messageValidator);
         NetworkController networkController = new NetworkController(userService, networkService, conversationService);
