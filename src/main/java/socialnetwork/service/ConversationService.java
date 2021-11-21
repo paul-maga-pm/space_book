@@ -38,19 +38,6 @@ public class ConversationService {
                                RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
                                RepositoryInterface<Long, ReplyDto> replyDtoRepository,
                                RepositoryInterface<Long, User> userRepository,
-                               EntityValidatorInterface<Long, MessageReadModel> messageValidator) {
-        this.messageDtoRepository = messageDtoRepository;
-        this.messageSenderReceiverDtoRepository = messageSenderReceiverDtoRepository;
-        this.replyDtoRepository = replyDtoRepository;
-        this.userRepository = userRepository;
-        this.messageValidator = messageValidator;
-
-    }
-
-    public ConversationService(RepositoryInterface<Long, MessageDto> messageDtoRepository,
-                               RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
-                               RepositoryInterface<Long, ReplyDto> replyDtoRepository,
-                               RepositoryInterface<Long, User> userRepository,
                                EntityValidatorInterface<Long, MessageReadModel> messageValidator,
                                ConversationServiceBoundary boundary) {
         this.messageDtoRepository = messageDtoRepository;

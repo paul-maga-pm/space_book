@@ -5,11 +5,8 @@ import socialnetwork.domain.validators.MessageWriteModelValidator;
 import socialnetwork.domain.validators.ReplyMessageWriteModelValidator;
 import socialnetwork.repository.RepositoryInterface;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ConversationServiceBoundary {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
@@ -40,12 +37,19 @@ public class ConversationServiceBoundary {
         messageWriteModelValidator.validate(message);
         Long idOfMessage = createMessageWriteModelId();
         messageDtoRepository.save(new MessageDto(idOfMessage, message.getText(), message.getDate()));
-        for (Long idOfReceiver : message.getIdListOfReceivers()){
-            MessageSenderReceiverDto dto = new MessageSenderReceiverDto(idOfMessage,
-                    message.getIdOfSender(),
-                    idOfReceiver);
-            messageSenderReceiverRepository.save(dto);
-        }
+        saveMessageSenderReceiverDtoOfListOfReceiversOf(message, idOfMessage);
+    }
+
+    private void saveMessageSenderReceiverDtoOfListOfReceiversOf(MessageWriteModel message, Long idOfMessage) {
+        for (Long idOfReceiver : message.getIdListOfReceivers())
+            saveMessageSenderReceiverDtoBetween(message.getIdOfSender(), idOfMessage, idOfReceiver);
+    }
+
+    private void saveMessageSenderReceiverDtoBetween(Long idOfSender, Long idOfMessage, Long idOfReceiver) {
+        MessageSenderReceiverDto dto = new MessageSenderReceiverDto(idOfMessage,
+                idOfSender,
+                idOfReceiver);
+        messageSenderReceiverRepository.save(dto);
     }
 
     public void sendReplyMessage(ReplyMessageWriteModel replyMessage){
@@ -53,6 +57,8 @@ public class ConversationServiceBoundary {
         replyMessage.setIdListOfReceivers(receiversIdList);
         replyMessageWriteModelValidator.validate(replyMessage);
         sendMessage(replyMessage);
+        ReplyDto dto = new ReplyDto(idAvailable - 1, replyMessage.getIdOfMessageThatRepliesTo());
+        replyDtoRepository.save(dto);
     }
 
     public void removeAllConversationsOfUser(Long idOfUser) {
@@ -71,12 +77,17 @@ public class ConversationServiceBoundary {
 
     private void removeAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
         for(ReplyDto replyDto : replyDtoRepository.getAll()){
-            Long idOfMessage = messageSenderReceiverDto.getId().getMessageId();
-            boolean messageWasAReplyOrWasRepliedTo =
-                    replyDto.messageIsAReplyOrIsRepliedTo(idOfMessage);
-            if(messageWasAReplyOrWasRepliedTo)
-                replyDtoRepository.remove(replyDto.getId());
+            removeReplyIfMessageSenderReceiverIsRelated(messageSenderReceiverDto, replyDto);
         }
+    }
+
+    private void removeReplyIfMessageSenderReceiverIsRelated
+            (MessageSenderReceiverDto messageSenderReceiverDto, ReplyDto replyDto) {
+        Long idOfMessage = messageSenderReceiverDto.getId().getMessageId();
+        boolean messageWasAReplyOrWasRepliedTo =
+                replyDto.messageIsAReplyOrIsRepliedTo(idOfMessage);
+        if(messageWasAReplyOrWasRepliedTo)
+            replyDtoRepository.remove(replyDto.getId());
     }
 
     private List<Long> getIdOfUsersThatWillReceiveTheReply(ReplyMessageWriteModel replyMessage) {
