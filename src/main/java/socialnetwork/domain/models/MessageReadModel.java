@@ -8,22 +8,22 @@ import java.util.Objects;
 /**
  * Abstraction of a message in a conversation between users in a network
  */
-public class Message extends Entity<Long>{
-    private User from;
-    private List<User> to = new ArrayList<>();
+public class MessageReadModel extends Entity<Long>{
+    private User sender;
+    private List<User> listOfReceivers = new ArrayList<>();
     private String text;
     private LocalDateTime date;
 
     /**
      * Constructor that creates a new message with the given id, from, to, text and date
      * @param id identifier of the message
-     * @param from sender of the message
+     * @param sender sender of the message
      * @param text text of the message
      * @param date date of the message
      */
-    public Message(Long id, User from, String text, LocalDateTime date){
+    public MessageReadModel(Long id, User sender, String text, LocalDateTime date){
         super(id);
-        this.from = from;
+        this.sender = sender;
         this.text = text;
         this.date = date;
     }
@@ -32,32 +32,32 @@ public class Message extends Entity<Long>{
      * Getter method for from
      * @return sender of the message
      */
-    public User getFrom() {
-        return from;
+    public User getSender() {
+        return sender;
     }
 
     /**
      * Setter method for from
-     * @param from new value for the sender of this message
+     * @param sender new value for the sender of this message
      */
-    public void setFrom(User from) {
-        this.from = from;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
     /**
      * Getter method for to
      * @return list of receivers of this message
      */
-    public List<User> getTo() {
-        return to;
+    public List<User> getReceivers() {
+        return listOfReceivers;
     }
 
     /**
      * Setter method for to
-     * @param to new value for the list of receivers of this message
+     * @param listOfReceivers new value for the list of receivers of this message
      */
-    public void setTo(List<User> to) {
-        this.to = to;
+    public void setListOfReceivers(List<User> listOfReceivers) {
+        this.listOfReceivers = listOfReceivers;
     }
 
     /**
@@ -98,29 +98,29 @@ public class Message extends Entity<Long>{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Message message)) return false;
+        if (!(o instanceof MessageReadModel message)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(from, message.getFrom()) &&
-                Objects.equals(to, message.getTo()) &&
+        return Objects.equals(sender, message.getSender()) &&
+                Objects.equals(listOfReceivers, message.getReceivers()) &&
                 Objects.equals(text, message.getText()) &&
                 Objects.equals(date, message.getDate());
     }
 
     /**
-     * Returns hashCode of this Message
+     * Returns hashCode of this MessageReadModel
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), from, to, text, date);
+        return Objects.hash(super.hashCode(), sender, listOfReceivers, text, date);
     }
 
     /**
-     * Parses this Message into String format
+     * Parses this MessageReadModel into String format
      * @return String
      */
     @Override
     public String toString() {
-        return super.toString() + "\nFrom: " + from.toString() +
+        return super.toString() + "\nFrom: " + sender.toString() +
                 "\nText: " + text + "\nDate: " + date;
     }
 
