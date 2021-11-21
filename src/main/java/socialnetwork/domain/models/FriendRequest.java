@@ -39,6 +39,15 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     }
 
     /**
+     *
+     * @param idOfUser
+     * @return
+     */
+    public boolean hasUser(Long idOfUser){
+        return getId().first.equals(idOfUser) || getId().second.equals(idOfUser);
+    }
+
+    /**
      * Checks if this FriendRequest and o are equal by value
      */
     @Override
