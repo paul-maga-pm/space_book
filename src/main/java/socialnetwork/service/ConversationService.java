@@ -1,7 +1,10 @@
 package socialnetwork.service;
 
+import socialnetwork.boundary.ConversationServiceBoundary;
 import socialnetwork.domain.models.*;
 import socialnetwork.domain.validators.EntityValidatorInterface;
+import socialnetwork.domain.validators.MessageValidator;
+import socialnetwork.domain.validators.MessageWriteModelValidator;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 
@@ -10,16 +13,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Bussines Layer for Message and ReplyMessage models
+ * Business Layer for MessageReadModel and ReplyMessageReadModel models
  */
 public class ConversationService {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
     private RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository;
     private RepositoryInterface<Long, ReplyDto> replyDtoRepository;
     private RepositoryInterface<Long, User> userRepository;
-    private EntityValidatorInterface<Long, Message> messageValidator;
+    private EntityValidatorInterface<Long, MessageReadModel> messageValidator;
 
     private static long idAvailable = 0;
+    private MessageWriteModelValidator messageWriteModelValidator;
+    private ConversationServiceBoundary conversationServiceBoundary;
 
     /**
      * Creates a new service that accesses the given repositories and validates the messages by the given validator's rules
@@ -27,82 +32,34 @@ public class ConversationService {
      * @param messageSenderReceiverDtoRepository repository containing the messageSenderReceiverDtos
      * @param replyDtoRepository repository containing the replyDtos
      * @param userRepository repository containing the users
-     * @param messageValidator validator for Message model
+     * @param messageValidator validator for MessageReadModel model
      */
     public ConversationService(RepositoryInterface<Long, MessageDto> messageDtoRepository,
                                RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
                                RepositoryInterface<Long, ReplyDto> replyDtoRepository,
                                RepositoryInterface<Long, User> userRepository,
-                               EntityValidatorInterface<Long, Message> messageValidator) {
+                               EntityValidatorInterface<Long, MessageReadModel> messageValidator) {
         this.messageDtoRepository = messageDtoRepository;
         this.messageSenderReceiverDtoRepository = messageSenderReceiverDtoRepository;
         this.replyDtoRepository = replyDtoRepository;
         this.userRepository = userRepository;
         this.messageValidator = messageValidator;
 
-        getIdAvailable();
     }
 
-    /**
-     * finds an id that can be used in the future for a new Message object
-     */
-    private void getIdAvailable(){
-        List<MessageDto> messageDtos = messageDtoRepository.getAll();
-        if(messageDtos.isEmpty())
-            idAvailable = 1;
-        else
-            idAvailable = messageDtoRepository.getAll().stream().map(messageDto -> messageDto.getId()).max(Long::compare).get() + 1;
-
-    }
-
-    /**
-     * sets idAvailable to the next free value for a message id
-     */
-    private void setIdAvailable(){
-        idAvailable++;
-    }
-
-    /**
-     * gets and available id for a new Message object
-     * @return identifier of a new message
-     */
-    private Long createMessageId(){
-        Long messageId = idAvailable;
-        setIdAvailable();
-        return messageId;
-    }
-
-    /**
-     * creates a user based on whether it exists or not
-     * @param senderId identifier of a user
-     * @return the user with the  given id (if it exists)
-     *         a mockup user otherwise
-     */
-    private User createSenderUserForMessage(Long senderId){
-        Optional<User> existingSenderOptional = userRepository.findById(senderId);
-        User sender;
-        if(existingSenderOptional.isPresent())
-            sender = existingSenderOptional.get();
-        else
-            sender = new User(-1L, "","");
-        return sender;
-    }
-
-    /**
-     * creates a list of users based on a list of their ids
-     * @param receiverIds list of identifier of users
-     * @return the list of users
-     */
-    private List<User> createReceiverUsersListForMessage(List<Long> receiverIds){
-        List<User> receivers = new ArrayList<>();
-        for(Long receiverId: receiverIds){
-            Optional<User> existingReceiverOptional = userRepository.findById(receiverId);
-            if(existingReceiverOptional.isPresent())
-                receivers.add(existingReceiverOptional.get());
-            else
-                receivers.add(new User(-1L, "", ""));
-        }
-        return receivers;
+    public ConversationService(RepositoryInterface<Long, MessageDto> messageDtoRepository,
+                               RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
+                               RepositoryInterface<Long, ReplyDto> replyDtoRepository,
+                               RepositoryInterface<Long, User> userRepository,
+                               EntityValidatorInterface<Long, MessageReadModel> messageValidator,
+                               ConversationServiceBoundary boundary) {
+        this.messageDtoRepository = messageDtoRepository;
+        this.messageSenderReceiverDtoRepository = messageSenderReceiverDtoRepository;
+        this.replyDtoRepository = replyDtoRepository;
+        this.userRepository = userRepository;
+        this.messageValidator = messageValidator;
+        this.conversationServiceBoundary = boundary;
+        this.messageWriteModelValidator = new MessageWriteModelValidator(userRepository);
     }
 
     /**
@@ -113,18 +70,9 @@ public class ConversationService {
      * @param date date when the message was sent
      */
     public void sendMessageFromUserToService(Long senderId, List<Long> receiverIds, String text, LocalDateTime date){
-        Long messageId = createMessageId();
-        User sender = createSenderUserForMessage(senderId);
-        List<User> receivers = createReceiverUsersListForMessage(receiverIds);
-
-        Message message = new Message(messageId, sender, text, date);
-        message.setTo(receivers);
-        messageValidator.validate(message);
-
-        messageDtoRepository.save(new MessageDto(message.getId(), text, date));
-        receiverIds.forEach(receiverId -> {
-            messageSenderReceiverDtoRepository.save(new MessageSenderReceiverDto(message.getId(), senderId, receiverId));
-        });
+        MessageWriteModel messageWriteModel = new MessageWriteModel(senderId, text, date);
+        messageWriteModel.setIdListOfReceivers(receiverIds);
+        conversationServiceBoundary.sendMessage(messageWriteModel);
     }
 
     /**
@@ -137,41 +85,11 @@ public class ConversationService {
      *                                if senderId is not part of the receivers of the message with messageRepliedToId
      */
     public void replyToMessageService(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
-        Optional<MessageDto> messageRepliedToDto = messageDtoRepository.findById(messageRepliedToId);
-        if(messageRepliedToDto.isEmpty())
-            throw new InvalidEntityException("Message that is replied to must exist");
-
-        List<MessageSenderReceiverDto> messageSenderReceiverDtos = messageSenderReceiverDtoRepository.getAll().stream().
-                filter(messageSenderReceiverDto -> messageSenderReceiverDto.getId().getMessageId() == messageRepliedToId).
-                collect(Collectors.toList());
-
-        List<MessageSenderReceiverDto> verifyIfSenderIdIsPartOfInitialReceivers = messageSenderReceiverDtos.stream().
-                filter(messageSenderReceiverDto -> messageSenderReceiverDto.getId().getReceiverId() == senderId).
-                collect(Collectors.toList());
-        if(verifyIfSenderIdIsPartOfInitialReceivers.isEmpty())
-            throw new InvalidEntityException("Sender must be part of the receivers of the message he wants to reply to");
-
-        List<Long> receiverIdsOfReplyMessage = new ArrayList<>();
-        receiverIdsOfReplyMessage.add(messageSenderReceiverDtos.get(0).getId().getSenderId());
-        messageSenderReceiverDtos.forEach(messageSenderReceiverDto -> {
-            Long receiverId = messageSenderReceiverDto.getId().getReceiverId();
-            if(receiverId != senderId)
-                receiverIdsOfReplyMessage.add(receiverId);
-        });
-
-        Long replyId = createMessageId();
-        User replier = createSenderUserForMessage(senderId);
-        List<User> replyReceivers = createReceiverUsersListForMessage(receiverIdsOfReplyMessage);
-        ReplyMessage reply = new ReplyMessage(replyId, replier, text, date, messageRepliedToId);
-        reply.setTo(replyReceivers);
-
-        messageValidator.validate(reply);
-
-        messageDtoRepository.save(new MessageDto(replyId, text, date));
-        receiverIdsOfReplyMessage.forEach(receiverId -> {
-            messageSenderReceiverDtoRepository.save(new MessageSenderReceiverDto(replyId, senderId, receiverId));
-        });
-        replyDtoRepository.save(new ReplyDto(replyId, messageRepliedToId));
+        ReplyMessageWriteModel replyMessageWriteModel = new ReplyMessageWriteModel(messageRepliedToId,
+                senderId,
+                text,
+                date);
+        conversationServiceBoundary.sendReplyMessage(replyMessageWriteModel);
     }
 
     /**
@@ -180,8 +98,8 @@ public class ConversationService {
      * @param idOfSecondUser identifier of the second user that is part of the conversation
      * @return the conversation (list of messages) between the two users
      */
-    public List<Message> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
-        List<Message> conversation = new ArrayList<>();
+    public List<MessageReadModel> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
+        List<MessageReadModel> conversation = new ArrayList<>();
 
         List<MessageSenderReceiverDto>messagesAndRepliesBetweenTheUsers = messageSenderReceiverDtoRepository.getAll().stream().
                 filter(messageSenderReceiverDto -> {
@@ -199,7 +117,7 @@ public class ConversationService {
         }
 
         messagesAndRepliesBetweenTheUsers.forEach(msg -> {
-            Message message;
+            MessageReadModel message;
             Long messageId = msg.getId().getMessageId();
             Long senderId = msg.getId().getSenderId();
             Optional<ReplyDto> optionalOfReply = replyDtoRepository.findById(messageId);
@@ -211,62 +129,21 @@ public class ConversationService {
                 Long idOfMessageThatIsRepliedTo = optionalOfReply.get().getIdOfMessageThatIsRepliedTo();
                 MessageDto messageDtoThatRepliesTo = messageDtoRepository.findById(idOfMessageThatIsRepliedTo).get();
                 User receiverOfReply = mapBetweenMessageDtoIdAndSender.get(idOfMessageThatIsRepliedTo);
-                Message messageThatRepliesTo = new Message(idOfMessageThatIsRepliedTo,
+                MessageReadModel messageThatRepliesTo = new MessageReadModel(idOfMessageThatIsRepliedTo,
                         receiverOfReply,
                         messageDtoThatRepliesTo.getText(),
                         messageDtoThatRepliesTo.getDate());
-                message = new ReplyMessage(messageId, sender, textOfMessage, date, messageThatRepliesTo);
+                message = new ReplyMessageReadModel(messageId, sender, textOfMessage, date, messageThatRepliesTo);
             }
             else
-                message = new Message(messageId, sender, textOfMessage, date);
+                message = new MessageReadModel(messageId, sender, textOfMessage, date);
             conversation.add(message);
         });
-        conversation.sort(Comparator.comparing(Message::getDate));
+        conversation.sort(Comparator.comparing(MessageReadModel::getDate));
         return conversation;
     }
 
-    /**
-     * @return all messageDto objects
-     */
-    public List<MessageDto> getAllMessageDtoService(){
-        return messageDtoRepository.getAll();
-    }
-
-    /**
-     * @return all messageSenderReceiverDto objects
-     */
-    public List<MessageSenderReceiverDto> getAllMessageSenderReceiverDtoService(){
-        return messageSenderReceiverDtoRepository.getAll();
-    }
-
-    /**
-     * @return all replyDto objects
-     */
-    public List<ReplyDto> getAllReplyDtoService(){
-        return replyDtoRepository.getAll();
-    }
-
-    public void removeAllConversationsOfUser(Long idOfUser) {
-        for(MessageSenderReceiverDto messageSenderReceiverDto : messageSenderReceiverDtoRepository.getAll()){
-            boolean messageWasSentOrReceivedByTheUser = messageSenderReceiverDto.messageIsSentOrReceivedByUser(idOfUser);
-            if(messageWasSentOrReceivedByTheUser)
-                removeMessageAndAllRepliesRelatedToMessage(messageSenderReceiverDto);
-        }
-    }
-
-    private void removeMessageAndAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
-        removeAllRepliesRelatedToMessage(messageSenderReceiverDto);
-        messageSenderReceiverDtoRepository.remove(messageSenderReceiverDto.getId());
-        messageDtoRepository.remove(messageSenderReceiverDto.getId().getMessageId());
-    }
-
-    private void removeAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
-        for(ReplyDto replyDto : replyDtoRepository.getAll()){
-            Long idOfMessage = messageSenderReceiverDto.getId().getMessageId();
-            boolean messageWasAReplyOrWasRepliedTo =
-                    replyDto.messageIsAReplyOrIsRepliedTo(idOfMessage);
-            if(messageWasAReplyOrWasRepliedTo)
-                replyDtoRepository.remove(replyDto.getId());
-        }
+    public void removeAllConversationsOfUserService(Long idOfUser) {
+        conversationServiceBoundary.removeAllConversationsOfUser(idOfUser);
     }
 }

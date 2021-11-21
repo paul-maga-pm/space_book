@@ -26,4 +26,16 @@ public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>
         return getId().getSenderId().equals(idOfUser) ||
                 getId().getReceiverId().equals(idOfUser);
     }
+
+    public boolean isMessageSentBy(Long idOfUser){
+        return this.getId().getSenderId().equals(idOfUser);
+    }
+
+    public boolean isMessageReceivedBy(Long idOfUser){
+        return this.getId().getReceiverId().equals(idOfUser);
+    }
+
+    public boolean isOfMessage(Long idOfMessage) {
+        return this.getId().getMessageId().equals(idOfMessage);
+    }
 }

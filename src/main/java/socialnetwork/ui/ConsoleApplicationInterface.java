@@ -242,10 +242,10 @@ public class ConsoleApplicationInterface {
         System.out.print("Id of second user: ");
         Long idOfSecondUser = readLongFromUser();
 
-        List<Message> conversation = socialNetworkController.getConversationBetweenTwoUsers(idOfFirstUser,
+        List<MessageReadModel> conversation = socialNetworkController.getConversationBetweenTwoUsers(idOfFirstUser,
                 idOfSecondUser);
 
-        for(Message message : conversation){
+        for(MessageReadModel message : conversation){
             System.out.println(message);
             System.out.println();
         }

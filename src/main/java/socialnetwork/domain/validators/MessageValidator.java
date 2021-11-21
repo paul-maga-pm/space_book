@@ -1,15 +1,15 @@
 package socialnetwork.domain.validators;
 
-import socialnetwork.domain.models.Message;
+import socialnetwork.domain.models.MessageReadModel;
 import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 
 /**
- * Validator for Message model
+ * Validator for MessageReadModel model
  */
-public class MessageValidator implements EntityValidatorInterface<Long, Message>{
+public class MessageValidator implements EntityValidatorInterface<Long, MessageReadModel>{
     private RepositoryInterface<Long, User> userRepository;
 
     /**
@@ -29,14 +29,14 @@ public class MessageValidator implements EntityValidatorInterface<Long, Message>
      *                                the receivers' list is empty, or if the text is empty
      */
     @Override
-    public void validate(Message message) {
+    public void validate(MessageReadModel message) {
         String errorMessage = "";
-        Long senderId = message.getFrom().getId();
+        Long senderId = message.getSender().getId();
 
         if(!checkIfUserExits(senderId))
             errorMessage += "User with id " + senderId + " doesn't exist\n";
 
-        for(User user : message.getTo()){
+        for(User user : message.getReceivers()){
             if(senderId == user.getId())
                 throw new InvalidEntityException("Id's of sender and receivers must be different");
             if(!checkIfUserExits(user.getId()))
@@ -45,7 +45,7 @@ public class MessageValidator implements EntityValidatorInterface<Long, Message>
         if(errorMessage.length() > 0)
             throw new EntityNotFoundValidationException(errorMessage);
 
-        if(message.getTo().isEmpty())
+        if(message.getReceivers().isEmpty())
             errorMessage += "Receivers' list can't be empty\n";
         if(message.getText().equals(""))
             errorMessage += "Text can't be empty.";
@@ -59,11 +59,11 @@ public class MessageValidator implements EntityValidatorInterface<Long, Message>
      * @return true if the users of the message exist in the repository, false otherwise
      */
     @Override
-    public boolean isValid(Message message) {
-        if(!checkIfUserExits(message.getFrom().getId()))
+    public boolean isValid(MessageReadModel message) {
+        if(!checkIfUserExits(message.getSender().getId()))
             return false;
 
-        for(User user: message.getTo())
+        for(User user: message.getReceivers())
             if(!checkIfUserExits(user.getId()))
                 return false;
 
