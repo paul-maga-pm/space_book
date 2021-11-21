@@ -63,7 +63,7 @@ public class Main {
         String url = ApplicationContext.getProperty("socialnetwork.database.url");
         String user = ApplicationContext.getProperty("socialnetwork.database.user");
         String password = ApplicationContext.getProperty("socialnetwork.database.password");
-        loadToDatabase(url, user, password);
+        //loadToDatabase(url, user, password);
         RepositoryInterface<Long, User> userRepository = new UserDatabaseRepository(url, user,password);
         EntityValidatorInterface<Long, User> userValidator = new UserValidator();
 
@@ -98,7 +98,7 @@ public class Main {
         UserService userService = new UserService(userRepository, userValidator);
         NetworkService networkService = new NetworkService(friendshipRepository, userRepository, friendshipValidator);
         ConversationService conversationService = new ConversationService(messageDtoRepository, messageSenderReceiverDtoRepository, replyDtoRepository, userRepository, messageValidator);
-        FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepository, friendRequestValidator);
+        FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepository, friendshipRepository, friendRequestValidator);
         SocialNetworkController socialNetworkController = new SocialNetworkController(userService, networkService, conversationService, friendRequestService);
         ConsoleApplicationInterface ui = new ConsoleApplicationInterface(socialNetworkController);
         ui.run();

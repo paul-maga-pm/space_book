@@ -89,7 +89,11 @@ public class SocialNetworkController {
      * @return Optional containing the removed relationship, empty Optional if the users are not friends
      */
     public Optional<Friendship> removeFriendship(Long idOfFirstUser, Long idOfSecondUser){
-        return networkService.removeFriendshipService(idOfFirstUser, idOfSecondUser);
+        Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(idOfFirstUser, idOfSecondUser);
+        if(existingFriendshipOptional.isPresent())
+            friendRequestService.rejectADeletedFriendship(existingFriendshipOptional.get().getId().first,
+                    existingFriendshipOptional.get().getId().second);
+        return existingFriendshipOptional;
     }
 
     /**
