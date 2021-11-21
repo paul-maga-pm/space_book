@@ -39,9 +39,9 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     }
 
     /**
-     *
-     * @param idOfUser
-     * @return
+     * Checks if the user is in the friendRequest
+     * @param idOfUser identifier of the user we want to check if he is in the friendRequest
+     * @return true if user is in friendRequest, false otherwise
      */
     public boolean hasUser(Long idOfUser){
         return getId().first.equals(idOfUser) || getId().second.equals(idOfUser);

@@ -63,7 +63,7 @@ public class Main {
         String url = ApplicationContext.getProperty("socialnetwork.database.url");
         String user = ApplicationContext.getProperty("socialnetwork.database.user");
         String password = ApplicationContext.getProperty("socialnetwork.database.password");
-        //loadToDatabase(url, user, password);
+        loadToDatabase(url, user, password);
         RepositoryInterface<Long, User> userRepository = new UserDatabaseRepository(url, user,password);
         EntityValidatorInterface<Long, User> userValidator = new UserValidator();
 

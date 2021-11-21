@@ -199,14 +199,35 @@ public class SocialNetworkController {
         return conversationService.getAllReplyDtoService();
     }
 
+    /**
+     * Adds a new friendRequest between the users with the given identifiers if it does not exist
+     * or if it exists and has a REJECTED status
+     * @param idOfFirstUser identifier of the first user
+     * @param idOfSecondUser identifier of the second user
+     * @return empty Optional if the friendRequest did not exist before
+     *         Optional containing the existing friendRequest otherwise
+     */
     public Optional<FriendRequest> sendFriendRequest(Long idOfFirstUser, Long idOfSecondUser){
         return friendRequestService.sendFriendRequestService(idOfFirstUser, idOfSecondUser);
     }
 
+    /**
+     * Modify the status of an existing PENDING friendRequest based on the new status
+     * @param idOfFirstUser identifier of the first user
+     * @param idOfSecondUser identifier of the second user
+     * @param status new status of the friendRequest
+     * @return empty Optional if the friendRequest did not exist before
+     *         Optional containing the existing friendRequest otherwise
+     */
     public Optional<FriendRequest> acceptOrRejectFriendRequest(Long idOfFirstUser, Long idOfSecondUser, Status status){
         return friendRequestService.acceptOrRejectFriendRequestService(idOfFirstUser, idOfSecondUser, status);
     }
 
+    /**
+     * Get all friendRequests that were sent to the user with the given id
+     * @param idOfUser identifier of the user
+     * @return lists of all the friendRequests sent to the user with the given id
+     */
     public List<FriendRequest> getAllFriendRequestsForUser(Long idOfUser){
         return friendRequestService.getAllFriendRequestsForUserService(idOfUser);
     }
