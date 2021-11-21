@@ -3,9 +3,7 @@ package socialnetwork.ui;
 
 
 import socialnetwork.controllers.SocialNetworkController;
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.Message;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.exceptions.InvalidNumericalValueException;
 
@@ -34,6 +32,10 @@ class Command{
     public static final String SEND_MESSAGE = "send message";
     public static final String REPLY_TO_MESSAGE = "reply to message";
     public static final String SEE_CONVERSATION = "see conversation";
+
+    public static final String SEND_FRIEND_REQUEST = "send friend request";
+    public static final String ACCEPT_FRIEND_REQUEST = "accept friend request";
+    public static final String REJECT_FRIEND_REQUEST = "reject friend request";
 }
 
 public class ConsoleApplicationInterface {
@@ -92,6 +94,9 @@ public class ConsoleApplicationInterface {
         System.out.printf(menuCommandsFormat, Command.SEND_MESSAGE);
         System.out.printf(menuCommandsFormat, Command.REPLY_TO_MESSAGE);
         System.out.printf(menuCommandsFormat, Command.SEE_CONVERSATION);
+        System.out.printf(menuCommandsFormat, Command.SEND_FRIEND_REQUEST);
+        System.out.printf(menuCommandsFormat, Command.ACCEPT_FRIEND_REQUEST);
+        System.out.printf(menuCommandsFormat, Command.REJECT_FRIEND_REQUEST);
         System.out.printf(menuCommandsFormat, Command.EXIT);
     }
 
@@ -113,6 +118,71 @@ public class ConsoleApplicationInterface {
         commandMap.put(Command.SEND_MESSAGE, this::sendMessageToUsersFromUser);
         commandMap.put(Command.REPLY_TO_MESSAGE, this::replyToMessageOfUser);
         commandMap.put(Command.SEE_CONVERSATION, this::seeConversationBetweenTwoUsers);
+
+        commandMap.put(Command.SEND_FRIEND_REQUEST, this::sendFriendRequest);
+        commandMap.put(Command.ACCEPT_FRIEND_REQUEST, this::acceptFriendRequest);
+        commandMap.put(Command.REJECT_FRIEND_REQUEST, this::rejectFriendRequest);
+    }
+
+    private void sendFriendRequest(){
+        System.out.println("Id of sender: ");
+        long idOfSender = readLongFromUser("Invalid numeric value for id of the sender");
+        System.out.println("Id of receiver: ");
+        long idOfReceiver = readLongFromUser("Invalid numeric value for id of the sender");
+
+        Optional<FriendRequest> existingFriendRequestOptional = socialNetworkController.sendFriendRequest(idOfSender, idOfReceiver);
+        if(existingFriendRequestOptional.isEmpty())
+            System.out.println("Friend request sent successfully");
+        else {
+            if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED))
+                System.out.println("Friend request was resent");
+            else
+                System.out.println("Friend request could not be sent");
+        }
+    }
+
+    private void acceptFriendRequest(){
+        System.out.println("Id: ");
+        long idOfReceiver = readLongFromUser("Invalid numeric value for id of the sender");
+        List<FriendRequest> friendRequestsForUser = socialNetworkController.getAllFriendRequestsForUser(idOfReceiver);
+        if(friendRequestsForUser.isEmpty())
+            System.out.println("This user does not have any friend requests");
+        else{
+            friendRequestsForUser.forEach(friendRequest -> System.out.println(friendRequest.toString()));
+            System.out.println("Id: ");
+            long idOfSender = readLongFromUser("Invalid numeric value for id of the sender");
+            Optional<FriendRequest> existingFriendRequestOptional = socialNetworkController.acceptOrRejectFriendRequest(idOfSender, idOfReceiver, Status.APPROVED);
+            if(existingFriendRequestOptional.isEmpty())
+                System.out.println("Could not accept friend request");
+            else{
+                if(existingFriendRequestOptional.get().getStatus().equals(Status.PENDING))
+                    System.out.println("Friend request accepted successfully");
+                else
+                    System.out.println("Friend request could not be accepted");
+            }
+        }
+    }
+
+    private void rejectFriendRequest(){
+        System.out.println("Id: ");
+        long idOfReceiver = readLongFromUser("Invalid numeric value for id of the sender");
+        List<FriendRequest> friendRequestsForUser = socialNetworkController.getAllFriendRequestsForUser(idOfReceiver);
+        if(friendRequestsForUser.isEmpty())
+            System.out.println("This user does not have any friend requests");
+        else{
+            friendRequestsForUser.forEach(friendRequest -> System.out.println(friendRequest.toString()));
+            System.out.println("Id: ");
+            long idOfSender = readLongFromUser("Invalid numeric value for id of the sender");
+            Optional<FriendRequest> existingFriendRequestOptional = socialNetworkController.acceptOrRejectFriendRequest(idOfSender, idOfReceiver, Status.REJECTED);
+            if(existingFriendRequestOptional.isEmpty())
+                System.out.println("Could not reject friend request");
+            else{
+                if(existingFriendRequestOptional.get().getStatus().equals(Status.PENDING))
+                    System.out.println("Friend request rejected successfully");
+                else
+                    System.out.println("Friend request could not be rejected");
+            }
+        }
     }
 
     private void sendMessageToUsersFromUser() {

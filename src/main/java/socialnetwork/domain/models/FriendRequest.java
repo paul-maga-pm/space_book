@@ -39,6 +39,15 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     }
 
     /**
+     * Checks if the user is in the friendRequest
+     * @param idOfUser identifier of the user we want to check if he is in the friendRequest
+     * @return true if user is in friendRequest, false otherwise
+     */
+    public boolean hasUser(Long idOfUser){
+        return getId().first.equals(idOfUser) || getId().second.equals(idOfUser);
+    }
+
+    /**
      * Checks if this FriendRequest and o are equal by value
      */
     @Override
@@ -60,12 +69,12 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
 
     /**
      * Parses this into String format
-     * @return String in format "Id of first user: {idOfFirstUser}, Id of second user: {idOfSecondUser}, Status: {status}"
+     * @return String in format "From: {idOfFirstUser}, To: {idOfSecondUser}, Status: {status}"
      */
     @Override
     public String toString() {
-        return "Id of first user: " + getId().first +
-                ", Id of second user: " + getId().second +
+        return "From: " + getId().first +
+                ", To: " + getId().second +
                 ", Status: " + status.toString();
     }
 }
