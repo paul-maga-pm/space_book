@@ -53,7 +53,7 @@ public class SocialNetworkController {
      */
     public Optional<User> removeUser(Long id){
         networkService.removeAllFriendshipsOfUserService(id);
-        conversationService.removeAllConversationsOfUser(id);
+        conversationService.removeAllConversationsOfUserService(id);
         friendRequestService.removeAllFriendRequestsOfUserService(id);
         return userService.removeUserService(id);
     }
@@ -174,29 +174,8 @@ public class SocialNetworkController {
      * @param idOfSecondUser identifier of the second user that is part of the conversation
      * @return the conversation (list of messages) between the two users
      */
-    public List<Message> getConversationBetweenTwoUsers(Long idOfFirstUser, Long idOfSecondUser){
+    public List<MessageReadModel> getConversationBetweenTwoUsers(Long idOfFirstUser, Long idOfSecondUser){
         return conversationService.getConversationBetweenTwoUsersService(idOfFirstUser, idOfSecondUser);
-    }
-
-    /**
-     * @return all messageDto objects
-     */
-    public List<MessageDto> getAllMessageDto(){
-        return conversationService.getAllMessageDtoService();
-    }
-
-    /**
-     * @return all messageSenderReceiverDto objects
-     */
-    public List<MessageSenderReceiverDto> getAllMessageSenderReceiverDto(){
-        return conversationService.getAllMessageSenderReceiverDtoService();
-    }
-
-    /**
-     * @return all replyDto objects
-     */
-    public List<ReplyDto> getAllReplyDto(){
-        return conversationService.getAllReplyDtoService();
     }
 
     /**

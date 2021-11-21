@@ -1,6 +1,7 @@
 package socialnetwork;
 
 
+import socialnetwork.boundary.ConversationServiceBoundary;
 import socialnetwork.config.ApplicationContext;
 import socialnetwork.controllers.SocialNetworkController;
 import socialnetwork.domain.models.*;
@@ -90,14 +91,26 @@ public class Main {
         RepositoryInterface<Long, MessageDto> messageDtoRepository = new MessageDtoDatabaseRepository(url, user, password);
         RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository = new MessageSenderReceiverDtoDatabaseRepository(url, user, password);
         RepositoryInterface<Long, ReplyDto> replyDtoRepository = new ReplyDtoDatabaseRepository(url, user, password);
-        EntityValidatorInterface<Long, Message> messageValidator = new MessageValidator(userRepository);
+        EntityValidatorInterface<Long, MessageReadModel> messageValidator = new MessageValidator(userRepository);
 
         RepositoryInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository = new FriendRequestDatabaseRepository(url, user, password);
         EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator = new FriendRequestValidator(userRepository);
 
         UserService userService = new UserService(userRepository, userValidator);
         NetworkService networkService = new NetworkService(friendshipRepository, userRepository, friendshipValidator);
-        ConversationService conversationService = new ConversationService(messageDtoRepository, messageSenderReceiverDtoRepository, replyDtoRepository, userRepository, messageValidator);
+
+        ConversationServiceBoundary conversationServiceBoundary =
+                new ConversationServiceBoundary(
+                        userRepository,
+                        messageDtoRepository,
+                        replyDtoRepository,
+                        messageSenderReceiverDtoRepository);
+        ConversationService conversationService = new ConversationService(messageDtoRepository,
+                messageSenderReceiverDtoRepository,
+                replyDtoRepository,
+                userRepository,
+                messageValidator,
+                conversationServiceBoundary);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepository, friendshipRepository, friendRequestValidator);
         SocialNetworkController socialNetworkController = new SocialNetworkController(userService, networkService, conversationService, friendRequestService);
         ConsoleApplicationInterface ui = new ConsoleApplicationInterface(socialNetworkController);
