@@ -12,12 +12,12 @@ import java.util.Optional;
 
 public class FriendRequestService {
     private RepositoryInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository;
-    private EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestEntityValidator;
+    private EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator;
 
     public FriendRequestService(RepositoryInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository,
-                                EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestEntityValidator) {
+                                EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator) {
         this.friendRequestRepository = friendRequestRepository;
-        this.friendRequestEntityValidator = friendRequestEntityValidator;
+        this.friendRequestValidator = friendRequestValidator;
     }
 
     public Optional<FriendRequest> sendFriendRequestService(Long idOfFirstUser, Long idOfSecondUser){
@@ -26,12 +26,13 @@ public class FriendRequestService {
 
         if(existingFriendRequestOptional.isEmpty()){
             FriendRequest friendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING);
-            friendRequestEntityValidator.validate(friendRequest);
+            friendRequestValidator.validate(friendRequest);
             friendRequestRepository.save(friendRequest);
         }
         else
             if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED)){
                 FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING);
+                friendRequestRepository.update(newFriendRequest);
             }
         return existingFriendRequestOptional;
     }
@@ -42,9 +43,8 @@ public class FriendRequestService {
 
         if(existingFriendRequestOptional.isPresent())
             if(existingFriendRequestOptional.get().getStatus().equals(Status.PENDING)){
-                FriendRequest acceptedFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, status);
-                friendRequestEntityValidator.validate(acceptedFriendRequest);
-                friendRequestRepository.update(acceptedFriendRequest);
+                FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, status);
+                friendRequestRepository.update(newFriendRequest);
             }
 
         return existingFriendRequestOptional;

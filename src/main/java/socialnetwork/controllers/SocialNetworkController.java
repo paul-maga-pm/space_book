@@ -4,6 +4,7 @@ package socialnetwork.controllers;
 import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.service.ConversationService;
+import socialnetwork.service.FriendRequestService;
 import socialnetwork.service.NetworkService;
 import socialnetwork.service.UserService;
 
@@ -19,16 +20,19 @@ public class SocialNetworkController {
     private UserService userService;
     private NetworkService networkService;
     private ConversationService conversationService;
+    private FriendRequestService friendRequestService;
 
     /**
      * Constructor that creates a controller that accesses the given services
      * @param userService service for User model
      * @param networkService service for Friendship model
      */
-    public SocialNetworkController(UserService userService, NetworkService networkService, ConversationService conversationService) {
+    public SocialNetworkController(UserService userService, NetworkService networkService,
+                                   ConversationService conversationService, FriendRequestService friendRequestService) {
         this.userService = userService;
         this.networkService = networkService;
         this.conversationService = conversationService;
+        this.friendRequestService = friendRequestService;
     }
 
     /**
@@ -50,6 +54,7 @@ public class SocialNetworkController {
     public Optional<User> removeUser(Long id){
         networkService.removeAllFriendshipsOfUserService(id);
         conversationService.removeAllConversationsOfUser(id);
+        friendRequestService.removeAllFriendRequestsOfUserService(id);
         return userService.removeUserService(id);
     }
 
@@ -188,5 +193,17 @@ public class SocialNetworkController {
      */
     public List<ReplyDto> getAllReplyDto(){
         return conversationService.getAllReplyDtoService();
+    }
+
+    public Optional<FriendRequest> sendFriendRequest(Long idOfFirstUser, Long idOfSecondUser){
+        return friendRequestService.sendFriendRequestService(idOfFirstUser, idOfSecondUser);
+    }
+
+    public Optional<FriendRequest> acceptOrRejectFriendRequest(Long idOfFirstUser, Long idOfSecondUser, Status status){
+        return friendRequestService.acceptOrRejectFriendRequestService(idOfFirstUser, idOfSecondUser, status);
+    }
+
+    public List<FriendRequest> getAllFriendRequestsForUser(Long idOfUser){
+        return friendRequestService.getAllFriendRequestsForUserService(idOfUser);
     }
 }
