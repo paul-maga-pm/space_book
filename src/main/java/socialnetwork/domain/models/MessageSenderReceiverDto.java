@@ -8,6 +8,18 @@ public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>
         super(new MessageSenderReceiverDtoId(messageId, senderId, receiverId));
     }
 
+    public Long getIdOfMessage(){
+        return getId().getMessageId();
+    }
+
+    public Long getIdOfSender(){
+        return getId().getSenderId();
+    }
+
+    public Long getIdOfReceiver(){
+        return getId().getReceiverId();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
