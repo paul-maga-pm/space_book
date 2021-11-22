@@ -18,11 +18,8 @@ class Command{
     public static final String REMOVE_USER = "remove user";
     public static final String FIND_USER = "find user";
     public static final String UPDATE_USER = "update user";
-    public static final String GET_ALL_USERS = "get all users";
 
-    public static final String ADD_FRIENDSHIP = "add friendship";
     public static final String REMOVE_FRIENDSHIP = "remove friendship";
-    public static final String FIND_FRIENDSHIP = "find friendship";
     public static final String FIND_FRIENDS_FOR_USER = "find friends for user";
     public static final String FIND_FRIENDS_FOR_USER_FROM_MONTH = "find friends for user from month";
 
@@ -83,10 +80,7 @@ public class ConsoleApplicationInterface {
         System.out.printf(menuCommandsFormat, Command.REMOVE_USER);
         System.out.printf(menuCommandsFormat, Command.FIND_USER);
         System.out.printf(menuCommandsFormat, Command.UPDATE_USER);
-        System.out.printf(menuCommandsFormat, Command.GET_ALL_USERS);
-        System.out.printf(menuCommandsFormat, Command.ADD_FRIENDSHIP);
         System.out.printf(menuCommandsFormat, Command.REMOVE_FRIENDSHIP);
-        System.out.printf(menuCommandsFormat, Command.FIND_FRIENDSHIP);
         System.out.printf(menuCommandsFormat, Command.FIND_FRIENDS_FOR_USER);
         System.out.printf(menuCommandsFormat, Command.FIND_FRIENDS_FOR_USER_FROM_MONTH);
         System.out.printf(menuCommandsFormat, Command.COUNT_COMMUNITIES);
@@ -105,11 +99,8 @@ public class ConsoleApplicationInterface {
         commandMap.put(Command.REMOVE_USER, this::removeUser);
         commandMap.put(Command.FIND_USER, this::findUser);
         commandMap.put(Command.UPDATE_USER, this::updateUser);
-        commandMap.put(Command.GET_ALL_USERS, this::getAllUsersWithTheirFriends);
 
-        commandMap.put(Command.ADD_FRIENDSHIP, this::addFriendship);
         commandMap.put(Command.REMOVE_FRIENDSHIP, this::removeFriendship);
-        commandMap.put(Command.FIND_FRIENDSHIP, this::findFriendship);
         commandMap.put(Command.FIND_FRIENDS_FOR_USER, this::findFriendsForUser);
         commandMap.put(Command.FIND_FRIENDS_FOR_USER_FROM_MONTH, this::findFriendsForUserFromMonth);
         commandMap.put(Command.COUNT_COMMUNITIES, this::countCommunities);
