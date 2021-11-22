@@ -10,43 +10,20 @@ import socialnetwork.repository.RepositoryInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * Business Layer for MessageReadModel and ReplyMessageReadModel models
  */
 public class ConversationService {
-    private RepositoryInterface<Long, MessageDto> messageDtoRepository;
-    private RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository;
-    private RepositoryInterface<Long, ReplyDto> replyDtoRepository;
-    private RepositoryInterface<Long, User> userRepository;
-    private EntityValidatorInterface<Long, MessageReadModel> messageValidator;
-
-    private static long idAvailable = 0;
-    private MessageWriteModelValidator messageWriteModelValidator;
     private ConversationServiceBoundary conversationServiceBoundary;
 
     /**
-     * Creates a new service that accesses the given repositories and validates the messages by the given validator's rules
-     * @param messageDtoRepository repository containing the messageDtos
-     * @param messageSenderReceiverDtoRepository repository containing the messageSenderReceiverDtos
-     * @param replyDtoRepository repository containing the replyDtos
-     * @param userRepository repository containing the users
-     * @param messageValidator validator for MessageReadModel model
+     * Creates a new service that accesses the MessageReadModels through the given boundary
      */
-    public ConversationService(RepositoryInterface<Long, MessageDto> messageDtoRepository,
-                               RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverDtoRepository,
-                               RepositoryInterface<Long, ReplyDto> replyDtoRepository,
-                               RepositoryInterface<Long, User> userRepository,
-                               EntityValidatorInterface<Long, MessageReadModel> messageValidator,
-                               ConversationServiceBoundary boundary) {
-        this.messageDtoRepository = messageDtoRepository;
-        this.messageSenderReceiverDtoRepository = messageSenderReceiverDtoRepository;
-        this.replyDtoRepository = replyDtoRepository;
-        this.userRepository = userRepository;
-        this.messageValidator = messageValidator;
+    public ConversationService(ConversationServiceBoundary boundary) {
         this.conversationServiceBoundary = boundary;
-        this.messageWriteModelValidator = new MessageWriteModelValidator(userRepository);
     }
 
     /**
@@ -86,46 +63,9 @@ public class ConversationService {
      * @return the conversation (list of messages) between the two users
      */
     public List<MessageReadModel> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
-        List<MessageReadModel> conversation = new ArrayList<>();
-
-        List<MessageSenderReceiverDto>messagesAndRepliesBetweenTheUsers = messageSenderReceiverDtoRepository.getAll().stream().
-                filter(messageSenderReceiverDto -> {
-                    return (messageSenderReceiverDto.getId().getSenderId() == idOfFirstUser && messageSenderReceiverDto.getId().getReceiverId() == idOfSecondUser) ||
-                            (messageSenderReceiverDto.getId().getSenderId() == idOfSecondUser && messageSenderReceiverDto.getId().getReceiverId() == idOfFirstUser);
-                }).collect(Collectors.toList());
-
-        Map<Long, User> mapBetweenMessageDtoIdAndSender = new HashMap<>();
-
-        for(var msg : messageSenderReceiverDtoRepository.getAll()) {
-            Long senderId = msg.getId().getSenderId();
-            User sender = userRepository.findById(senderId).get();
-            mapBetweenMessageDtoIdAndSender.put(msg.getId().getMessageId(),
-                    sender);
-        }
-
-        messagesAndRepliesBetweenTheUsers.forEach(msg -> {
-            MessageReadModel message;
-            Long messageId = msg.getId().getMessageId();
-            Long senderId = msg.getId().getSenderId();
-            Optional<ReplyDto> optionalOfReply = replyDtoRepository.findById(messageId);
-            Optional<MessageDto> messageDto = messageDtoRepository.findById(messageId);
-            String textOfMessage = messageDto.get().getText();
-            LocalDateTime date = messageDto.get().getDate();
-            User sender = userRepository.findById(senderId).get();
-            if(optionalOfReply.isPresent()) {
-                Long idOfMessageThatIsRepliedTo = optionalOfReply.get().getIdOfMessageThatIsRepliedTo();
-                MessageDto messageDtoThatRepliesTo = messageDtoRepository.findById(idOfMessageThatIsRepliedTo).get();
-                User receiverOfReply = mapBetweenMessageDtoIdAndSender.get(idOfMessageThatIsRepliedTo);
-                MessageReadModel messageThatRepliesTo = new MessageReadModel(idOfMessageThatIsRepliedTo,
-                        receiverOfReply,
-                        messageDtoThatRepliesTo.getText(),
-                        messageDtoThatRepliesTo.getDate());
-                message = new ReplyMessageReadModel(messageId, sender, textOfMessage, date, messageThatRepliesTo);
-            }
-            else
-                message = new MessageReadModel(messageId, sender, textOfMessage, date);
-            conversation.add(message);
-        });
+        List<MessageReadModel> allMessages = conversationServiceBoundary.getAllMessageReadModels();
+        Predicate<MessageReadModel> filterPredicate = m -> m.isBetween(idOfFirstUser, idOfSecondUser);
+        List<MessageReadModel> conversation = allMessages.stream().filter(filterPredicate).toList();
         conversation.sort(Comparator.comparing(MessageReadModel::getDate));
         return conversation;
     }

@@ -105,12 +105,7 @@ public class Main {
                         messageDtoRepository,
                         replyDtoRepository,
                         messageSenderReceiverDtoRepository);
-        ConversationService conversationService = new ConversationService(messageDtoRepository,
-                messageSenderReceiverDtoRepository,
-                replyDtoRepository,
-                userRepository,
-                messageValidator,
-                conversationServiceBoundary);
+        ConversationService conversationService = new ConversationService(conversationServiceBoundary);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepository, friendshipRepository, friendRequestValidator);
         SocialNetworkController socialNetworkController = new SocialNetworkController(userService, networkService, conversationService, friendRequestService);
         ConsoleApplicationInterface ui = new ConsoleApplicationInterface(socialNetworkController);
