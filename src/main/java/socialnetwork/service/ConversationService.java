@@ -49,6 +49,8 @@ public class ConversationService {
      *                                if senderId is not part of the receivers of the message with messageRepliedToId
      */
     public void replyToMessageService(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
+        if(conversationServiceBoundary.isReplyMessage(messageRepliedToId))
+            throw new InvalidEntityException("You can't reply to another reply");
         ReplyMessageWriteModel replyMessageWriteModel = new ReplyMessageWriteModel(messageRepliedToId,
                 senderId,
                 text,

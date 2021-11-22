@@ -31,8 +31,7 @@ public class ReplyDto extends Entity<Long>{
         return Objects.hash(super.hashCode(), idOfMessageThatIsRepliedTo);
     }
 
-    public boolean messageIsAReplyOrIsRepliedTo(Long idOfMessage) {
-        return this.getId().equals(idOfMessage) ||
-                this.idOfMessageThatIsRepliedTo.equals(idOfMessage);
+    public boolean repliesTo(Long messageId){
+        return this.idOfMessageThatIsRepliedTo.equals(messageId);
     }
 }

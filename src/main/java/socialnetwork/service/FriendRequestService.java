@@ -68,7 +68,9 @@ public class FriendRequestService {
      * @return empty Optional if the friendRequest did not exist before
      *         Optional containing the existing friendRequest otherwise
      */
-    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long idOfFirstUser, Long idOfSecondUser, Status status){
+    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long idOfFirstUser,
+                                                                      Long idOfSecondUser,
+                                                                      Status status){
         UnorderedPair<Long, Long> idOfAcceptedFriendRequest = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
         Optional<FriendRequest> existingFriendRequestOptional = friendRequestRepository.findById(idOfAcceptedFriendRequest);
 
