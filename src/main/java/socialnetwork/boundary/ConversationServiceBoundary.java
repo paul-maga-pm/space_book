@@ -30,7 +30,7 @@ public class ConversationServiceBoundary {
         this.messageSenderReceiverRepository = messageSenderReceiverRepository;
         messageWriteModelValidator = new MessageWriteModelValidator(userRepository);
         replyMessageWriteModelValidator = new ReplyMessageWriteModelValidator(messageDtoRepository,
-                messageSenderReceiverRepository);
+                messageSenderReceiverRepository, replyDtoRepository);
         setAvailableIdWithinExistingIds();
     }
 

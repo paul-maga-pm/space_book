@@ -1,9 +1,6 @@
 package socialnetwork.domain.validators;
 
-import socialnetwork.domain.models.MessageDto;
-import socialnetwork.domain.models.MessageSenderReceiverDto;
-import socialnetwork.domain.models.MessageSenderReceiverDtoId;
-import socialnetwork.domain.models.ReplyMessageWriteModel;
+import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.RepositoryInterface;
 
@@ -11,17 +8,26 @@ public class ReplyMessageWriteModelValidator {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
     private RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto>
         messageSenderReceiverDtoRepository;
+    private RepositoryInterface<Long, ReplyDto> replyDtoRepository;
 
     public ReplyMessageWriteModelValidator(RepositoryInterface<Long, MessageDto> messageDtoRepository,
                                            RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto>
-                                                   messageSenderReceiverDtoRepository){
+                                                   messageSenderReceiverDtoRepository,
+                                           RepositoryInterface<Long, ReplyDto> replyDtoRepository){
         this.messageDtoRepository = messageDtoRepository;
         this.messageSenderReceiverDtoRepository = messageSenderReceiverDtoRepository;
+        this.replyDtoRepository = replyDtoRepository;
     }
 
     public void validate(ReplyMessageWriteModel replyMessageWriteModel){
+        validateThatReplyDoesntReplyToAnotherReply(replyMessageWriteModel);
         validateThatMessageThatRepliesToExist(replyMessageWriteModel);
         validateThatSenderOfTheReplyIsAReceiverOfTheMessage(replyMessageWriteModel);
+    }
+
+    private void validateThatReplyDoesntReplyToAnotherReply(ReplyMessageWriteModel replyMessageWriteModel) {
+        if(replyDtoRepository.findById(replyMessageWriteModel.getIdOfMessageThatRepliesTo()).isPresent())
+            throw new InvalidEntityException("You can't reply to another reply");
     }
 
     private void validateThatMessageThatRepliesToExist(ReplyMessageWriteModel replyMessage) {
