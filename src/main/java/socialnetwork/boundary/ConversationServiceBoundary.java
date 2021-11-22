@@ -5,8 +5,9 @@ import socialnetwork.domain.validators.MessageWriteModelValidator;
 import socialnetwork.domain.validators.ReplyMessageWriteModelValidator;
 import socialnetwork.repository.RepositoryInterface;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class ConversationServiceBoundary {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
@@ -24,6 +25,7 @@ public class ConversationServiceBoundary {
             RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto>
                 messageSenderReceiverRepository) {
 
+        this.userRepository = userRepository;
         this.messageDtoRepository = messageDtoRepository;
         this.replyDtoRepository = replyDtoRepository;
         this.messageSenderReceiverRepository = messageSenderReceiverRepository;
@@ -31,6 +33,100 @@ public class ConversationServiceBoundary {
         replyMessageWriteModelValidator = new ReplyMessageWriteModelValidator(messageDtoRepository,
                 messageSenderReceiverRepository);
         setAvailableIdWithinExistingIds();
+    }
+
+    public List<MessageReadModel> getAllMessageReadModels(){
+        Map<Long, User> mapBetweenMessageDtoIdAndSender = getMapBetweenMessageIdAndSender();
+        List<MessageReadModel> allMessageReadModel = new ArrayList<>();
+
+        for(var messageDto : messageDtoRepository.getAll()){
+            MessageReadModel messageReadModelThatWillBeAdded = getMessageReadModelFrom(mapBetweenMessageDtoIdAndSender,
+                    messageDto);
+            allMessageReadModel.add(messageReadModelThatWillBeAdded);
+        }
+        return allMessageReadModel;
+    }
+
+    private MessageReadModel getMessageReadModelFrom(Map<Long, User> mapBetweenMessageDtoIdAndSender,
+                                                     MessageDto messageDto) {
+        MessageReadModel messageReadModelThatWillBeAdded;
+
+        String textOfMessage = messageDto.getText();
+        LocalDateTime dateOfMessage = messageDto.getDate();
+        User senderOfMessage = mapBetweenMessageDtoIdAndSender.get(messageDto.getId());
+        if(isMessageDtoReply(messageDto)){
+            MessageReadModel messageThatRepliesTo = getMessageThatRepliesTo(mapBetweenMessageDtoIdAndSender,
+                    messageDto);
+            messageReadModelThatWillBeAdded = new ReplyMessageReadModel(messageDto.getId(),
+                    senderOfMessage,
+                    textOfMessage,
+                    dateOfMessage,
+                    messageThatRepliesTo);
+        } else messageReadModelThatWillBeAdded = new MessageReadModel(messageDto.getId(),
+                senderOfMessage,
+                textOfMessage,
+                dateOfMessage);
+        messageReadModelThatWillBeAdded.setListOfReceivers(findAllReceiversOfMessageWithId(messageDto.getId()));
+        return messageReadModelThatWillBeAdded;
+    }
+
+    private MessageReadModel getMessageThatRepliesTo(Map<Long, User> mapBetweenMessageDtoIdAndSender,
+                                                     MessageDto reply) {
+        Long idOfMessageThatIsRepliedTo = getIdOfMessageThatRepliesTo(reply);
+        User senderOfMessageThatIsRepliedTo = mapBetweenMessageDtoIdAndSender.get(idOfMessageThatIsRepliedTo);
+        String textOfMessageThatIsRepliedTo = getTextOfMessageThatRepliesTo(reply);
+        LocalDateTime dateOfMessageThatIsRepliedTo = getDateOfMessageThatRepliesTo(reply);
+        return  new MessageReadModel(
+                idOfMessageThatIsRepliedTo,
+                senderOfMessageThatIsRepliedTo,
+                textOfMessageThatIsRepliedTo,
+                dateOfMessageThatIsRepliedTo
+        );
+    }
+
+    private LocalDateTime getDateOfMessageThatRepliesTo(MessageDto reply) {
+        Long id = getIdOfMessageThatRepliesTo(reply);
+        return messageDtoRepository.findById(id)
+                .get()
+                .getDate();
+    }
+
+    private String getTextOfMessageThatRepliesTo(MessageDto reply) {
+        Long id = getIdOfMessageThatRepliesTo(reply);
+        return messageDtoRepository.findById(id)
+                .get()
+                .getText();
+    }
+
+    private Long getIdOfMessageThatRepliesTo(MessageDto messageDto) {
+        return replyDtoRepository.findById(messageDto.getId()).get().getIdOfMessageThatIsRepliedTo();
+    }
+
+    private boolean isMessageDtoReply(MessageDto messageDto) {
+        return replyDtoRepository.findById(messageDto.getId()).isPresent();
+    }
+
+    private Map<Long, User> getMapBetweenMessageIdAndSender() {
+        Map<Long, User> mapBetweenMessageDtoIdAndSender = new HashMap<>();
+        for(var msg : messageSenderReceiverRepository.getAll()) {
+            Long senderId = msg.getId().getSenderId();
+            User sender = userRepository.findById(senderId).get();
+            mapBetweenMessageDtoIdAndSender.put(msg.getId().getMessageId(),
+                    sender);
+        }
+        return mapBetweenMessageDtoIdAndSender;
+    }
+
+    private List<User> findAllReceiversOfMessageWithId(Long idOfMessage) {
+        List<User> receivers = new ArrayList<>();
+
+        for(var dto : messageSenderReceiverRepository.getAll())
+            if(dto.isOfMessage(idOfMessage)){
+                Long idOfReceiver = dto.getIdOfReceiver();
+                User receiver = userRepository.findById(idOfReceiver).get();
+                receivers.add(receiver);
+            }
+        return receivers;
     }
 
     public void sendMessage(MessageWriteModel message) {
