@@ -68,8 +68,9 @@ public class ConversationService {
         List<MessageReadModel> allMessages = conversationServiceBoundary.getAllMessageReadModels();
         Predicate<MessageReadModel> filterPredicate = m -> m.isBetween(idOfFirstUser, idOfSecondUser);
         List<MessageReadModel> conversation = allMessages.stream().filter(filterPredicate).toList();
-        conversation.sort(Comparator.comparing(MessageReadModel::getDate));
-        return conversation;
+        return conversation.stream()
+                .sorted(Comparator.comparing(MessageReadModel::getDate))
+                .collect(Collectors.toList());
     }
 
     public void removeAllConversationsOfUserService(Long idOfUser) {
