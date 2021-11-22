@@ -8,7 +8,7 @@ public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>
         super(new MessageSenderReceiverDtoId(messageId, senderId, receiverId));
     }
 
-    public Long getIdOfMessage(){
+    public Long getMessageId(){
         return getId().getMessageId();
     }
 
@@ -34,17 +34,16 @@ public class MessageSenderReceiverDto extends Entity<MessageSenderReceiverDtoId>
         return Objects.hash(super.hashCode());
     }
 
-    public boolean messageIsSentOrReceivedByUser(Long idOfUser) {
-        return getId().getSenderId().equals(idOfUser) ||
-                getId().getReceiverId().equals(idOfUser);
-    }
-
-    public boolean isMessageSentBy(Long idOfUser){
+    public boolean isSentBy(Long idOfUser){
         return this.getId().getSenderId().equals(idOfUser);
     }
 
-    public boolean isMessageReceivedBy(Long idOfUser){
+    public boolean isReceivedBy(Long idOfUser){
         return this.getId().getReceiverId().equals(idOfUser);
+    }
+
+    public boolean isSendOrReceivedByUser(Long idOfUser){
+        return isSentBy(idOfUser) || isReceivedBy(idOfUser);
     }
 
     public boolean isOfMessage(Long idOfMessage) {

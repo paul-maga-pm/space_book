@@ -7,7 +7,6 @@ import socialnetwork.repository.RepositoryInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class ConversationServiceBoundary {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
@@ -157,33 +156,91 @@ public class ConversationServiceBoundary {
         replyDtoRepository.save(dto);
     }
 
-    public void removeAllConversationsOfUser(Long idOfUser) {
-        for(MessageSenderReceiverDto messageSenderReceiverDto : messageSenderReceiverRepository.getAll()){
-            boolean messageWasSentOrReceivedByTheUser = messageSenderReceiverDto.messageIsSentOrReceivedByUser(idOfUser);
-            if(messageWasSentOrReceivedByTheUser)
-                removeMessageAndAllRepliesRelatedToMessage(messageSenderReceiverDto);
+    public boolean isReplyMessage(Long messageId) {
+        return replyDtoRepository.findById(messageId).isPresent();
+    }
+
+    public void removeAllConversationsOfUser(Long userId) {
+        for(var dto : findAllMessagesReceivedByUser(userId)){
+            if(dto.isReceivedBy(userId)){
+                for(var replyDto : replyDtoRepository.getAll())
+                    if(replyDto.repliesTo(dto.getMessageId())){
+                        replyDtoRepository.remove(replyDto.getId());
+                        List<Long> receiversIdList = getIdListOfUsersThatReceivedMessage(replyDto);
+                        for(var receiverId : receiversIdList) {
+                            MessageSenderReceiverDtoId id = new MessageSenderReceiverDtoId(
+                                    replyDto.getId(),
+                                    dto.getIdOfReceiver(),
+                                    receiverId);
+                            messageSenderReceiverRepository.remove(id);
+                        }
+                        messageDtoRepository.remove(replyDto.getId());
+                    }
+                messageSenderReceiverRepository.remove(dto.getId());
+                if(messageHasNoReceiver(dto.getMessageId())) {
+                    messageDtoRepository.remove(dto.getMessageId());
+                }
+                if(isReplyMessage(dto.getMessageId()))
+                    replyDtoRepository.remove(dto.getMessageId());
+            }
+        }
+
+        for(var dto : findAllMessagesSentByUser(userId)){
+            if(messageHasNoReceiver(dto.getMessageId()))
+                messageDtoRepository.remove(dto.getMessageId());
+            else{
+                List<Long> idListOfReceivers = getIdListOfUsersThatReceivedMessage(dto.getMessageId());
+
+                for(var receiverId : idListOfReceivers){
+                    MessageSenderReceiverDtoId id = new MessageSenderReceiverDtoId(dto.getMessageId(),
+                            userId,
+                            receiverId);
+                    messageSenderReceiverRepository.remove(id);
+                }
+
+            }
         }
     }
 
-    private void removeMessageAndAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
-        removeAllRepliesRelatedToMessage(messageSenderReceiverDto);
-        messageSenderReceiverRepository.remove(messageSenderReceiverDto.getId());
-        messageDtoRepository.remove(messageSenderReceiverDto.getId().getMessageId());
-    }
+    private boolean messageHasNoReceiver(Long messageId) {
+        int count = 0;
 
-    private void removeAllRepliesRelatedToMessage(MessageSenderReceiverDto messageSenderReceiverDto) {
-        for(ReplyDto replyDto : replyDtoRepository.getAll()){
-            removeReplyIfMessageSenderReceiverIsRelated(messageSenderReceiverDto, replyDto);
+        for(var dto : messageSenderReceiverRepository.getAll()){
+            if(dto.getMessageId().equals(messageId))
+                count++;
+            if(count > 0)
+                return false;
         }
+        return count == 0;
     }
 
-    private void removeReplyIfMessageSenderReceiverIsRelated
-            (MessageSenderReceiverDto messageSenderReceiverDto, ReplyDto replyDto) {
-        Long idOfMessage = messageSenderReceiverDto.getId().getMessageId();
-        boolean messageWasAReplyOrWasRepliedTo =
-                replyDto.messageIsAReplyOrIsRepliedTo(idOfMessage);
-        if(messageWasAReplyOrWasRepliedTo)
-            replyDtoRepository.remove(replyDto.getId());
+    private List<Long> getIdListOfUsersThatReceivedMessage(ReplyDto replyDto) {
+        return getIdListOfUsersThatReceivedMessage(replyDto.getId());
+    }
+
+    private List<Long> getIdListOfUsersThatReceivedMessage(Long messageId) {
+        List<Long> idList = new ArrayList<>();
+
+        for(var dto : messageSenderReceiverRepository.getAll())
+            if(dto.getMessageId().equals(messageId))
+                idList.add(dto.getIdOfReceiver());
+        return idList;
+    }
+
+    private List<MessageSenderReceiverDto> findAllMessagesReceivedByUser(Long userId){
+        List<MessageSenderReceiverDto> messages = new ArrayList<>();
+        for(var dto : messageSenderReceiverRepository.getAll())
+            if(dto.isReceivedBy(userId))
+                messages.add(dto);
+        return  messages;
+    }
+
+    private List<MessageSenderReceiverDto> findAllMessagesSentByUser(Long userId){
+        List<MessageSenderReceiverDto> messages = new ArrayList<>();
+        for(var dto : messageSenderReceiverRepository.getAll())
+            if(dto.isSentBy(userId))
+                messages.add(dto);
+        return  messages;
     }
 
     private List<Long> getIdOfUsersThatWillReceiveTheReply(ReplyMessageWriteModel replyMessage) {
@@ -201,7 +258,7 @@ public class ConversationServiceBoundary {
 
     private Long getIdOfReceiverOfDtoIfMessageIsNotReceivedByUserOrIdOfSenderOtherwise
             (Long idOfUser, MessageSenderReceiverDto dto) {
-        boolean isDtoReceivedByUser = dto.isMessageReceivedBy(idOfUser);
+        boolean isDtoReceivedByUser = dto.isReceivedBy(idOfUser);
         if (!isDtoReceivedByUser)
             return dto.getId().getReceiverId();
         return dto.getId().getSenderId();
