@@ -30,31 +30,27 @@ public class ConversationServiceBoundary {
         this.messageSenderReceiverRepository = messageSenderReceiverRepository;
         messageWriteModelValidator = new MessageWriteModelValidator(userRepository);
         replyMessageWriteModelValidator = new ReplyMessageWriteModelValidator(messageDtoRepository,
-                messageSenderReceiverRepository);
+                messageSenderReceiverRepository, replyDtoRepository);
         setAvailableIdWithinExistingIds();
     }
 
     public List<MessageReadModel> getAllMessageReadModels(){
-        Map<Long, User> mapBetweenMessageDtoIdAndSender = getMapBetweenMessageIdAndSender();
+        Map<Long, User> senderMap = getMapBetweenMessageIdAndSender();
         List<MessageReadModel> allMessageReadModel = new ArrayList<>();
-
         for(var messageDto : messageDtoRepository.getAll()){
-            MessageReadModel messageReadModelThatWillBeAdded = getMessageReadModelFrom(mapBetweenMessageDtoIdAndSender,
-                    messageDto);
+            MessageReadModel messageReadModelThatWillBeAdded = getMessageModel(senderMap, messageDto);
             allMessageReadModel.add(messageReadModelThatWillBeAdded);
         }
         return allMessageReadModel;
     }
 
-    private MessageReadModel getMessageReadModelFrom(Map<Long, User> mapBetweenMessageDtoIdAndSender,
-                                                     MessageDto messageDto) {
+    private MessageReadModel getMessageModel(Map<Long, User> senderMap, MessageDto messageDto) {
         MessageReadModel messageReadModelThatWillBeAdded;
-
         String textOfMessage = messageDto.getText();
         LocalDateTime dateOfMessage = messageDto.getDate();
-        User senderOfMessage = mapBetweenMessageDtoIdAndSender.get(messageDto.getId());
+        User senderOfMessage = senderMap.get(messageDto.getId());
         if(isMessageDtoReply(messageDto)){
-            MessageReadModel messageThatRepliesTo = getMessageThatRepliesTo(mapBetweenMessageDtoIdAndSender,
+            MessageReadModel messageThatRepliesTo = getMessageThatRepliesTo(senderMap,
                     messageDto);
             messageReadModelThatWillBeAdded = new ReplyMessageReadModel(messageDto.getId(),
                     senderOfMessage,
@@ -65,7 +61,8 @@ public class ConversationServiceBoundary {
                 senderOfMessage,
                 textOfMessage,
                 dateOfMessage);
-        messageReadModelThatWillBeAdded.setListOfReceivers(findAllReceiversOfMessageWithId(messageDto.getId()));
+        List<User> listOfReceivers = findAllReceiversOfMessageWithId(messageDto.getId());
+        messageReadModelThatWillBeAdded.setListOfReceivers(listOfReceivers);
         return messageReadModelThatWillBeAdded;
     }
 
@@ -85,16 +82,12 @@ public class ConversationServiceBoundary {
 
     private LocalDateTime getDateOfMessageThatRepliesTo(MessageDto reply) {
         Long id = getIdOfMessageThatRepliesTo(reply);
-        return messageDtoRepository.findById(id)
-                .get()
-                .getDate();
+        return messageDtoRepository.findById(id).get().getDate();
     }
 
     private String getTextOfMessageThatRepliesTo(MessageDto reply) {
         Long id = getIdOfMessageThatRepliesTo(reply);
-        return messageDtoRepository.findById(id)
-                .get()
-                .getText();
+        return messageDtoRepository.findById(id).get().getText();
     }
 
     private Long getIdOfMessageThatRepliesTo(MessageDto messageDto) {
@@ -161,45 +154,48 @@ public class ConversationServiceBoundary {
     }
 
     public void removeAllConversationsOfUser(Long userId) {
-        for(var dto : findAllMessagesReceivedByUser(userId)){
-            if(dto.isReceivedBy(userId)){
-                for(var replyDto : replyDtoRepository.getAll())
-                    if(replyDto.repliesTo(dto.getMessageId())){
-                        replyDtoRepository.remove(replyDto.getId());
-                        List<Long> receiversIdList = getIdListOfUsersThatReceivedMessage(replyDto);
-                        for(var receiverId : receiversIdList) {
-                            MessageSenderReceiverDtoId id = new MessageSenderReceiverDtoId(
-                                    replyDto.getId(),
-                                    dto.getIdOfReceiver(),
-                                    receiverId);
-                            messageSenderReceiverRepository.remove(id);
-                        }
-                        messageDtoRepository.remove(replyDto.getId());
-                    }
-                messageSenderReceiverRepository.remove(dto.getId());
-                if(messageHasNoReceiver(dto.getMessageId())) {
-                    messageDtoRepository.remove(dto.getMessageId());
-                }
-                if(isReplyMessage(dto.getMessageId()))
-                    replyDtoRepository.remove(dto.getMessageId());
-            }
-        }
+        removeAllMessagesReceivedBy(userId);
+        removeAllMessagesSentBy(userId);
+    }
 
-        for(var dto : findAllMessagesSentByUser(userId)){
+    private void removeAllMessagesReceivedBy(Long userId) {
+        for(var dto : findAllMessagesReceivedByUser(userId))
+            if(dto.isReceivedBy(userId))
+                removeMessageReceivedBy(dto);
+    }
+
+    private void removeMessageReceivedBy(MessageSenderReceiverDto dto) {
+        removeAllRepliesToMessageOfUser(dto.getMessageId(), dto.getIdOfReceiver());
+        messageSenderReceiverRepository.remove(dto.getId());
+        if(messageHasNoReceiver(dto.getMessageId()))
+            messageDtoRepository.remove(dto.getMessageId());
+        if(isReplyMessage(dto.getMessageId()))
+            replyDtoRepository.remove(dto.getMessageId());
+    }
+
+    private void removeAllRepliesToMessageOfUser(Long ifOfUser, Long idOfMessageThatIsRepliedTo) {
+        for(var replyDto : replyDtoRepository.getAll())
+            if(replyDto.repliesTo(idOfMessageThatIsRepliedTo)){
+                replyDtoRepository.remove(replyDto.getId());
+                removeAllMessageSenderReceiverDtoWithMessageAndSender(ifOfUser, replyDto.getId());
+                messageDtoRepository.remove(replyDto.getId());
+            }
+    }
+
+    private void removeAllMessageSenderReceiverDtoWithMessageAndSender(Long ifOfUser, Long idOfMessage) {
+        List<Long> receiversIdList = getIdListOfUsersThatReceivedMessage(idOfMessage);
+        for(var receiverId : receiversIdList) {
+            MessageSenderReceiverDtoId id = new MessageSenderReceiverDtoId(idOfMessage, ifOfUser, receiverId);
+            messageSenderReceiverRepository.remove(id);
+        }
+    }
+
+    private void removeAllMessagesSentBy(Long userId) {
+        for(var dto : findAllMessagesSentByUser(userId))
             if(messageHasNoReceiver(dto.getMessageId()))
                 messageDtoRepository.remove(dto.getMessageId());
-            else{
-                List<Long> idListOfReceivers = getIdListOfUsersThatReceivedMessage(dto.getMessageId());
-
-                for(var receiverId : idListOfReceivers){
-                    MessageSenderReceiverDtoId id = new MessageSenderReceiverDtoId(dto.getMessageId(),
-                            userId,
-                            receiverId);
-                    messageSenderReceiverRepository.remove(id);
-                }
-
-            }
-        }
+            else
+                removeAllMessageSenderReceiverDtoWithMessageAndSender(userId, dto.getMessageId());
     }
 
     private boolean messageHasNoReceiver(Long messageId) {
@@ -212,10 +208,6 @@ public class ConversationServiceBoundary {
                 return false;
         }
         return count == 0;
-    }
-
-    private List<Long> getIdListOfUsersThatReceivedMessage(ReplyDto replyDto) {
-        return getIdListOfUsersThatReceivedMessage(replyDto.getId());
     }
 
     private List<Long> getIdListOfUsersThatReceivedMessage(Long messageId) {
