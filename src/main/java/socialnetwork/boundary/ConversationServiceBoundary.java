@@ -165,7 +165,7 @@ public class ConversationServiceBoundary {
     }
 
     private void removeMessageReceivedBy(MessageSenderReceiverDto dto) {
-        removeAllRepliesToMessageOfUser(dto.getMessageId(), dto.getIdOfReceiver());
+        removeAllRepliesToMessageOfUser( dto.getIdOfReceiver(), dto.getMessageId() );
         messageSenderReceiverRepository.remove(dto.getId());
         if(messageHasNoReceiver(dto.getMessageId()))
             messageDtoRepository.remove(dto.getMessageId());
