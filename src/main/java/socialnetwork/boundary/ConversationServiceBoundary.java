@@ -178,7 +178,8 @@ public class ConversationServiceBoundary {
             if(replyDto.repliesTo(idOfMessageThatIsRepliedTo)){
                 replyDtoRepository.remove(replyDto.getId());
                 removeAllMessageSenderReceiverDtoWithMessageAndSender(ifOfUser, replyDto.getId());
-                messageDtoRepository.remove(replyDto.getId());
+                if(messageHasNoReceiver(replyDto.getId()))
+                    messageDtoRepository.remove(replyDto.getId());
             }
     }
 
