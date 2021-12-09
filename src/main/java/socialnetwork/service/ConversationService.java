@@ -1,12 +1,8 @@
 package socialnetwork.service;
 
-import socialnetwork.boundary.ConversationServiceBoundary;
+import socialnetwork.dataaccess.ConversationDataAccess;
 import socialnetwork.domain.models.*;
-import socialnetwork.domain.validators.EntityValidatorInterface;
-import socialnetwork.domain.validators.MessageValidator;
-import socialnetwork.domain.validators.MessageWriteModelValidator;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.repository.RepositoryInterface;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -17,13 +13,13 @@ import java.util.stream.Collectors;
  * Business Layer for MessageReadModel and ReplyMessageReadModel models
  */
 public class ConversationService {
-    private ConversationServiceBoundary conversationServiceBoundary;
+    private ConversationDataAccess conversationDataAccess;
 
     /**
      * Creates a new service that accesses the MessageReadModels through the given boundary
      */
-    public ConversationService(ConversationServiceBoundary boundary) {
-        this.conversationServiceBoundary = boundary;
+    public ConversationService(ConversationDataAccess boundary) {
+        this.conversationDataAccess = boundary;
     }
 
     /**
@@ -36,7 +32,7 @@ public class ConversationService {
     public void sendMessageFromUserToService(Long senderId, List<Long> receiverIds, String text, LocalDateTime date){
         MessageWriteModel messageWriteModel = new MessageWriteModel(senderId, text, date);
         messageWriteModel.setIdListOfReceivers(receiverIds);
-        conversationServiceBoundary.sendMessage(messageWriteModel);
+        conversationDataAccess.sendMessage(messageWriteModel);
     }
 
     /**
@@ -49,13 +45,13 @@ public class ConversationService {
      *                                if senderId is not part of the receivers of the message with messageRepliedToId
      */
     public void replyToMessageService(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
-        if(conversationServiceBoundary.isReplyMessage(messageRepliedToId))
+        if(conversationDataAccess.isReplyMessage(messageRepliedToId))
             throw new InvalidEntityException("You can't reply to another reply");
         ReplyMessageWriteModel replyMessageWriteModel = new ReplyMessageWriteModel(messageRepliedToId,
                 senderId,
                 text,
                 date);
-        conversationServiceBoundary.sendReplyMessage(replyMessageWriteModel);
+        conversationDataAccess.sendReplyMessage(replyMessageWriteModel);
     }
 
     /**
@@ -65,7 +61,7 @@ public class ConversationService {
      * @return the conversation (list of messages) between the two users
      */
     public List<MessageReadModel> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
-        List<MessageReadModel> allMessages = conversationServiceBoundary.getAllMessageReadModels();
+        List<MessageReadModel> allMessages = conversationDataAccess.getAllMessageReadModels();
         Predicate<MessageReadModel> filterPredicate = m -> m.isBetween(idOfFirstUser, idOfSecondUser);
         List<MessageReadModel> conversation = allMessages.stream().filter(filterPredicate).toList();
         return conversation.stream()
@@ -74,6 +70,6 @@ public class ConversationService {
     }
 
     public void removeAllConversationsOfUserService(Long idOfUser) {
-        conversationServiceBoundary.removeAllConversationsOfUser(idOfUser);
+        conversationDataAccess.removeAllConversationsOfUser(idOfUser);
     }
 }

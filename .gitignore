@@ -3,3 +3,5 @@ build/
 .idea/
 gradle/
 gradlew/
+src/test/
+test_data/

@@ -1,4 +1,4 @@
-package socialnetwork.boundary;
+package socialnetwork.dataaccess;
 
 import socialnetwork.domain.models.*;
 import socialnetwork.domain.validators.MessageWriteModelValidator;
@@ -8,7 +8,7 @@ import socialnetwork.repository.RepositoryInterface;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class ConversationServiceBoundary {
+public class ConversationDataAccess {
     private RepositoryInterface<Long, MessageDto> messageDtoRepository;
     private RepositoryInterface<Long, ReplyDto> replyDtoRepository;
     private RepositoryInterface<MessageSenderReceiverDtoId, MessageSenderReceiverDto> messageSenderReceiverRepository;
@@ -17,7 +17,7 @@ public class ConversationServiceBoundary {
     private MessageWriteModelValidator messageWriteModelValidator;
     private ReplyMessageWriteModelValidator replyMessageWriteModelValidator;
 
-    public ConversationServiceBoundary(
+    public ConversationDataAccess(
             RepositoryInterface<Long, User> userRepository,
             RepositoryInterface<Long, MessageDto> messageDtoRepository,
             RepositoryInterface<Long, ReplyDto> replyDtoRepository,

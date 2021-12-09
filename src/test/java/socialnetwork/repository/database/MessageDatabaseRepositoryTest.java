@@ -25,9 +25,7 @@ public class MessageDatabaseRepositoryTest extends MessageDtoRepositoryTestSette
 
     @BeforeAll
     static void setUpDataBase(){
-        FriendshipDatabaseTableSetter.tearDown();
-        MessagesSenderReceiverDatabaseTableSetter.tearDown();
-        UserDatabaseTableSetter.tearDown();
+        DatabaseCleaner.clearDatabase();
         MessageDatabaseTableSetter.tearDown();
     }
 

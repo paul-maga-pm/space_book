@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class FriendRequestDatabaseRepository extends
         AbstractDatabaseRepository<UnorderedPair<Long, Long>, FriendRequest>{
@@ -33,7 +34,6 @@ public class FriendRequestDatabaseRepository extends
             Long idOfFirstUser = resultSet.getLong("id_first_user");
             Long idOfSecondUser = resultSet.getLong("id_second_user");
             String status = resultSet.getString("status");
-
             return new FriendRequest(idOfFirstUser, idOfSecondUser, StatusSupplier.getStatus(status));
         } catch (SQLException exception){
             throw new SQLException(exception);
