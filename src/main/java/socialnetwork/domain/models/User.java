@@ -11,6 +11,7 @@ import java.util.Objects;
 public class User extends Entity<Long>{
     private String firstName;
     private String lastName;
+    private String userName;
     private List<User> friendsList = new ArrayList<>();
 
     /**
@@ -23,6 +24,14 @@ public class User extends Entity<Long>{
         super(id);
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public void setUserName(String newUserName){
+        this.userName = newUserName;
+    }
+
+    public String getUserName(){
+        return userName;
     }
 
     /**

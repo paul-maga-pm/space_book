@@ -46,16 +46,24 @@ public class UserService {
         return id;
     }
 
+    // Each user from the returned list will contain their username
     public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
         final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
         Predicate<User> fullNameContainsString
                 = user -> user.getFirstName().toLowerCase(Locale.ROOT).contains(lowerCasedStr)
                 || user.getLastName().toLowerCase(Locale.ROOT).contains(lowerCasedStr);
-        return userRepository
+        List<User> users = userRepository
                 .getAll()
                 .stream()
                 .filter(fullNameContainsString)
                 .collect(Collectors.toList());
+
+        for(int i = 0; i < users.size(); i++){
+            String username = credentialRepository.findById(users.get(i).getId()).get().getUserName();
+            users.get(i).setUserName(username);
+        }
+
+        return users;
     }
 
     public Long findIdOfUserWithUsername(String userName){
