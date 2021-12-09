@@ -21,7 +21,7 @@ public class FriendRequestService {
     private EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator;
 
     /**
-     * Constructor that creates a new service that accesses the given repositories and validates the friendsRequests
+     * Constructor that creates a new socialnetwork.service that accesses the given repositories and validates the friendsRequests
      * with the given validator's rules
      * @param friendRequestRepository repository of friendRequests objects
      * @param friendshipRepository repository of friendships objects

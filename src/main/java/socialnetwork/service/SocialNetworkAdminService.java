@@ -20,8 +20,8 @@ public class SocialNetworkAdminService {
 
     /**
      * Constructor that creates a controller that accesses the given services
-     * @param adminService service for User model
-     * @param networkService service for Friendship model
+     * @param adminService socialnetwork.service for User model
+     * @param networkService socialnetwork.service for Friendship model
      */
     public SocialNetworkAdminService(AdminService adminService, NetworkService networkService,
                                      ConversationService conversationService, FriendRequestService friendRequestService) {
