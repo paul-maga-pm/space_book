@@ -16,7 +16,7 @@ public class ConversationService {
     private ConversationDataAccess conversationDataAccess;
 
     /**
-     * Creates a new service that accesses the MessageReadModels through the given boundary
+     * Creates a new socialnetwork.service that accesses the MessageReadModels through the given boundary
      */
     public ConversationService(ConversationDataAccess boundary) {
         this.conversationDataAccess = boundary;

@@ -6,6 +6,11 @@ import socialnetwork.domain.validators.EntityValidatorInterface;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.RepositoryInterface;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 public class UserService {
     private EntityValidatorInterface<Long, User> userValidator;
     private RepositoryInterface<Long, User> userRepository;
@@ -41,12 +46,16 @@ public class UserService {
         return id;
     }
 
-    private Long findAvailableId() {
-        Long maxId = -1L;
-        for(User user : userRepository.getAll())
-            if(user.getId() > maxId)
-                maxId = user.getId() + 1;
-        return maxId + 1;
+    public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
+        final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
+        Predicate<User> fullNameContainsString
+                = user -> user.getFirstName().toLowerCase(Locale.ROOT).contains(lowerCasedStr)
+                || user.getLastName().toLowerCase(Locale.ROOT).contains(lowerCasedStr);
+        return userRepository
+                .getAll()
+                .stream()
+                .filter(fullNameContainsString)
+                .collect(Collectors.toList());
     }
 
     public Long findIdOfUserWithUsername(String userName){
@@ -54,6 +63,14 @@ public class UserService {
             if(credential.getUserName().equals(userName))
                 return credential.getId();
         throw new EntityNotFoundValidationException("User with username " + userName + " doesn't exist");
+    }
+
+    private Long findAvailableId() {
+        Long maxId = -1L;
+        for(User user : userRepository.getAll())
+            if(user.getId() > maxId)
+                maxId = user.getId() + 1;
+        return maxId + 1;
     }
 
     private Long findIdOfUserWithCredentials(String userName, String password){
