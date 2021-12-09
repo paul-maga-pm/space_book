@@ -1,12 +1,8 @@
-package socialnetwork.controllers;
+package socialnetwork.service;
 
 
 import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.service.ConversationService;
-import socialnetwork.service.FriendRequestService;
-import socialnetwork.service.NetworkService;
-import socialnetwork.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,20 +12,20 @@ import java.util.Optional;
 /**
  * Controller between ui and business layer
  */
-public class SocialNetworkController {
-    private UserService userService;
+public class SocialNetworkAdminService {
+    private AdminService adminService;
     private NetworkService networkService;
     private ConversationService conversationService;
     private FriendRequestService friendRequestService;
 
     /**
      * Constructor that creates a controller that accesses the given services
-     * @param userService service for User model
+     * @param adminService service for User model
      * @param networkService service for Friendship model
      */
-    public SocialNetworkController(UserService userService, NetworkService networkService,
-                                   ConversationService conversationService, FriendRequestService friendRequestService) {
-        this.userService = userService;
+    public SocialNetworkAdminService(AdminService adminService, NetworkService networkService,
+                                     ConversationService conversationService, FriendRequestService friendRequestService) {
+        this.adminService = adminService;
         this.networkService = networkService;
         this.conversationService = conversationService;
         this.friendRequestService = friendRequestService;
@@ -43,7 +39,7 @@ public class SocialNetworkController {
      * @return empty Optional if the user was added, Optional containing the existing user with the same id otherwise
      */
     public Optional<User> addUser(Long id, String firstName, String lastName){
-        return userService.addUserService(id, firstName, lastName);
+        return adminService.addUserService(id, firstName, lastName);
     }
 
     /**
@@ -55,7 +51,7 @@ public class SocialNetworkController {
         networkService.removeAllFriendshipsOfUserService(id);
         conversationService.removeAllConversationsOfUserService(id);
         friendRequestService.removeAllFriendRequestsOfUserService(id);
-        return userService.removeUserService(id);
+        return adminService.removeUserService(id);
     }
 
     /**
@@ -64,7 +60,7 @@ public class SocialNetworkController {
      * @return empty Optional if the user with the given id doesn't exit, Optional with the existing user otherwise
      */
     public Optional<User> findUserById(Long id){
-        return userService.findUserByIdService(id);
+        return adminService.findUserByIdService(id);
     }
 
     /**
@@ -75,7 +71,7 @@ public class SocialNetworkController {
      * @throws InvalidEntityException if the id, newFirstName, newLastName are not valid
      */
     public Optional<User> updateUser(Long id, String newFirstName, String newLastName){
-        return userService.updateUserService(id, newFirstName, newLastName);
+        return adminService.updateUserService(id, newFirstName, newLastName);
     }
 
     public Optional<Friendship> addFriendship(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){

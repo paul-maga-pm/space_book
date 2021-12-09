@@ -5,6 +5,7 @@ public class DatabaseCleaner {
         FriendshipDatabaseTableSetter.tearDown();
         MessagesSenderReceiverDatabaseTableSetter.tearDown();
         ReplyDatabaseTableSetter.tearDown();
+        UserCredentialDatabaseTableSetter.tearDown();
         UserDatabaseTableSetter.tearDown();
         MessageDatabaseTableSetter.tearDown();
     }

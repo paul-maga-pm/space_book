@@ -8,4 +8,7 @@ public class ExceptionBaseClass extends RuntimeException{
     public ExceptionBaseClass(Throwable cause) {
         super(cause);
     }
+
+    public ExceptionBaseClass(){
+    }
 }

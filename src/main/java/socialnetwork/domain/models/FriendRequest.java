@@ -2,6 +2,7 @@ package socialnetwork.domain.models;
 
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Objects;
  */
 public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     private Status status;
-
+    private LocalDateTime date;
 
     /**
      * Constructor that creates a new friend request between the users with the given id
@@ -20,6 +21,12 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     public FriendRequest(Long idOfFirstUser, Long idOfSecondUser, Status status) {
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
         this.status = status;
+    }
+
+    public FriendRequest(Long idOfFirstUser, Long idOfSecondUser, Status status, LocalDateTime date) {
+        super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
+        this.status = status;
+        this.date = date;
     }
 
     /**
