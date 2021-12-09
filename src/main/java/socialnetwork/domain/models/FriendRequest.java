@@ -2,6 +2,7 @@ package socialnetwork.domain.models;
 
 import socialnetwork.utils.containers.UnorderedPair;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -27,6 +28,12 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
         super(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
         this.status = status;
         this.date = date;
+    }
+
+    public FriendRequest(FriendRequest friendRequest) {
+        super(friendRequest.getId());
+        this.status = friendRequest.status;
+        this.date = friendRequest.date;
     }
 
     /**
@@ -63,7 +70,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
         if (!(o instanceof FriendRequest)) return false;
         if (!super.equals(o)) return false;
         FriendRequest that = (FriendRequest) o;
-        return Objects.equals(status, that.getStatus());
+        return status == that.status && Objects.equals(date, that.date);
     }
 
     /**
@@ -71,7 +78,7 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), status);
+        return Objects.hash(super.hashCode(), status, date);
     }
 
     /**
@@ -82,6 +89,11 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
     public String toString() {
         return "From: " + getId().first +
                 ", To: " + getId().second +
-                ", Status: " + status.toString();
+                ", Status: " + status.toString() +
+                ", Date: " + date.toString();
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 }

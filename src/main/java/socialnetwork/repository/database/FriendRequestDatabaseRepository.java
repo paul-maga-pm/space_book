@@ -4,10 +4,7 @@ import socialnetwork.domain.models.FriendRequest;
 import socialnetwork.domain.models.StatusSupplier;
 import socialnetwork.utils.containers.UnorderedPair;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 
 public class FriendRequestDatabaseRepository extends
@@ -34,7 +31,8 @@ public class FriendRequestDatabaseRepository extends
             Long idOfFirstUser = resultSet.getLong("id_first_user");
             Long idOfSecondUser = resultSet.getLong("id_second_user");
             String status = resultSet.getString("status");
-            return new FriendRequest(idOfFirstUser, idOfSecondUser, StatusSupplier.getStatus(status));
+            LocalDateTime date = resultSet.getTimestamp("date").toLocalDateTime();
+            return new FriendRequest(idOfFirstUser, idOfSecondUser, StatusSupplier.getStatus(status), date);
         } catch (SQLException exception){
             throw new SQLException(exception);
         }
@@ -48,13 +46,14 @@ public class FriendRequestDatabaseRepository extends
      */
     @Override
     public PreparedStatement createInsertStatementForEntity(Connection connection, FriendRequest friendRequest) throws SQLException {
-        String insertStringStatement = "INSERT INTO friend_requests (id_first_user, id_second_user, status) VALUES (?, ?, ?)";
+        String insertStringStatement = "INSERT INTO friend_requests (id_first_user, id_second_user, status, date) VALUES (?, ?, ?, ?)";
         PreparedStatement insertStatement = null;
         try{
             insertStatement = connection.prepareStatement(insertStringStatement);
             insertStatement.setLong(1, friendRequest.getId().first);
             insertStatement.setLong(2, friendRequest.getId().second);
             insertStatement.setString(3, friendRequest.getStatus().name());
+            insertStatement.setTimestamp(4, Timestamp.valueOf(friendRequest.getDate()));
             return insertStatement;
         } catch (SQLException exception){
             closePreparedStatement(insertStatement);
@@ -117,11 +116,7 @@ public class FriendRequestDatabaseRepository extends
      */
     @Override
     public PreparedStatement createSelectAllStatement(Connection connection) throws SQLException {
-        try{
-            return connection.prepareStatement("SELECT * FROM friend_requests");
-        } catch (SQLException exception){
-            throw new SQLException(exception);
-        }
+        return connection.prepareStatement("SELECT * FROM friend_requests");
     }
 
     /**
@@ -132,16 +127,17 @@ public class FriendRequestDatabaseRepository extends
      */
     @Override
     public PreparedStatement createUpdateStatementForEntity(Connection connection, FriendRequest newFriendRequest) throws SQLException {
-        String updateFriendRequestStringStatement = "UPDATE friend_requests SET status = ? WHERE " +
+        String updateFriendRequestStringStatement = "UPDATE friend_requests SET status = ?, date = ? WHERE " +
                 "id_first_user = ? AND id_second_user = ? OR id_first_user = ? AND id_second_user = ?";
         PreparedStatement updateFriendRequestStatement = null;
         try{
             updateFriendRequestStatement = connection.prepareStatement(updateFriendRequestStringStatement);
             updateFriendRequestStatement.setString(1, newFriendRequest.getStatus().name());
-            updateFriendRequestStatement.setLong(2, newFriendRequest.getId().first);
-            updateFriendRequestStatement.setLong(3, newFriendRequest.getId().second);
+            updateFriendRequestStatement.setTimestamp(2, Timestamp.valueOf(newFriendRequest.getDate()));
+            updateFriendRequestStatement.setLong(3, newFriendRequest.getId().first);
             updateFriendRequestStatement.setLong(4, newFriendRequest.getId().second);
-            updateFriendRequestStatement.setLong(5, newFriendRequest.getId().first);
+            updateFriendRequestStatement.setLong(5, newFriendRequest.getId().second);
+            updateFriendRequestStatement.setLong(6, newFriendRequest.getId().first);
             return updateFriendRequestStatement;
         } catch (SQLException exception){
             closePreparedStatement(updateFriendRequestStatement);
