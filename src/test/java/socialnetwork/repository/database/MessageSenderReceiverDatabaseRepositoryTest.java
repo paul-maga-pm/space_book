@@ -30,10 +30,7 @@ extends MessageSenderReceiverDtoRepositoryTestSetter {
 
     @BeforeAll
     static void setUpDatabase(){
-        FriendshipDatabaseTableSetter.tearDown();
-        MessagesSenderReceiverDatabaseTableSetter.tearDown();
-        UserDatabaseTableSetter.tearDown();
-        MessageDatabaseTableSetter.tearDown();
+        DatabaseCleaner.clearDatabase();
 
         setUpUsersTable();
         setUpMessagesTable();
