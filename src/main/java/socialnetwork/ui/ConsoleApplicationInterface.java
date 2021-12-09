@@ -62,11 +62,11 @@ public class ConsoleApplicationInterface {
             }
 
             if(commandMap.containsKey(userCommand))
-                try {
+               // try {
                     commandMap.get(userCommand).run();
-                } catch (ExceptionBaseClass exception){
-                    System.out.println(exception.getMessage());
-                }
+               // } catch (ExceptionBaseClass exception){
+                //    System.out.println(exception.getMessage());
+              //  }
             else
                 System.out.println("Invalid command");
         }
