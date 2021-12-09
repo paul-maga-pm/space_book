@@ -27,7 +27,7 @@ public class UserSignUpCredentialValidator
     private void validateUsernameOfCredential(UserCredential credential) {
         String username = credential.getUserName();
 
-        if(!username.endsWith("@email.com"))
+        if(!username.endsWith("@email.com") && !username.endsWith("@gmail.com"))
             throw new InvalidEntityException("Username is invalid");
     }
 
