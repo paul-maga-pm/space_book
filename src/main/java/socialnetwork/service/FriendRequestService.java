@@ -48,15 +48,15 @@ public class FriendRequestService {
         Optional<FriendRequest> existingFriendRequestOptional = friendRequestRepository.findById(idOfNewFriendRequest);
 
         if(existingFriendRequestOptional.isEmpty()){
-            FriendRequest friendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING);
+            FriendRequest friendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING, LocalDateTime.now());
             friendRequestValidator.validate(friendRequest);
             friendRequestRepository.save(friendRequest);
         }
         else
-            if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED)){
-                FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING);
-                friendRequestRepository.update(newFriendRequest);
-            }
+        if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED)){
+            FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING, LocalDateTime.now());
+            friendRequestRepository.update(newFriendRequest);
+        }
         return existingFriendRequestOptional;
     }
 
@@ -76,7 +76,8 @@ public class FriendRequestService {
 
         if(existingFriendRequestOptional.isPresent())
             if(existingFriendRequestOptional.get().getStatus().equals(Status.PENDING)){
-                FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, status);
+                LocalDateTime date = existingFriendRequestOptional.get().getDate();
+                FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, status, date);
                 if(status.equals(Status.APPROVED))
                     friendshipRepository.save(new Friendship(idOfFirstUser, idOfSecondUser, LocalDateTime.now()));
                 friendRequestRepository.update(newFriendRequest);
@@ -91,8 +92,13 @@ public class FriendRequestService {
      * @param idOfSecondUser identifier of the second user
      */
     public void rejectADeletedFriendship(Long idOfFirstUser, Long idOfSecondUser){
-        FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.REJECTED);
-        friendRequestRepository.update(newFriendRequest);
+        Optional<FriendRequest> existingFriendRequestOptional =
+                friendRequestRepository.findById(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
+        if(existingFriendRequestOptional.isPresent()){
+            FriendRequest friendRequest = existingFriendRequestOptional.get();
+            friendRequest.setStatus(Status.REJECTED);
+            friendRequestRepository.update(friendRequest);
+        }
     }
 
     /**
