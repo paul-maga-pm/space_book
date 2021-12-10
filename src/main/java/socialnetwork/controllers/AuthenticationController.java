@@ -14,10 +14,10 @@ public class AuthenticationController {
     private SocialNetworkUserService service;
 
     @FXML
-    private Button loginButton;
-
+    private TextField loginEmailTextField;
     @FXML
-    private Button signInButton;
+    private PasswordField loginPasswordPasswordField;
+
     @FXML
     private TextField signInFirstNameTextField;
     @FXML
@@ -28,14 +28,17 @@ public class AuthenticationController {
     private PasswordField signInPasswordPasswordField;
 
     @FXML
-    protected void openUserPage(Event event) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("user-page.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        Stage stage = new Stage();
-        stage.setTitle("Log In");
-        stage.setScene(scene);
-        stage.show();
-        ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
+    protected void loginUser(Event event){
+        String email = loginEmailTextField.getText();
+        String password = loginPasswordPasswordField.getText();
+        try{
+            service.loginUserService(email, password);
+            openUserPage(event);
+        } catch(ExceptionBaseClass exception){
+            showWarning(exception.getMessage());
+
+        } catch(Exception e){
+        }
     }
 
     @FXML
@@ -52,6 +55,16 @@ public class AuthenticationController {
 
         } catch(Exception e){
         }
+    }
+
+    private void openUserPage(Event event) throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("user-page.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.setTitle("Log In");
+        stage.setScene(scene);
+        stage.show();
+        ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
     }
 
     private void showWarning(String message) {

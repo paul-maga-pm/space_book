@@ -31,9 +31,9 @@
                                 <Label prefHeight="35.0" prefWidth="200.0" text="User Login" GridPane.columnSpan="2" />
                                 <Label prefHeight="36.0" prefWidth="100.0" text="Email:" GridPane.rowIndex="1" />
                                 <Label prefHeight="40.0" prefWidth="100.0" text="Password:" GridPane.rowIndex="2" />
-                                <TextField prefHeight="26.0" prefWidth="162.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                <Button fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#openUserPage" prefHeight="26.0" prefWidth="84.0" text="Login" GridPane.rowIndex="3" />
+                                <TextField fx:id="loginEmailTextField" prefHeight="26.0" prefWidth="162.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <PasswordField fx:id="loginPasswordPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Button fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#loginUser" prefHeight="26.0" prefWidth="84.0" text="Login" GridPane.rowIndex="3" />
                             </children>
                         </GridPane>
                     </children>
