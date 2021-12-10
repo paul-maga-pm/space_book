@@ -2,8 +2,11 @@ package socialnetwork.service;
 
 import socialnetwork.domain.models.FriendRequest;
 import socialnetwork.domain.models.Friendship;
+import socialnetwork.domain.models.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class SocialNetworkUserService {
@@ -32,13 +35,11 @@ public class SocialNetworkUserService {
         idOfLoggedUser = userService.loginUser(userName, password);
     }
 
-    public void sendFriendRequestService(String friendUserName){
-        Long idOFriend = userService.findIdOfUserWithUsername(friendUserName);
-        friendRequestService.sendFriendRequestService(idOfLoggedUser, idOFriend);
+    public void sendFriendRequestService(Long idOfFriend){
+        friendRequestService.sendFriendRequestService(idOfLoggedUser, idOfFriend);
     }
 
-    public Optional<Friendship> removeFriendshipService(String friendUsername){
-        Long idOfFriend = userService.findIdOfUserWithUsername(friendUsername);
+    public Optional<Friendship> removeFriendshipService(Long idOfFriend){
         Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(idOfLoggedUser, idOfFriend);
         if(existingFriendshipOptional.isPresent())
             friendRequestService.rejectADeletedFriendship(existingFriendshipOptional.get().getId().first,
@@ -46,7 +47,18 @@ public class SocialNetworkUserService {
         return existingFriendshipOptional;
     }
 
-    public List<FriendRequest> getAllFriendRequestsOfUser(){
+    public List<FriendRequest> getAllFriendRequestsOfLoggedUser(){
         return friendRequestService.getAllFriendRequestsForUserService(idOfLoggedUser);
+    }
+
+    public Map<Optional<User>, LocalDateTime> findAllFriendsOfLoggedUser(){
+        Map<Optional<User>, LocalDateTime> friends = networkService.findAllFriendsForUserService(idOfLoggedUser);
+
+        for(var entry : friends.keySet()){
+            String userName = userService.findUserNameOfUser(entry.get().getId());
+            entry.get().setUserName(userName);
+        }
+
+        return friends;
     }
 }
