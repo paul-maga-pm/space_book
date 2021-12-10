@@ -7,7 +7,7 @@ import java.util.Properties;
 public class Config {
 
     public static Properties getProperties() {
-        try(InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("config.properties"))
+        try(InputStream inputStream = Config.class.getClassLoader().getResourceAsStream("socialnetwork/config.properties"))
         {
             Properties properties=new Properties();
             properties.load(inputStream);
