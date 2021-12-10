@@ -9,8 +9,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
+import socialnetwork.service.SocialNetworkUserService;
 
 public class AuthenticationController {
+    private SocialNetworkUserService service;
+
     @FXML
     private Button loginButton;
 
@@ -34,5 +37,9 @@ public class AuthenticationController {
         Alert alert = new Alert(Alert.AlertType.NONE, "Could not Sign In", ButtonType.OK);
         alert.setTitle("Warning");
         alert.showAndWait();
+    }
+
+    public void setService(SocialNetworkUserService socialNetworkUserService){
+        this.service = socialNetworkUserService;
     }
 }
