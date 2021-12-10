@@ -60,8 +60,10 @@ public class AuthenticationController {
     private void openUserPage(Event event) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("user-page.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        UserPageController controller = fxmlLoader.getController();
+        controller.setService(service);
         Stage stage = new Stage();
-        stage.setTitle("Log In");
+        stage.setTitle("Welcome!");
         stage.setScene(scene);
         stage.show();
         ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
