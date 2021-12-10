@@ -14,10 +14,14 @@ public class AuthenticationController {
     private SocialNetworkUserService service;
 
     @FXML
+    private Button loginButton;
+    @FXML
     private TextField loginEmailTextField;
     @FXML
     private PasswordField loginPasswordPasswordField;
 
+    @FXML
+    private Button signInButton;
     @FXML
     private TextField signInFirstNameTextField;
     @FXML
