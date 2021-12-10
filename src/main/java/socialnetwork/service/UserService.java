@@ -8,6 +8,7 @@ import socialnetwork.repository.RepositoryInterface;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,13 @@ public class UserService {
         }
 
         return users;
+    }
+
+    public String findUserNameOfUser(Long idOfUser){
+        Optional<UserCredential> userCredentialOptional = credentialRepository.findById(idOfUser);
+        if(userCredentialOptional.isEmpty())
+            return null;
+        return userCredentialOptional.get().getUserName();
     }
 
     private Long findAvailableId() {
