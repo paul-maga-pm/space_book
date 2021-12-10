@@ -32,13 +32,11 @@ public class SocialNetworkUserService {
         idOfLoggedUser = userService.loginUser(userName, password);
     }
 
-    public void sendFriendRequestService(String friendUserName){
-        Long idOFriend = userService.findIdOfUserWithUsername(friendUserName);
-        friendRequestService.sendFriendRequestService(idOfLoggedUser, idOFriend);
+    public void sendFriendRequestService(Long idOfFriend){
+        friendRequestService.sendFriendRequestService(idOfLoggedUser, idOfFriend);
     }
 
-    public Optional<Friendship> removeFriendshipService(String friendUsername){
-        Long idOfFriend = userService.findIdOfUserWithUsername(friendUsername);
+    public Optional<Friendship> removeFriendshipService(Long idOfFriend){
         Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(idOfLoggedUser, idOfFriend);
         if(existingFriendshipOptional.isPresent())
             friendRequestService.rejectADeletedFriendship(existingFriendshipOptional.get().getId().first,

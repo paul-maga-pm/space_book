@@ -66,13 +66,6 @@ public class UserService {
         return users;
     }
 
-    public Long findIdOfUserWithUsername(String userName){
-        for(UserCredential credential : credentialRepository.getAll())
-            if(credential.getUserName().equals(userName))
-                return credential.getId();
-        throw new EntityNotFoundValidationException("User with username " + userName + " doesn't exist");
-    }
-
     private Long findAvailableId() {
         Long maxId = -1L;
         for(User user : userRepository.getAll())
