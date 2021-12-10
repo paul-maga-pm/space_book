@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="socialnetwork.controllers.AuthenticationController" prefHeight="228.0" prefWidth="670.0">
+<AnchorPane prefHeight="228.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.AuthenticationController">
     <children>
         <SplitPane dividerPositions="0.4999999999999999" prefHeight="238.0" prefWidth="670.0">
             <items>
@@ -55,11 +59,11 @@
                                 <Label prefHeight="38.0" prefWidth="100.0" text="Last Name:" GridPane.rowIndex="2" />
                                 <Label prefHeight="46.0" prefWidth="100.0" text="Email:" GridPane.rowIndex="3" />
                                 <Label prefHeight="57.0" prefWidth="100.0" text="Password:" GridPane.rowIndex="4" />
-                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                <Button fx:id="signInButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#showWarning" prefHeight="26.0" prefWidth="113.0" text="Sign In" GridPane.rowIndex="5" />
+                                <TextField fx:id="signInFirstNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <TextField fx:id="signInLastNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField fx:id="signInEmailTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <PasswordField fx:id="signInPasswordPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                <Button fx:id="signInButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#signInUser" prefHeight="26.0" prefWidth="113.0" text="Sign In" GridPane.rowIndex="5" />
                             </children>
                         </GridPane>
                     </children>

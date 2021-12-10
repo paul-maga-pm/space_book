@@ -4,11 +4,10 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
+import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkUserService;
 
 public class AuthenticationController {
@@ -19,6 +18,14 @@ public class AuthenticationController {
 
     @FXML
     private Button signInButton;
+    @FXML
+    private TextField signInFirstNameTextField;
+    @FXML
+    private TextField signInLastNameTextField;
+    @FXML
+    private TextField signInEmailTextField;
+    @FXML
+    private PasswordField signInPasswordPasswordField;
 
     @FXML
     protected void openUserPage(Event event) throws Exception {
@@ -28,13 +35,27 @@ public class AuthenticationController {
         stage.setTitle("Log In");
         stage.setScene(scene);
         stage.show();
-        //((Node)(event.getSource())).getScene().getWindow().hide();
         ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
     }
 
     @FXML
-    protected void showWarning(Event event) {
-        Alert alert = new Alert(Alert.AlertType.NONE, "Could not Sign In", ButtonType.OK);
+    protected void signInUser(Event event){
+        String firstName = signInFirstNameTextField.getText();
+        String lastName = signInLastNameTextField.getText();
+        String email = signInEmailTextField.getText();
+        String password = signInPasswordPasswordField.getText();
+        try{
+            service.signUpUserService(firstName, lastName, email, password);
+            openUserPage(event);
+        } catch (ExceptionBaseClass exception){
+            showWarning(exception.getMessage());
+
+        } catch(Exception e){
+        }
+    }
+
+    private void showWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
         alert.setTitle("Warning");
         alert.showAndWait();
     }
