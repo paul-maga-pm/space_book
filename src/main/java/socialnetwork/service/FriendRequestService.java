@@ -52,11 +52,11 @@ public class FriendRequestService {
             friendRequestValidator.validate(friendRequest);
             friendRequestRepository.save(friendRequest);
         }
-        else
+        /*else
         if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED)){
             FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING, LocalDateTime.now());
             friendRequestRepository.update(newFriendRequest);
-        }
+        }*/
         return existingFriendRequestOptional;
     }
 

@@ -67,6 +67,10 @@ public class UserService {
         return users;
     }
 
+    public List<User> getAllUsers(){
+        return userRepository.getAll();
+    }
+
     public String findUserNameOfUser(Long idOfUser){
         Optional<UserCredential> userCredentialOptional = credentialRepository.findById(idOfUser);
         if(userCredentialOptional.isEmpty())
