@@ -61,4 +61,8 @@ public class SocialNetworkUserService {
 
         return friends;
     }
+
+    public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
+        return userService.findUsersThatHaveInTheirFullNameTheString(str);
+    }
 }
