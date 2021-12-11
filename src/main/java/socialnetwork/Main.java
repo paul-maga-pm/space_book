@@ -34,6 +34,7 @@ public class Main {
 
         try(Connection connection = DriverManager.getConnection(url, user, password);
             PreparedStatement deleteFriendshipsStatement = connection.prepareStatement("DELETE FROM friendships");
+            PreparedStatement deleteCredential = connection.prepareStatement("delete from user_credentials");
             PreparedStatement deleteUsersStatement = connection.prepareStatement("DELETE  FROM users");
             PreparedStatement deleteMessages = connection.prepareStatement("DELETE FROM messages");
             PreparedStatement deleteSenderReceivers = connection.prepareStatement("DELETE FROM messages_sender_receiver");
@@ -44,17 +45,12 @@ public class Main {
             deleteSenderReceivers.executeUpdate();
             deleteMessages.executeUpdate();
             deleteFriendshipsStatement.executeUpdate();
+            deleteCredential.executeUpdate();
             deleteUsersStatement.executeUpdate();
             deleteFriendRequests.executeUpdate();
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
-
-        UserDatabaseRepository userDb = new UserDatabaseRepository(url, user, password);
-        FriendshipDatabaseRepository friendshipDb = new FriendshipDatabaseRepository(url, user, password);
-
-        for(User u : userRepository.getAll())
-            userDb.save(u);
     }
 
 

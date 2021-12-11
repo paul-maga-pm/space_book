@@ -6,6 +6,7 @@ import socialnetwork.domain.validators.EntityValidatorInterface;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.RepositoryInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,6 +50,9 @@ public class UserService {
 
     // Each user from the returned list will contain their username
     public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
+        if(str.length() < 3)
+            return new ArrayList<>();
+
         final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
         Predicate<User> fullNameContainsString
                 = user -> user.getFirstName().toLowerCase(Locale.ROOT).contains(lowerCasedStr)
@@ -82,7 +86,7 @@ public class UserService {
         Long maxId = -1L;
         for(User user : userRepository.getAll())
             if(user.getId() > maxId)
-                maxId = user.getId() + 1;
+                maxId = user.getId();
         return maxId + 1;
     }
 
