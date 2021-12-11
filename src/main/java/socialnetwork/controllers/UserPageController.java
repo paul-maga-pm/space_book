@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
 import socialnetwork.domain.models.User;
+import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkUserService;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ public class UserPageController {
     private TextField searchUserTextField;
     @FXML
     private ListView<User> listViewUsers;
+    @FXML
+    private Button sendFriendRequestButton;
 
     @FXML
     private TableView tableViewFriends;
@@ -52,8 +55,18 @@ public class UserPageController {
         listViewUsers.setItems(modelUsers);
     }
 
-    private void handleSearch(){
-        modelUsers.setAll(service.findUsersThatHaveInTheirFullNameTheString(searchUserTextField.getText()));
+    @FXML
+    protected void sendFriendRequest(){
+        User user = listViewUsers.getSelectionModel().getSelectedItem();
+        if(user != null){
+            try{
+                service.sendFriendRequestService(user.getId());
+            }catch(ExceptionBaseClass exception) {
+                showWarning(exception.getMessage());
+            }
+        } else {
+            showWarning("Must select a user!");
+        }
     }
 
     @FXML
@@ -72,5 +85,15 @@ public class UserPageController {
 
     public void setService(SocialNetworkUserService socialNetworkUserService){
         this.service = socialNetworkUserService;
+    }
+
+    private void handleSearch(){
+        modelUsers.setAll(service.findUsersThatHaveInTheirFullNameTheString(searchUserTextField.getText()));
+    }
+
+    private void showWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
+        alert.setTitle("Warning");
+        alert.showAndWait();
     }
 }

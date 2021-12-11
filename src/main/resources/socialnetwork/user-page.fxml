@@ -26,7 +26,7 @@
                                     </VBox.margin>
                                 </TextField>
                                 <ListView fx:id="listViewUsers" prefHeight="140.0" prefWidth="166.0" />
-                                <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="129.0" text="Send Friend Request" />
+                                <Button fx:id="sendFriendRequestButton" mnemonicParsing="false" onAction="#sendFriendRequest" prefHeight="26.0" prefWidth="129.0" text="Send Friend Request" />
                                 <Button fx:id="logOutButton" mnemonicParsing="false" onAction="#returnToLogin" text="Log Out">
                                     <VBox.margin>
                                         <Insets top="125.0" />
