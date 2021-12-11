@@ -58,7 +58,7 @@
                                                 <TableColumn fx:id="tableColumnLastName" prefWidth="106.40003204345703" text="Last Name" />
                                             </columns>
                                         </TableView>
-                                        <Button alignment="BOTTOM_LEFT" contentDisplay="CENTER" mnemonicParsing="false" text="Remove Friend" />
+                                        <Button fx:id="removeFriendButton" alignment="BOTTOM_LEFT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#removeFriend" text="Remove Friend" />
                                     </children>
                                 </VBox>
                                 <VBox prefHeight="400.0" prefWidth="255.0" spacing="10.0">

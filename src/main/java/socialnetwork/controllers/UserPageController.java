@@ -10,10 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
-import socialnetwork.domain.models.FriendRequest;
-import socialnetwork.domain.models.Status;
-import socialnetwork.domain.models.StatusSupplier;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.models.*;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkUserService;
 
@@ -42,6 +39,8 @@ public class UserPageController {
     private TableColumn<User, String> tableColumnFirstName;
     @FXML
     private TableColumn<User, String> tableColumnLastName;
+    @FXML
+    private Button removeFriendButton;
 
 
     @FXML
@@ -109,8 +108,8 @@ public class UserPageController {
                 Optional<FriendRequest> existingFriendRequest = service.acceptOrRejectFriendRequestService(modelFriendRequest.getUser().getId(), Status.APPROVED);
                 if(existingFriendRequest.isPresent())
                     if(existingFriendRequest.get().getStatus().equals(Status.PENDING)){
-                        modelFriendRequest.setStatus("APPROVED");
-                        modelFriendRequests.set(tableViewFriendRequests.getSelectionModel().getSelectedIndex(), modelFriendRequest);
+                        modelFriendRequests.setAll(getFriendRequestsModel());
+                        modelFriends.setAll(getFriendsModel());
                 } else{
                     showWarning("Information", "Could not accept");
                 }
@@ -130,8 +129,7 @@ public class UserPageController {
                 Optional<FriendRequest> existingFriendRequest = service.acceptOrRejectFriendRequestService(modelFriendRequest.getUser().getId(), Status.REJECTED);
                 if(existingFriendRequest.isPresent())
                     if(existingFriendRequest.get().getStatus().equals(Status.PENDING)){
-                        modelFriendRequest.setStatus("REJECTED");
-                        modelFriendRequests.set(tableViewFriendRequests.getSelectionModel().getSelectedIndex(), modelFriendRequest);
+                        modelFriendRequests.setAll(getFriendRequestsModel());
                     } else {
                         showWarning("Information", "Could not reject");
                     }
@@ -140,6 +138,26 @@ public class UserPageController {
             }
         } else {
             showWarning("Warning", "Must select a friend request!");
+        }
+    }
+
+    @FXML
+    protected void removeFriend(){
+        User friend = tableViewFriends.getSelectionModel().getSelectedItem();
+        if(friend != null){
+            try{
+                Optional<Friendship> existingFriendship = service.removeFriendshipService(friend.getId());
+                if(existingFriendship.isPresent()){
+                    modelFriends.setAll(getFriendsModel());
+                    modelFriendRequests.setAll(getFriendRequestsModel());
+                } else {
+                    showWarning("Information", "Could not remove friend");
+                }
+            } catch (ExceptionBaseClass exception){
+                showWarning("Warning", exception.getMessage());
+            }
+        } else {
+            showWarning("Warning", "Must select a friend!");
         }
     }
 
@@ -156,22 +174,28 @@ public class UserPageController {
         ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
     }
 
-    public void setService(SocialNetworkUserService socialNetworkUserService){
-        this.service = socialNetworkUserService;
-
+    private List<ModelFriendRequest> getFriendRequestsModel(){
         Map<FriendRequest, User> friendRequestsOfUserMap = service.getAllFriendRequestsOfLoggedUser();
         List<ModelFriendRequest> friendRequestsOfUser = new ArrayList<>();
         for(Map.Entry<FriendRequest, User> set: friendRequestsOfUserMap.entrySet()){
             friendRequestsOfUser.add(new ModelFriendRequest(set.getKey(), set.getValue()));
         }
-        modelFriendRequests.setAll(friendRequestsOfUser);
+        return friendRequestsOfUser;
+    }
 
+    private List<User> getFriendsModel(){
         Map<Optional<User>, LocalDateTime> friendsMap = service.findAllFriendsOfLoggedUser();
         List<User> friends = new ArrayList<>();
         for(Map.Entry<Optional<User>, LocalDateTime> set: friendsMap.entrySet()){
             friends.add(set.getKey().get());
         }
-        modelFriends.setAll(friends);
+        return friends;
+    }
+
+    public void setService(SocialNetworkUserService socialNetworkUserService){
+        this.service = socialNetworkUserService;
+        modelFriendRequests.setAll(getFriendRequestsModel());
+        modelFriends.setAll(getFriendsModel());
     }
 
     private void handleSearch(){
