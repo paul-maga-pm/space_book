@@ -5,6 +5,7 @@ import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.User;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,8 +48,15 @@ public class SocialNetworkUserService {
         return existingFriendshipOptional;
     }
 
-    public List<FriendRequest> getAllFriendRequestsOfLoggedUser(){
-        return friendRequestService.getAllFriendRequestsForUserService(idOfLoggedUser);
+    public Map<FriendRequest, User> getAllFriendRequestsOfLoggedUser(){
+        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsForUserService(idOfLoggedUser);
+        List<User> users = userService.getAllUsers();
+        Map<FriendRequest, User>  friendRequestsAndSendersForLoggedUser = new HashMap<>();
+        for(FriendRequest friendRequest: friendRequestsForUser){
+            Optional<User> sender = users.stream().filter(user -> user.getId()==friendRequest.getId().first).findFirst();
+            friendRequestsAndSendersForLoggedUser.put(friendRequest, sender.get());
+        }
+        return friendRequestsAndSendersForLoggedUser;
     }
 
     public Map<Optional<User>, LocalDateTime> findAllFriendsOfLoggedUser(){
