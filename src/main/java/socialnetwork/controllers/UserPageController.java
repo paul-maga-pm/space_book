@@ -114,7 +114,23 @@ public class UserPageController {
 
     @FXML
     protected void rejectFriendRequest(){
-
+        ModelFriendRequest modelFriendRequest = tableViewFriendRequests.getSelectionModel().getSelectedItem();
+        if(modelFriendRequest != null){
+            try{
+                Optional<FriendRequest> existingFriendRequest = service.acceptOrRejectFriendRequestService(modelFriendRequest.getUser().getId(), Status.REJECTED);
+                if(existingFriendRequest.isPresent())
+                    if(existingFriendRequest.get().getStatus().equals(Status.PENDING)){
+                        modelFriendRequest.setStatus("REJECTED");
+                        modelFriendRequests.set(tableViewFriendRequests.getSelectionModel().getSelectedIndex(), modelFriendRequest);
+                    } else {
+                        showWarning("Information", "Could not reject");
+                    }
+            } catch(ExceptionBaseClass exception){
+                showWarning("Warning", exception.getMessage());
+            }
+        } else {
+            showWarning("Warning", "Must select a friend request!");
+        }
     }
 
     @FXML
