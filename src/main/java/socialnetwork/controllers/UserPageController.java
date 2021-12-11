@@ -27,6 +27,7 @@ public class UserPageController {
     private SocialNetworkUserService service;
     ObservableList<User> modelUsers = FXCollections.observableArrayList();
     ObservableList<ModelFriendRequest> modelFriendRequests = FXCollections.observableArrayList();
+    ObservableList<User> modelFriends = FXCollections.observableArrayList();
 
     @FXML
     private TextField searchUserTextField;
@@ -36,7 +37,12 @@ public class UserPageController {
     private Button sendFriendRequestButton;
 
     @FXML
-    private TableView tableViewFriends;
+    private TableView<User> tableViewFriends;
+    @FXML
+    private TableColumn<User, String> tableColumnFirstName;
+    @FXML
+    private TableColumn<User, String> tableColumnLastName;
+
 
     @FXML
     private TableView<ModelFriendRequest> tableViewFriendRequests;
@@ -75,6 +81,10 @@ public class UserPageController {
         tableColumnStatus.setCellValueFactory(new PropertyValueFactory<ModelFriendRequest, String>("status"));
         tableColumnDate.setCellValueFactory(new PropertyValueFactory<ModelFriendRequest, LocalDateTime>("date"));
         tableViewFriendRequests.setItems(modelFriendRequests);
+
+        tableColumnFirstName.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
+        tableColumnLastName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
+        tableViewFriends.setItems(modelFriends);
     }
 
     @FXML
@@ -143,7 +153,6 @@ public class UserPageController {
         stage.setTitle("Log In");
         stage.setScene(scene);
         stage.show();
-        //((Node)(event.getSource())).getScene().getWindow().hide();
         ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
     }
 
@@ -156,6 +165,13 @@ public class UserPageController {
             friendRequestsOfUser.add(new ModelFriendRequest(set.getKey(), set.getValue()));
         }
         modelFriendRequests.setAll(friendRequestsOfUser);
+
+        Map<Optional<User>, LocalDateTime> friendsMap = service.findAllFriendsOfLoggedUser();
+        List<User> friends = new ArrayList<>();
+        for(Map.Entry<Optional<User>, LocalDateTime> set: friendsMap.entrySet()){
+            friends.add(set.getKey().get());
+        }
+        modelFriends.setAll(friends);
     }
 
     private void handleSearch(){

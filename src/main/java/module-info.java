@@ -8,6 +8,7 @@ module socialnetwork {
     requires java.sql;
 
     opens socialnetwork to javafx.fxml;
+    opens socialnetwork.domain.models to javafx.base;
     exports socialnetwork;
     exports socialnetwork.controllers;
     opens socialnetwork.controllers to javafx.fxml;
