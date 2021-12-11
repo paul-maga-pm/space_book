@@ -2,9 +2,11 @@ package socialnetwork.service;
 
 import socialnetwork.domain.models.FriendRequest;
 import socialnetwork.domain.models.Friendship;
+import socialnetwork.domain.models.Status;
 import socialnetwork.domain.models.User;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +41,10 @@ public class SocialNetworkUserService {
         friendRequestService.sendFriendRequestService(idOfLoggedUser, idOfFriend);
     }
 
+    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long idOfFriend, Status status){
+        return friendRequestService.acceptOrRejectFriendRequestService(idOfFriend, idOfLoggedUser, status);
+    }
+
     public Optional<Friendship> removeFriendshipService(Long idOfFriend){
         Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(idOfLoggedUser, idOfFriend);
         if(existingFriendshipOptional.isPresent())
@@ -47,8 +53,15 @@ public class SocialNetworkUserService {
         return existingFriendshipOptional;
     }
 
-    public List<FriendRequest> getAllFriendRequestsOfLoggedUser(){
-        return friendRequestService.getAllFriendRequestsForUserService(idOfLoggedUser);
+    public Map<FriendRequest, User> getAllFriendRequestsOfLoggedUser(){
+        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsForUserService(idOfLoggedUser);
+        List<User> users = userService.getAllUsers();
+        Map<FriendRequest, User>  friendRequestsAndSendersForLoggedUser = new HashMap<>();
+        for(FriendRequest friendRequest: friendRequestsForUser){
+            Optional<User> sender = users.stream().filter(user -> user.getId()==friendRequest.getId().first).findFirst();
+            friendRequestsAndSendersForLoggedUser.put(friendRequest, sender.get());
+        }
+        return friendRequestsAndSendersForLoggedUser;
     }
 
     public Map<Optional<User>, LocalDateTime> findAllFriendsOfLoggedUser(){
@@ -60,5 +73,9 @@ public class SocialNetworkUserService {
         }
 
         return friends;
+    }
+
+    public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
+        return userService.findUsersThatHaveInTheirFullNameTheString(str);
     }
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane prefHeight="228.0" prefWidth="670.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.AuthenticationController">
+    <children>
+        <SplitPane dividerPositions="0.4999999999999999" prefHeight="238.0" prefWidth="670.0">
+            <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="237.0" prefWidth="243.0">
+                    <children>
+                        <GridPane layoutX="48.0" layoutY="32.0" prefHeight="122.0" prefWidth="262.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="146.40001220703124" minWidth="10.0" prefWidth="71.2" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="191.2" minWidth="10.0" prefWidth="191.2" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label prefHeight="35.0" prefWidth="200.0" text="User Login" GridPane.columnSpan="2" />
+                                <Label prefHeight="36.0" prefWidth="100.0" text="Email:" GridPane.rowIndex="1" />
+                                <Label prefHeight="40.0" prefWidth="100.0" text="Password:" GridPane.rowIndex="2" />
+                                <TextField fx:id="loginEmailTextField" prefHeight="26.0" prefWidth="162.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <PasswordField fx:id="loginPasswordPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Button fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#loginUser" prefHeight="26.0" prefWidth="84.0" text="Login" GridPane.rowIndex="3" />
+                            </children>
+                        </GridPane>
+                    </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="237.0" prefWidth="380.0">
+                    <children>
+                        <GridPane layoutX="48.0" layoutY="27.0" prefHeight="181.0" prefWidth="262.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="135.20001220703125" minWidth="10.0" prefWidth="75.20001983642578" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="193.59994354248045" minWidth="10.0" prefWidth="187.1999801635742" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Label prefHeight="30.0" prefWidth="258.0" text="User Sign In" GridPane.columnSpan="2" />
+                                <Label prefHeight="34.0" prefWidth="100.0" text="First Name:" GridPane.rowIndex="1" />
+                                <Label prefHeight="38.0" prefWidth="100.0" text="Last Name:" GridPane.rowIndex="2" />
+                                <Label prefHeight="46.0" prefWidth="100.0" text="Email:" GridPane.rowIndex="3" />
+                                <Label prefHeight="57.0" prefWidth="100.0" text="Password:" GridPane.rowIndex="4" />
+                                <TextField fx:id="signInFirstNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <TextField fx:id="signInLastNameTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <TextField fx:id="signInEmailTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <PasswordField fx:id="signInPasswordPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                <Button fx:id="signInButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#signInUser" prefHeight="26.0" prefWidth="113.0" text="Sign In" GridPane.rowIndex="5" />
+                            </children>
+                        </GridPane>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
+</AnchorPane>
