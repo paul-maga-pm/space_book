@@ -76,12 +76,12 @@
                                         </TableView>
                                         <HBox prefHeight="28.0" prefWidth="212.0" spacing="10.0">
                                             <children>
-                                                <Button mnemonicParsing="false" text="Accept">
+                                                <Button fx:id="acceptFriendRequestButton" mnemonicParsing="false" onAction="#acceptFriendRequest" text="Accept">
                                                     <HBox.margin>
                                                         <Insets left="20.0" />
                                                     </HBox.margin>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="Reject">
+                                                <Button fx:id="rejectFriendRequestButton" mnemonicParsing="false" onAction="#rejectFriendRequest" text="Reject">
                                                     <HBox.margin>
                                                         <Insets left="40.0" />
                                                     </HBox.margin>

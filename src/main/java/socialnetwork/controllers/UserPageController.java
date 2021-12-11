@@ -11,6 +11,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
 import socialnetwork.domain.models.FriendRequest;
+import socialnetwork.domain.models.Status;
 import socialnetwork.domain.models.StatusSupplier;
 import socialnetwork.domain.models.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
@@ -45,6 +46,10 @@ public class UserPageController {
     private TableColumn<ModelFriendRequest, String> tableColumnStatus;
     @FXML
     private TableColumn<ModelFriendRequest, LocalDateTime> tableColumnDate;
+    @FXML
+    private Button acceptFriendRequestButton;
+    @FXML
+    private Button rejectFriendRequestButton;
 
     @FXML
     private Button logOutButton;
@@ -79,11 +84,37 @@ public class UserPageController {
             try{
                 service.sendFriendRequestService(user.getId());
             }catch(ExceptionBaseClass exception) {
-                showWarning(exception.getMessage());
+                showWarning("Warning", exception.getMessage());
             }
         } else {
-            showWarning("Must select a user!");
+            showWarning("Warning","Must select a user!");
         }
+    }
+
+    @FXML
+    protected void acceptFriendRequest(){
+        ModelFriendRequest modelFriendRequest = tableViewFriendRequests.getSelectionModel().getSelectedItem();
+        if(modelFriendRequest != null){
+            try{
+                Optional<FriendRequest> existingFriendRequest = service.acceptOrRejectFriendRequestService(modelFriendRequest.getUser().getId(), Status.APPROVED);
+                if(existingFriendRequest.isPresent())
+                    if(existingFriendRequest.get().getStatus().equals(Status.PENDING)){
+                        modelFriendRequest.setStatus("APPROVED");
+                        modelFriendRequests.set(tableViewFriendRequests.getSelectionModel().getSelectedIndex(), modelFriendRequest);
+                } else{
+                    showWarning("Information", "Could not accept");
+                }
+            } catch(ExceptionBaseClass exception){
+                showWarning("Warning", exception.getMessage());
+            }
+        } else {
+            showWarning("Warning", "Must select a friend request!");
+        }
+    }
+
+    @FXML
+    protected void rejectFriendRequest(){
+
     }
 
     @FXML
@@ -115,9 +146,9 @@ public class UserPageController {
         modelUsers.setAll(service.findUsersThatHaveInTheirFullNameTheString(searchUserTextField.getText()));
     }
 
-    private void showWarning(String message) {
+    private void showWarning(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
-        alert.setTitle("Warning");
+        alert.setTitle(title);
         alert.showAndWait();
     }
 

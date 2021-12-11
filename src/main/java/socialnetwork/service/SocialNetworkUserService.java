@@ -2,6 +2,7 @@ package socialnetwork.service;
 
 import socialnetwork.domain.models.FriendRequest;
 import socialnetwork.domain.models.Friendship;
+import socialnetwork.domain.models.Status;
 import socialnetwork.domain.models.User;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,10 @@ public class SocialNetworkUserService {
 
     public void sendFriendRequestService(Long idOfFriend){
         friendRequestService.sendFriendRequestService(idOfLoggedUser, idOfFriend);
+    }
+
+    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long idOfFriend, Status status){
+        return friendRequestService.acceptOrRejectFriendRequestService(idOfFriend, idOfLoggedUser, status);
     }
 
     public Optional<Friendship> removeFriendshipService(Long idOfFriend){
