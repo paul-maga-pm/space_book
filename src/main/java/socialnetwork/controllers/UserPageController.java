@@ -15,6 +15,7 @@ import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkUserService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class UserPageController {
     @FXML
     private ListView<User> listViewUsers;
     @FXML
-    private Button sendFriendRequestButton;
+    private ToggleButton sendFriendRequestToggleButton;
 
     @FXML
     private TableView<User> tableViewFriends;
@@ -75,6 +76,8 @@ public class UserPageController {
             }
         });
         listViewUsers.setItems(modelUsers);
+        listViewUsers.getSelectionModel().selectedItemProperty().addListener((x,y,z) -> changeToggleButtonState());
+        sendFriendRequestToggleButton.setDisable(true);
 
         tableColumnFrom.setCellValueFactory(new PropertyValueFactory<ModelFriendRequest, String>("from"));
         tableColumnStatus.setCellValueFactory(new PropertyValueFactory<ModelFriendRequest, String>("status"));
@@ -87,15 +90,29 @@ public class UserPageController {
     }
 
     @FXML
-    protected void sendFriendRequest(){
+    protected void sendOrWithdrawFriendRequest(){
         User user = listViewUsers.getSelectionModel().getSelectedItem();
         if(user != null){
-            try{
-                service.sendFriendRequestService(user.getId());
-            }catch(ExceptionBaseClass exception) {
-                showWarning("Warning", exception.getMessage());
+            if(sendFriendRequestToggleButton.getText().equals("Send")){
+                try{
+                    service.sendFriendRequestService(user.getId());
+                    sendFriendRequestToggleButton.setText("Sent");
+                    return;
+                }catch(ExceptionBaseClass exception) {
+                    showWarning("Warning", exception.getMessage());
+                }
             }
-        } else {
+            if(sendFriendRequestToggleButton.getText().equals("Sent")){
+                try{
+                    service.withdrawFriendRequest(user.getId());
+                    sendFriendRequestToggleButton.setText("Send");
+                    return;
+                }catch(ExceptionBaseClass exception) {
+                    showWarning("Warning", exception.getMessage());
+                }
+            }
+        }
+        else {
             showWarning("Warning","Must select a user!");
         }
     }
@@ -174,6 +191,43 @@ public class UserPageController {
         ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
     }
 
+    private void changeToggleButtonState(){
+        User user = listViewUsers.getSelectionModel().getSelectedItem();
+        if(user != null){
+            if(user.getId() == service.getIdOfLoggedUser()){
+                sendFriendRequestToggleButton.setDisable(true);
+                return;
+            }
+            Optional<FriendRequest> existingFriendRequest = service.findOneFriendRequestService(user.getId());
+            if(existingFriendRequest.isEmpty()){
+                sendFriendRequestToggleButton.setDisable(false);
+                sendFriendRequestToggleButton.setText("Send");
+                sendFriendRequestToggleButton.setSelected(false);
+                return;
+            }
+            else{
+                Status friendRequestStatus = existingFriendRequest.get().getStatus();
+                if(friendRequestStatus.equals(Status.REJECTED) || friendRequestStatus.equals(Status.APPROVED)){
+                    sendFriendRequestToggleButton.setDisable(true);
+                    sendFriendRequestToggleButton.setText("Send");
+                    return;
+                }
+                if(friendRequestStatus.equals(Status.PENDING)){
+                    if(existingFriendRequest.get().getId().first == service.getIdOfLoggedUser()){
+                        sendFriendRequestToggleButton.setDisable(false);
+                        sendFriendRequestToggleButton.setText("Sent");
+                        sendFriendRequestToggleButton.setSelected(true);
+                        return;
+                    }
+                    else{
+                        sendFriendRequestToggleButton.setDisable(true);
+                        sendFriendRequestToggleButton.setText("Send");
+                    }
+                }
+            }
+        }
+    }
+
     private List<ModelFriendRequest> getFriendRequestsModel(){
         Map<FriendRequest, User> friendRequestsOfUserMap = service.getAllFriendRequestsOfLoggedUser();
         List<ModelFriendRequest> friendRequestsOfUser = new ArrayList<>();
@@ -214,6 +268,7 @@ public class UserPageController {
         private String from;
         private String status;
         private LocalDateTime date;
+        private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         public ModelFriendRequest(FriendRequest friendRequest, User user) {
             this.friendRequest = friendRequest;
@@ -231,8 +286,8 @@ public class UserPageController {
             return status;
         }
 
-        public LocalDateTime getDate() {
-            return date;
+        public String getDate() {
+            return date.format(DATE_TIME_FORMATTER);
         }
 
         public FriendRequest getFriendRequest() {
