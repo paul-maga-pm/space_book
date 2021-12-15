@@ -12,9 +12,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="703.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.UserPageController">
+<AnchorPane prefHeight="400.0" prefWidth="763.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.UserPageController">
     <children>
-        <SplitPane dividerPositions="0.3178475935828876" prefHeight="400.0" prefWidth="703.0">
+        <SplitPane dividerPositions="0.25105042016806717" prefHeight="400.0" prefWidth="763.0">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="162.0" prefWidth="33.0">
                     <children>
@@ -44,14 +44,14 @@
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
-                        <HBox layoutY="-2.0" prefHeight="400.0" prefWidth="476.0">
+                        <HBox layoutY="-2.0" prefHeight="400.0" prefWidth="568.0">
                             <children>
-                                <VBox prefHeight="400.0" prefWidth="240.0" spacing="10.0">
+                                <VBox prefHeight="400.0" prefWidth="231.0" spacing="10.0">
                                     <padding>
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </padding>
                                     <children>
-                                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="179.0" text="Friends" textAlignment="CENTER" />
+                                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="213.0" text="Friends" textAlignment="CENTER" />
                                         <TableView fx:id="tableViewFriends" prefHeight="200.0" prefWidth="147.0">
                                             <columns>
                                                 <TableColumn fx:id="tableColumnFirstName" prefWidth="107.19995248317719" text="First Name" />
@@ -61,36 +61,25 @@
                                         <Button fx:id="removeFriendButton" alignment="BOTTOM_LEFT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#removeFriend" text="Remove Friend" />
                                     </children>
                                 </VBox>
-                                <VBox prefHeight="400.0" prefWidth="255.0" spacing="10.0">
+                                <VBox prefHeight="400.0" prefWidth="341.0" spacing="10.0">
                                     <padding>
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </padding>
                                     <children>
-                                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="186.0" text="Friend Requests" />
-                                        <TableView fx:id="tableViewFriendRequests" prefHeight="200.0" prefWidth="201.0">
+                                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="324.0" text="Friend Requests" />
+                                        <TableView fx:id="tableViewFriendRequests" prefHeight="200.0" prefWidth="320.0">
                                             <columns>
                                                 <TableColumn fx:id="tableColumnFrom" prefWidth="75.0" text="From" />
                                                 <TableColumn fx:id="tableColumnStatus" prefWidth="75.0" text="Status" />
-                                    <TableColumn fx:id="tableColumnDate" prefWidth="75.0" text="Date" />
+                                    <TableColumn fx:id="tableColumnDate" prefWidth="168.80003356933594" text="Date" />
                                             </columns>
                                         </TableView>
-                                        <HBox prefHeight="28.0" prefWidth="212.0" spacing="10.0">
-                                            <children>
-                                                <Button fx:id="acceptFriendRequestButton" mnemonicParsing="false" onAction="#acceptFriendRequest" text="Accept">
-                                                    <HBox.margin>
-                                                        <Insets left="20.0" />
-                                                    </HBox.margin>
-                                                </Button>
-                                                <Button fx:id="rejectFriendRequestButton" mnemonicParsing="false" onAction="#rejectFriendRequest" text="Reject">
-                                                    <HBox.margin>
-                                                        <Insets left="40.0" />
-                                                    </HBox.margin>
-                                                </Button>
-                                            </children>
-                                            <padding>
-                                                <Insets bottom="10.0" left="10.0" right="10.0" />
-                                            </padding>
-                                        </HBox>
+                              <AnchorPane prefHeight="122.0" prefWidth="320.0">
+                                 <children>
+                                                <Button fx:id="acceptFriendRequestButton" layoutX="173.0" layoutY="1.0" mnemonicParsing="false" onAction="#acceptFriendRequest" text="Accept" />
+                                                <Button fx:id="rejectFriendRequestButton" layoutX="257.0" layoutY="1.0" mnemonicParsing="false" onAction="#rejectFriendRequest" text="Reject" />
+                                 </children>
+                              </AnchorPane>
                                     </children>
                                 </VBox>
                             </children>
