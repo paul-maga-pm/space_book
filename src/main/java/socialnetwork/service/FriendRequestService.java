@@ -1,5 +1,6 @@
 package socialnetwork.service;
 
+import javafx.collections.ObservableList;
 import socialnetwork.domain.models.FriendRequest;
 import socialnetwork.domain.models.Friendship;
 import socialnetwork.domain.models.Status;
@@ -52,12 +53,12 @@ public class FriendRequestService {
             friendRequestValidator.validate(friendRequest);
             friendRequestRepository.save(friendRequest);
         }
-        /*else
-        if(existingFriendRequestOptional.get().getStatus().equals(Status.REJECTED)){
-            FriendRequest newFriendRequest = new FriendRequest(idOfFirstUser, idOfSecondUser, Status.PENDING, LocalDateTime.now());
-            friendRequestRepository.update(newFriendRequest);
-        }*/
         return existingFriendRequestOptional;
+    }
+
+    public Optional<FriendRequest> removeFriendRequestService(Long idOfFirstUser, Long idOfSecondUser){
+        UnorderedPair<Long, Long> idOfRemovedFriendRequest = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
+        return friendRequestRepository.remove(idOfRemovedFriendRequest);
     }
 
     /**
@@ -92,13 +93,7 @@ public class FriendRequestService {
      * @param idOfSecondUser identifier of the second user
      */
     public void rejectADeletedFriendship(Long idOfFirstUser, Long idOfSecondUser){
-        Optional<FriendRequest> existingFriendRequestOptional =
-                friendRequestRepository.findById(new UnorderedPair<>(idOfFirstUser, idOfSecondUser));
-        if(existingFriendRequestOptional.isPresent()){
-            FriendRequest friendRequest = existingFriendRequestOptional.get();
-            friendRequest.setStatus(Status.REJECTED);
-            friendRequestRepository.update(friendRequest);
-        }
+        removeFriendRequestService(idOfFirstUser, idOfSecondUser);
     }
 
     /**
@@ -116,6 +111,11 @@ public class FriendRequestService {
         });
 
         return friendRequestsForUser;
+    }
+
+    public Optional<FriendRequest> findOneFriendRequest(Long idOfFirstUser, Long idOfSecondUser){
+        UnorderedPair<Long, Long> idOfSearchedFriendRequest = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
+        return friendRequestRepository.findById(idOfSearchedFriendRequest);
     }
 
     /**

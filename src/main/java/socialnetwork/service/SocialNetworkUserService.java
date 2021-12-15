@@ -29,6 +29,10 @@ public class SocialNetworkUserService {
         this.friendRequestService = friendRequestService;
     }
 
+    public Long getIdOfLoggedUser(){
+        return idOfLoggedUser;
+    }
+
     public void signUpUserService(String firstName, String lastName, String userName, String password){
         idOfLoggedUser = userService.signUpUser(firstName, lastName, userName, password);
     }
@@ -51,6 +55,14 @@ public class SocialNetworkUserService {
             friendRequestService.rejectADeletedFriendship(existingFriendshipOptional.get().getId().first,
                     existingFriendshipOptional.get().getId().second);
         return existingFriendshipOptional;
+    }
+
+    public Optional<FriendRequest> withdrawFriendRequest(Long idOfFriend){
+        return friendRequestService.removeFriendRequestService(idOfLoggedUser, idOfFriend);
+    }
+
+    public Optional<FriendRequest> findOneFriendRequestService(Long idOfFriend){
+        return friendRequestService.findOneFriendRequest(idOfLoggedUser, idOfFriend);
     }
 
     public Map<FriendRequest, User> getAllFriendRequestsOfLoggedUser(){
