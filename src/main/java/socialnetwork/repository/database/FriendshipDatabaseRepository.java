@@ -1,7 +1,6 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.exceptions.DatabaseException;
+import socialnetwork.domain.entities.Friendship;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.*;

@@ -1,8 +1,6 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.models.User;
-import socialnetwork.exceptions.DatabaseException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.domain.entities.User;
 
 import java.sql.*;
 
@@ -30,7 +28,9 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      */
     @Override
     public PreparedStatement createFindStatementForEntityWithId(Connection connection, Long id) throws SQLException {
-        String findSqlString = "SELECT id, first_name, last_name FROM users WHERE id = ?";
+        String findSqlString = "SELECT * FROM users u  " +
+                "inner join user_credentials u_c on u_c.user_id = u.id" +
+                " WHERE id = ?";
         PreparedStatement findSql = null;
         try{
             findSql = connection.prepareStatement(findSqlString);
@@ -50,7 +50,8 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
     @Override
     public PreparedStatement createSelectAllStatement(Connection connection) throws SQLException {
         try{
-            String selectAllStatementString = "SELECT * FROM users";
+            String selectAllStatementString = "SELECT * FROM users u  " +
+                    "inner join user_credentials u_c on u_c.user_id = u.id";
             return connection.prepareStatement(selectAllStatementString);
         } catch (SQLException exception) {
             throw new SQLException(exception);
@@ -132,7 +133,10 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             Long id = resultSet.getLong("id");
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
-            return new User(id, firstName, lastName);
+            String userName = resultSet.getString("username");
+            User user = new User(id, firstName, lastName);
+            user.setUserName(userName);
+            return user;
         } catch (SQLException exception){
             throw new SQLException(exception);
         }

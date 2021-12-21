@@ -1,27 +1,27 @@
 package socialnetwork.domain.validators;
 
 
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 import socialnetwork.utils.containers.UnorderedPair;
 
 /**
  * Validator for Friendship model
  */
 public class FriendshipValidator
-        implements EntityValidatorInterface<UnorderedPair<Long, Long>, Friendship> {
+        implements EntityValidator<UnorderedPair<Long, Long>, Friendship> {
 
-    private RepositoryInterface<Long, User> userRepository;
+    private Repository<Long, User> userRepository;
 
     /**
      * Constructor that creates a new validator that accesses the given user repository for friendship validation
      * @param userRepository repository containing the users
      * @throws IllegalArgumentException if userRepository is null
      */
-    public FriendshipValidator(RepositoryInterface<Long, User> userRepository) {
+    public FriendshipValidator(Repository<Long, User> userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -43,17 +43,6 @@ public class FriendshipValidator
             errorMessage += "User with id " + idOfSecondUser + " doesn't exist";
         if(errorMessage.length() > 0)
             throw new EntityNotFoundValidationException(errorMessage);
-    }
-
-    /**
-     * Validates the existence of the users in the repository (given in the constructor) of the given friendship
-     * @param friendship Entity that will be validated
-     * @return true if the users of the friendship exist in the repository, false otherwise
-     */
-    @Override
-    public boolean isValid(Friendship friendship) {
-        return checkIfUserExists(friendship.getId().first) &&
-                checkIfUserExists((friendship.getId().second));
     }
 
     /**

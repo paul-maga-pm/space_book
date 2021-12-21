@@ -1,6 +1,6 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.models.UserCredential;
+import socialnetwork.domain.entities.UserCredential;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,7 +1,7 @@
 package socialnetwork.repository;
 
 
-import socialnetwork.domain.models.Entity;
+import socialnetwork.domain.entities.Entity;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import java.util.Optional;
  * @param <ID> id type of E
  * @param <E> subclass of Entity
  */
-public interface RepositoryInterface<ID, E extends Entity<ID>> {
+public interface Repository<ID, E extends Entity<ID>> {
     /**
      * Saves the given entity
      *

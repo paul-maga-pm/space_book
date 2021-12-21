@@ -1,7 +1,7 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.models.FriendRequest;
-import socialnetwork.domain.models.StatusSupplier;
+import socialnetwork.domain.entities.FriendRequest;
+import socialnetwork.domain.entities.StatusSupplier;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.*;

@@ -1,14 +1,13 @@
 package socialnetwork.domain.validators;
 
-import socialnetwork.domain.models.UserCredential;
+import socialnetwork.domain.entities.UserCredential;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.exceptions.UnimplementedMethodException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 
 public class UserSignUpCredentialValidator
-        implements EntityValidatorInterface<Long, UserCredential> {
-    private RepositoryInterface<Long, UserCredential> credentialRepository;
-    public UserSignUpCredentialValidator(RepositoryInterface<Long, UserCredential> credentialRepository) {
+        implements EntityValidator<Long, UserCredential> {
+    private Repository<Long, UserCredential> credentialRepository;
+    public UserSignUpCredentialValidator(Repository<Long, UserCredential> credentialRepository) {
         this.credentialRepository = credentialRepository;
     }
 
@@ -41,8 +40,4 @@ public class UserSignUpCredentialValidator
                 throw new InvalidEntityException("Username is already used");
     }
 
-    @Override
-    public boolean isValid(UserCredential credential) {
-        throw new UnimplementedMethodException();
-    }
 }

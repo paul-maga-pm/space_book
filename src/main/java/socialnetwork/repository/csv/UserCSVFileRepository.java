@@ -1,7 +1,7 @@
 package socialnetwork.repository.csv;
 
 
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.CorruptedDataException;
 import socialnetwork.exceptions.IoFileException;
 

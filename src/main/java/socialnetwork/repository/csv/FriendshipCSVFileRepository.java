@@ -1,7 +1,7 @@
 package socialnetwork.repository.csv;
 
 
-import socialnetwork.domain.models.Friendship;
+import socialnetwork.domain.entities.Friendship;
 import socialnetwork.exceptions.CorruptedDataException;
 import socialnetwork.exceptions.IoFileException;
 import socialnetwork.utils.containers.UnorderedPair;

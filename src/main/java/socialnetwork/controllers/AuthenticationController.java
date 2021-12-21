@@ -8,10 +8,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
 import socialnetwork.exceptions.ExceptionBaseClass;
-import socialnetwork.service.SocialNetworkUserService;
+import socialnetwork.service.SocialNetworkService;
 
 public class AuthenticationController {
-    private SocialNetworkUserService service;
+    private SocialNetworkService service;
 
     @FXML
     private Button loginButton;
@@ -79,7 +79,7 @@ public class AuthenticationController {
         alert.showAndWait();
     }
 
-    public void setService(SocialNetworkUserService socialNetworkUserService){
-        this.service = socialNetworkUserService;
+    public void setService(SocialNetworkService socialNetworkService){
+        this.service = socialNetworkService;
     }
 }
