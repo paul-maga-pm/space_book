@@ -1,25 +1,25 @@
 package socialnetwork.domain.validators;
 
-import socialnetwork.domain.models.FriendRequest;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.entities.FriendRequest;
+import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 import socialnetwork.utils.containers.UnorderedPair;
 
 /**
  * Validator for FriendRequest model
  */
-public class FriendRequestValidator implements EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest>{
+public class FriendRequestValidator implements EntityValidator<UnorderedPair<Long, Long>, FriendRequest> {
 
-    private RepositoryInterface<Long, User> userRepository;
+    private Repository<Long, User> userRepository;
 
     /**
      * Constructor that creates a new validator that accesses the given user repository for friendRequest validation
      * @param userRepository repository containing the users
      * @throws IllegalArgumentException if userRepository is null
      */
-    public FriendRequestValidator(RepositoryInterface<Long, User> userRepository) {
+    public FriendRequestValidator(Repository<Long, User> userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -41,17 +41,6 @@ public class FriendRequestValidator implements EntityValidatorInterface<Unordere
             errorMessage += "User with id " + idOfSecondUser + " doesn't exist";
         if(errorMessage.length() > 0)
             throw new EntityNotFoundValidationException(errorMessage);
-    }
-
-    /**
-     * Validates the existence of the users in the repository (given in the constructor) of the given friendRequest
-     * @param friendRequest Entity that will be validated
-     * @return true if the users of the friendRequest exist in the repository, false otherwise
-     */
-    @Override
-    public boolean isValid(FriendRequest friendRequest) {
-        return checkIfUserExists(friendRequest.getId().first) &&
-                checkIfUserExists((friendRequest.getId().second));
     }
 
     /**

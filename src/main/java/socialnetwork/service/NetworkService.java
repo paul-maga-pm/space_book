@@ -1,11 +1,11 @@
 package socialnetwork.service;
 
 
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.User;
-import socialnetwork.domain.validators.EntityValidatorInterface;
+import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.User;
+import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.InvalidEntityException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 import socialnetwork.utils.containers.UndirectedGraph;
 import socialnetwork.utils.containers.UnorderedPair;
 
@@ -16,9 +16,9 @@ import java.util.*;
  * Business layer for Friendship model
  */
 public class NetworkService {
-    private RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository;
-    private RepositoryInterface<Long, User> userRepository;
-    private EntityValidatorInterface<UnorderedPair<Long, Long>, Friendship> friendshipValidator;
+    private Repository<UnorderedPair<Long, Long>, Friendship> friendshipRepository;
+    private Repository<Long, User> userRepository;
+    private EntityValidator<UnorderedPair<Long, Long>, Friendship> friendshipValidator;
 
     /**
      * Constructor that creates a new socialnetwork.service that accesses the given repositories and validates the friendships
@@ -28,8 +28,8 @@ public class NetworkService {
      * @param friendshipValidator validator for Friendship model
      */
 
-    public NetworkService(RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository,
-                          RepositoryInterface<Long, User> userRepository, EntityValidatorInterface<UnorderedPair<Long, Long>, Friendship> friendshipValidator){
+    public NetworkService(Repository<UnorderedPair<Long, Long>, Friendship> friendshipRepository,
+                          Repository<Long, User> userRepository, EntityValidator<UnorderedPair<Long, Long>, Friendship> friendshipValidator){
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.friendshipValidator = friendshipValidator;

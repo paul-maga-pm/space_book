@@ -1,8 +1,7 @@
-package socialnetwork.domain.models;
+package socialnetwork.domain.entities;
 
 import socialnetwork.utils.containers.UnorderedPair;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Objects;
 

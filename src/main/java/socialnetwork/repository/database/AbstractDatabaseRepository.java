@@ -1,10 +1,8 @@
 package socialnetwork.repository.database;
 
-import socialnetwork.domain.models.Entity;
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.User;
+import socialnetwork.domain.entities.Entity;
 import socialnetwork.exceptions.DatabaseException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
-        implements RepositoryInterface<ID, E> {
+        implements Repository<ID, E> {
     private String url;
     private String user;
     private String password;

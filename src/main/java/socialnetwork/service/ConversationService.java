@@ -1,75 +1,132 @@
 package socialnetwork.service;
 
-import socialnetwork.dataaccess.ConversationDataAccess;
-import socialnetwork.domain.models.*;
-import socialnetwork.exceptions.InvalidEntityException;
+import socialnetwork.domain.entities.*;
+import socialnetwork.domain.validators.EntityValidator;
+import socialnetwork.repository.Repository;
+import socialnetwork.utils.containers.OrderedPair;
 
+import java.io.Flushable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-/**
- * Business Layer for MessageReadModel and ReplyMessageReadModel models
- */
 public class ConversationService {
-    private ConversationDataAccess conversationDataAccess;
+    private final EntityValidator<ConversationParticipationId, ConversationParticipation> participationValidator;
+    private Repository<Long, User> userRepository;
+    private Repository<Long, Conversation> conversationRepository;
+    private Repository<ConversationParticipationId, ConversationParticipation> conversationParticipationRepository;
+    private Repository<Long, Message> messageRepository;
+    private EntityValidator<Long, Message> messageValidator;
+    private EntityValidator<Long, Conversation> conversationValidator;
 
-    /**
-     * Creates a new socialnetwork.service that accesses the MessageReadModels through the given boundary
-     */
-    public ConversationService(ConversationDataAccess boundary) {
-        this.conversationDataAccess = boundary;
+    public ConversationService(Repository<Long, User> userRepository,
+                               Repository<Long, Conversation> conversationRepository,
+                               Repository<ConversationParticipationId, ConversationParticipation>
+                                       conversationParticipationRepository,
+                               Repository<Long, Message> messageRepository,
+                               EntityValidator<Long, Message> messageValidator,
+                               EntityValidator<Long, Conversation> conversationValidator,
+                               EntityValidator<ConversationParticipationId, ConversationParticipation> participationValidator) {
+        this.userRepository = userRepository;
+        this.conversationRepository = conversationRepository;
+        this.conversationParticipationRepository = conversationParticipationRepository;
+        this.messageRepository = messageRepository;
+        this.messageValidator = messageValidator;
+        this.conversationValidator = conversationValidator;
+        this.participationValidator = participationValidator;
     }
 
-    /**
-     * Add a new message
-     * @param senderId identifier of sender
-     * @param receiverIds identifiers of receivers
-     * @param text content of the message
-     * @param date date when the message was sent
-     */
-    public void sendMessageFromUserToService(Long senderId, List<Long> receiverIds, String text, LocalDateTime date){
-        MessageWriteModel messageWriteModel = new MessageWriteModel(senderId, text, date);
-        messageWriteModel.setIdListOfReceivers(receiverIds);
-        conversationDataAccess.sendMessage(messageWriteModel);
+    public ConversationDto createConversation(String name, String description, List<Long> participantsIdList){
+        Long conversationId = findAvailableIdForConversation();
+        Conversation conversation = new Conversation(conversationId, name, description);
+
+        conversationValidator.validate(conversation);
+        conversationRepository.save(conversation);
+
+        for(var participantId : participantsIdList){
+            ConversationParticipation participation = new ConversationParticipation(participantId, conversationId);
+            participationValidator.validate(participation);
+            conversationParticipationRepository.save(participation);
+        }
+
+        List<User> conversationParticipants = getConversationParticipants(conversationId);
+
+        return new ConversationDto(conversationId,
+                                name,
+                                description,
+                                conversationParticipants,
+                                new ArrayList<>());
     }
 
-    /**
-     * Add a new reply
-     * @param messageRepliedToId identifier of the message that we reply to
-     * @param senderId identifier of the sender
-     * @param text content of the reply
-     * @param date date when the reply was sent
-     * @throws InvalidEntityException if there is no message with messageRepliedToId or
-     *                                if senderId is not part of the receivers of the message with messageRepliedToId
-     */
-    public void replyToMessageService(Long messageRepliedToId, Long senderId, String text, LocalDateTime date){
-        if(conversationDataAccess.isReplyMessage(messageRepliedToId))
-            throw new InvalidEntityException("You can't reply to another reply");
-        ReplyMessageWriteModel replyMessageWriteModel = new ReplyMessageWriteModel(messageRepliedToId,
-                senderId,
-                text,
-                date);
-        conversationDataAccess.sendReplyMessage(replyMessageWriteModel);
+    public void sendMessageInConversation(Long conversationId, Long senderId, String text, LocalDateTime date){
+        Long id = findAvailableIdForMessage();
+        Message message = new Message(id, conversationId, senderId, text, date);
+        participationValidator.validate(new ConversationParticipation(senderId, conversationId));
+        messageValidator.validate(message);
+        messageRepository.save(message);
     }
 
-    /**
-     * Get conversation between two users
-     * @param idOfFirstUser identifier of the first user that is part of the conversation
-     * @param idOfSecondUser identifier of the second user that is part of the conversation
-     * @return the conversation (list of messages) between the two users
-     */
-    public List<MessageReadModel> getConversationBetweenTwoUsersService(Long idOfFirstUser, Long idOfSecondUser){
-        List<MessageReadModel> allMessages = conversationDataAccess.getAllMessageReadModels();
-        Predicate<MessageReadModel> filterPredicate = m -> m.isBetween(idOfFirstUser, idOfSecondUser);
-        List<MessageReadModel> conversation = allMessages.stream().filter(filterPredicate).toList();
-        return conversation.stream()
-                .sorted(Comparator.comparing(MessageReadModel::getDate))
+    public List<ConversationDto> getConversationsOfUser(Long userId){
+        List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
+                .filter(convo -> convo.getParticipantId().equals(userId))
+                .map(convo -> convo.getConversationId())
                 .collect(Collectors.toList());
+
+        List<ConversationDto> conversationDtoList = new ArrayList<>();
+        for(var conversationId : userConversationsIdList){
+            ConversationDto conversationDto = getConversationDtoWithId(conversationId);
+            conversationDtoList.add(conversationDto);
+        }
+        return conversationDtoList;
     }
 
-    public void removeAllConversationsOfUserService(Long idOfUser) {
-        conversationDataAccess.removeAllConversationsOfUser(idOfUser);
+    private ConversationDto getConversationDtoWithId(Long conversationId) {
+        Conversation conversation = conversationRepository.findById(conversationId).get();
+        String name = conversation.getName();
+        String description = conversation.getDescription();
+
+        List<User> participants = getConversationParticipants(conversationId);
+
+        List<MessageDto> messages = getConversationMessages(conversationId);
+
+        return new ConversationDto(conversationId,
+                name,
+                description,
+                participants,
+                messages);
+    }
+
+    private List<MessageDto> getConversationMessages(Long conversationId) {
+        List<MessageDto> messages = messageRepository.getAll().stream()
+                .filter(message -> message.getConversationId().equals(conversationId))
+                .map(message -> {
+                    User sender = userRepository.findById(message.getSenderId()).get();
+                    return new MessageDto(sender, message.getText(), message.getDate());})
+                .collect(Collectors.toList());
+        return messages;
+    }
+
+    private List<User> getConversationParticipants(Long conversationId) {
+        List<User> participants = conversationParticipationRepository.getAll().stream()
+                .filter(convo -> convo.getConversationId().equals(conversationId))
+                .map(convo -> userRepository.findById(convo.getParticipantId()).get())
+                .collect(Collectors.toList());
+        return participants;
+    }
+
+    private Long findAvailableIdForConversation() {
+        var optional = conversationRepository.getAll().stream()
+                        .max(Comparator.comparing(Conversation::getId));
+        if(optional.isEmpty())
+            return 1L;
+        return optional.get().getId() + 1;
+    }
+
+    private Long findAvailableIdForMessage() {
+        var optional = messageRepository.getAll().stream()
+                .max(Comparator.comparing(Message::getId));
+        if(optional.isEmpty())
+            return 1L;
+        return optional.get().getId() + 1;
     }
 }

@@ -1,8 +1,8 @@
 package socialnetwork.repository.memory;
 
 
-import socialnetwork.domain.models.Entity;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.domain.entities.Entity;
+import socialnetwork.repository.Repository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Optional;
  * @param <E> subclass of Entity that has the identifier of tye ID
  */
 public class InMemoryRepository <ID, E extends Entity<ID>>
-        implements RepositoryInterface<ID, E> {
+        implements Repository<ID, E> {
     private Map<ID, E> entitiesMap = new HashMap<ID, E>();
 
     @Override

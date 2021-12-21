@@ -1,4 +1,4 @@
-package socialnetwork.domain.models;
+package socialnetwork.domain.entities;
 
 /**
  * Class that turns a String into and Enum type

@@ -1,4 +1,4 @@
-package socialnetwork.domain.models;
+package socialnetwork.domain.entities;
 
 
 import java.util.Objects;
@@ -18,7 +18,6 @@ public class Entity <ID>{
     public Entity(ID id) {
         this.id = id;
     }
-
 
     /**
      * Getter method for identifier

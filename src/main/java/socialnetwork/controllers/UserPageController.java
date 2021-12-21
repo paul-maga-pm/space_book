@@ -10,9 +10,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import socialnetwork.HelloApplication;
-import socialnetwork.domain.models.*;
+import socialnetwork.domain.entities.*;
 import socialnetwork.exceptions.ExceptionBaseClass;
-import socialnetwork.service.SocialNetworkUserService;
+import socialnetwork.service.SocialNetworkService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class UserPageController {
-    private SocialNetworkUserService service;
+    private SocialNetworkService service;
     ObservableList<User> modelUsers = FXCollections.observableArrayList();
     ObservableList<ModelFriendRequest> modelFriendRequests = FXCollections.observableArrayList();
     ObservableList<User> modelFriends = FXCollections.observableArrayList();
@@ -194,7 +194,7 @@ public class UserPageController {
     private void changeToggleButtonState(){
         User user = listViewUsers.getSelectionModel().getSelectedItem();
         if(user != null){
-            if(user.getId() == service.getIdOfLoggedUser()){
+            if(user.getId() == service.getLoggedUserId()){
                 sendFriendRequestToggleButton.setDisable(true);
                 return;
             }
@@ -213,7 +213,7 @@ public class UserPageController {
                     return;
                 }
                 if(friendRequestStatus.equals(Status.PENDING)){
-                    if(existingFriendRequest.get().getId().first == service.getIdOfLoggedUser()){
+                    if(existingFriendRequest.get().getId().first == service.getLoggedUserId()){
                         sendFriendRequestToggleButton.setDisable(false);
                         sendFriendRequestToggleButton.setText("Sent");
                         sendFriendRequestToggleButton.setSelected(true);
@@ -246,8 +246,8 @@ public class UserPageController {
         return friends;
     }
 
-    public void setService(SocialNetworkUserService socialNetworkUserService){
-        this.service = socialNetworkUserService;
+    public void setService(SocialNetworkService socialNetworkService){
+        this.service = socialNetworkService;
         modelFriendRequests.setAll(getFriendRequestsModel());
         modelFriends.setAll(getFriendsModel());
     }

@@ -1,28 +1,25 @@
 package socialnetwork.service;
 
-import socialnetwork.domain.models.User;
-import socialnetwork.domain.models.UserCredential;
-import socialnetwork.domain.validators.EntityValidatorInterface;
+import socialnetwork.domain.entities.User;
+import socialnetwork.domain.entities.UserCredential;
+import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.repository.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UserService {
-    private EntityValidatorInterface<Long, User> userValidator;
-    private RepositoryInterface<Long, User> userRepository;
-    private RepositoryInterface<Long, UserCredential> credentialRepository;
-    private EntityValidatorInterface<Long, UserCredential> signupCredentialValidator;
+    private EntityValidator<Long, User> userValidator;
+    private Repository<Long, User> userRepository;
+    private Repository<Long, UserCredential> credentialRepository;
+    private EntityValidator<Long, UserCredential> signupCredentialValidator;
 
-    public UserService(RepositoryInterface<Long, User> userRepository,
-                       RepositoryInterface<Long, UserCredential> credentialRepository,
-                       EntityValidatorInterface<Long, UserCredential> signUpCredentialValidator,
-                       EntityValidatorInterface<Long, User> userValidator) {
+    public UserService(Repository<Long, User> userRepository,
+                       Repository<Long, UserCredential> credentialRepository,
+                       EntityValidator<Long, UserCredential> signUpCredentialValidator,
+                       EntityValidator<Long, User> userValidator) {
         this.userRepository = userRepository;
         this.credentialRepository = credentialRepository;
         this.signupCredentialValidator = signUpCredentialValidator;
@@ -30,11 +27,11 @@ public class UserService {
     }
 
 
-    public Long loginUser(String userName, String password) {
-        return findIdOfUserWithCredentials(userName, password);
+    public User loginUser(String userName, String password) {
+        return findUserWithCredentials(userName, password);
     }
 
-    public Long signUpUser(String firstName, String lastName, String userName, String password){
+    public User signUpUser(String firstName, String lastName, String userName, String password){
         Long id = findAvailableId();
 
         UserCredential credential = new UserCredential(id, userName, password);
@@ -45,7 +42,7 @@ public class UserService {
 
         userRepository.save(user);
         credentialRepository.save(credential);
-        return id;
+        return user;
     }
 
     // Each user from the returned list will contain their username
@@ -62,12 +59,6 @@ public class UserService {
                 .stream()
                 .filter(fullNameContainsString)
                 .collect(Collectors.toList());
-
-        for(int i = 0; i < users.size(); i++){
-            String username = credentialRepository.findById(users.get(i).getId()).get().getUserName();
-            users.get(i).setUserName(username);
-        }
-
         return users;
     }
 
@@ -75,25 +66,20 @@ public class UserService {
         return userRepository.getAll();
     }
 
-    public String findUserNameOfUser(Long idOfUser){
-        Optional<UserCredential> userCredentialOptional = credentialRepository.findById(idOfUser);
-        if(userCredentialOptional.isEmpty())
-            return null;
-        return userCredentialOptional.get().getUserName();
-    }
-
     private Long findAvailableId() {
-        Long maxId = -1L;
-        for(User user : userRepository.getAll())
-            if(user.getId() > maxId)
-                maxId = user.getId();
-        return maxId + 1;
+        var optional = userRepository.getAll().stream()
+                .max(Comparator.comparing(User::getId));
+
+        if(optional.isEmpty())
+            return 1L;
+        return optional.get().getId() + 1;
+
     }
 
-    private Long findIdOfUserWithCredentials(String userName, String password){
+    private User findUserWithCredentials(String userName, String password){
         for(UserCredential credential : credentialRepository.getAll())
             if(credential.getUserName().equals(userName) && credential.getPassword().equals(password))
-                return credential.getId();
+                return userRepository.findById(credential.getId()).get();
 
         throw new EntityNotFoundValidationException("Username or password incorrect. User doesn't exist");
     }

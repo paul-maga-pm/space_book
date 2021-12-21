@@ -1,4 +1,4 @@
-package socialnetwork.domain.models;
+package socialnetwork.domain.entities;
 
 import socialnetwork.utils.containers.UnorderedPair;
 

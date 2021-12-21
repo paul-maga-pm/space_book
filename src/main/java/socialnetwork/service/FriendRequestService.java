@@ -1,11 +1,10 @@
 package socialnetwork.service;
 
-import javafx.collections.ObservableList;
-import socialnetwork.domain.models.FriendRequest;
-import socialnetwork.domain.models.Friendship;
-import socialnetwork.domain.models.Status;
-import socialnetwork.domain.validators.EntityValidatorInterface;
-import socialnetwork.repository.RepositoryInterface;
+import socialnetwork.domain.entities.FriendRequest;
+import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.Status;
+import socialnetwork.domain.validators.EntityValidator;
+import socialnetwork.repository.Repository;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.time.LocalDateTime;
@@ -17,9 +16,9 @@ import java.util.Optional;
  * Business layer for FriendRequest model
  */
 public class FriendRequestService {
-    private RepositoryInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository;
-    private RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository;
-    private EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator;
+    private Repository<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository;
+    private Repository<UnorderedPair<Long, Long>, Friendship> friendshipRepository;
+    private EntityValidator<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator;
 
     /**
      * Constructor that creates a new socialnetwork.service that accesses the given repositories and validates the friendsRequests
@@ -28,9 +27,9 @@ public class FriendRequestService {
      * @param friendshipRepository repository of friendships objects
      * @param friendRequestValidator validator for FriendRequest model
      */
-    public FriendRequestService(RepositoryInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository,
-                                RepositoryInterface<UnorderedPair<Long, Long>, Friendship> friendshipRepository,
-                                EntityValidatorInterface<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator) {
+    public FriendRequestService(Repository<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepository,
+                                Repository<UnorderedPair<Long, Long>, Friendship> friendshipRepository,
+                                EntityValidator<UnorderedPair<Long, Long>, FriendRequest> friendRequestValidator) {
         this.friendRequestRepository = friendRequestRepository;
         this.friendRequestValidator = friendRequestValidator;
         this.friendshipRepository = friendshipRepository;
