@@ -43,6 +43,13 @@ public class FriendRequest extends Entity<UnorderedPair<Long, Long>>{
         return status;
     }
 
+    public Long getSenderId(){
+        return getId().first;
+    }
+
+    public Long getReceiverId(){
+        return getId().second;
+    }
     /**
      * Setter method for status
      * @param status new value for the status of this friend request

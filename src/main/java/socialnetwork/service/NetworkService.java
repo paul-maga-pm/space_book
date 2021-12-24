@@ -2,6 +2,7 @@ package socialnetwork.service;
 
 
 import socialnetwork.domain.entities.Friendship;
+import socialnetwork.domain.entities.FriendshipDto;
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.InvalidEntityException;
@@ -11,6 +12,7 @@ import socialnetwork.utils.containers.UnorderedPair;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Business layer for Friendship model
@@ -89,8 +91,8 @@ public class NetworkService {
         });
     }
 
-    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserService(Long id){
-        Map<Optional<User>, LocalDateTime> friendsForUser = new HashMap<>();
+    public List<FriendshipDto> findAllFriendsForUserService(Long id){
+        List<FriendshipDto> friendshipDtoList = new ArrayList<>();
         List<Friendship> friendships = friendshipRepository.getAll();
         friendships.stream().filter(friendship -> friendship.hasUser(id))
                 .forEach(friendship -> {
@@ -99,9 +101,12 @@ public class NetworkService {
                         idOfFriend = friendship.getId().second;
                     else
                         idOfFriend = friendship.getId().first;
-                    friendsForUser.put(userRepository.findById(idOfFriend), friendship.getDate());
+                    User friend = userRepository.findById(idOfFriend).get();
+                    LocalDateTime friendshipDate = friendship.getDate();
+                    FriendshipDto dto = new FriendshipDto(friend, friendshipDate);
+                    friendshipDtoList.add(dto);
                 });
-        return friendsForUser;
+        return friendshipDtoList;
     }
 
     /**
@@ -111,15 +116,13 @@ public class NetworkService {
      * @return a Map with the key representing the friend of the user and the value the date when the users became
      * friends
      */
-    public Map<Optional<User>, LocalDateTime> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
-        Map<Optional<User>, LocalDateTime> friendsOfUserMap = findAllFriendsForUserService(idOfUser);
+    public List<FriendshipDto> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
+        List<FriendshipDto> usersFriendshipsDtoList = findAllFriendsForUserService(idOfUser);
         int year = LocalDateTime.now().getYear();
-        Map<Optional<User>, LocalDateTime> friendsOfUserFromMonthMap = new HashMap<>();
-        friendsOfUserMap.forEach((user, date) -> {
-            if(date.getYear() == year && date.getMonth().getValue() == month)
-                friendsOfUserFromMonthMap.put(user, date);
-        });
-        return friendsOfUserFromMonthMap;
+        return  usersFriendshipsDtoList.stream()
+                .filter(dto -> dto.getFriendshipDate().getYear() == LocalDateTime.now().getYear() &&
+                               dto.getFriendshipDate().getMonth().getValue() == month)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -174,4 +177,10 @@ public class NetworkService {
         return allUsersAndTheirFriends;
     }
 
+    public LocalDateTime findDateOfFriendship(Long firstUserId, Long secondUserId) {
+        var friendship = friendshipRepository.findById(new UnorderedPair<>(firstUserId, secondUserId));
+        if (friendship.isEmpty())
+            return null;
+        return friendship.get().getDate();
+    }
 }

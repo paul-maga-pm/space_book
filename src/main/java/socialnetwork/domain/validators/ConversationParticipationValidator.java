@@ -6,7 +6,6 @@ import socialnetwork.domain.entities.ConversationParticipationId;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.Repository;
-import socialnetwork.utils.containers.OrderedPair;
 
 public class ConversationParticipationValidator
         implements EntityValidator<ConversationParticipationId, ConversationParticipation> {

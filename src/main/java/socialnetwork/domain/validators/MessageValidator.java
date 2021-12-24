@@ -1,9 +1,10 @@
 package socialnetwork.domain.validators;
 
-import socialnetwork.domain.entities.*;
+import socialnetwork.domain.entities.ConversationParticipation;
+import socialnetwork.domain.entities.ConversationParticipationId;
+import socialnetwork.domain.entities.Message;
 import socialnetwork.exceptions.InvalidEntityException;
 import socialnetwork.repository.Repository;
-import socialnetwork.utils.containers.OrderedPair;
 
 public class MessageValidator implements EntityValidator<Long, Message> {
     private Repository<ConversationParticipationId, ConversationParticipation> participationRepository;

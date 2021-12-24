@@ -5,8 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import socialnetwork.HelloApplication;
+import socialnetwork.Run;
+import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkService;
 
@@ -36,10 +36,10 @@ public class AuthenticationController {
         String email = loginEmailTextField.getText();
         String password = loginPasswordPasswordField.getText();
         try{
-            service.loginUserService(email, password);
-            openUserPage(event);
+            User loggedUser = service.loginUserService(email, password);
+            openUserPage(loggedUser);
         } catch(ExceptionBaseClass exception){
-            showWarning(exception.getMessage());
+            Run.showPopUpWindow("Warning", exception.getMessage());
 
         } catch(Exception e){
         }
@@ -52,31 +52,22 @@ public class AuthenticationController {
         String email = signInEmailTextField.getText();
         String password = signInPasswordPasswordField.getText();
         try{
-            service.signUpUserService(firstName, lastName, email, password);
-            openUserPage(event);
+            User signedUser = service.signUpUserService(firstName, lastName, email, password);
+            openUserPage(signedUser);
         } catch (ExceptionBaseClass exception){
-            showWarning(exception.getMessage());
+            Run.showPopUpWindow("Warning", exception.getMessage());
 
         } catch(Exception e){
         }
     }
 
-    private void openUserPage(Event event) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("user-page.fxml"));
+    private void openUserPage(User loggedUser) throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(Run.class.getResource("main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        UserPageController controller = fxmlLoader.getController();
+        MainMenuController controller = fxmlLoader.getController();
+        controller.setLoggedUser(loggedUser);
         controller.setService(service);
-        Stage stage = new Stage();
-        stage.setTitle("Welcome!");
-        stage.setScene(scene);
-        stage.show();
-        ((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
-    }
-
-    private void showWarning(String message) {
-        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
-        alert.setTitle("Warning");
-        alert.showAndWait();
+        Run.getPrimaryStage().setScene(scene);
     }
 
     public void setService(SocialNetworkService socialNetworkService){

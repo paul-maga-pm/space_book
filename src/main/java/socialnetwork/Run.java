@@ -3,6 +3,8 @@ package socialnetwork;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import socialnetwork.config.ApplicationContext;
 import socialnetwork.controllers.AuthenticationController;
@@ -23,9 +25,9 @@ import socialnetwork.service.UserService;
 import socialnetwork.utils.containers.UnorderedPair;
 
 public class Run extends Application {
-    @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
+    private static Stage primaryStage;
+
+    public SocialNetworkService createService(){
 
         final String url = ApplicationContext.getProperty("socialnetwork.database.url");
         final String user = ApplicationContext.getProperty("socialnetwork.database.user");
@@ -47,23 +49,40 @@ public class Run extends Application {
         NetworkService networkService = new NetworkService(friendshipRepo, userRepo, friendshipVal);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepo, friendshipRepo, friendRequestVal);
 
-        SocialNetworkService socialNetworkService = new SocialNetworkService(userService,
+        return new SocialNetworkService(userService,
                 networkService,
                 friendRequestService,
                 null);
+    }
 
+    @Override
+    public void start(Stage stage) throws Exception {
+        primaryStage = stage;
+        FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
+        Scene scene = new Scene(loader.load());
+        AuthenticationController controller = loader.getController();
+        controller.setService(createService());
+        primaryStage.setScene(scene);
+        primaryStage.show();
+//        PendingFriendRequestView view = new PendingFriendRequestView(new User(1L, "Michael", "Corleone"),
+//                LocalDateTime.now());
+//        Scene scene = new Scene(view);
+//        primaryStage.setScene(scene);
+//        primaryStage.show();
+    }
 
-        Scene scene = new Scene(fxmlLoader.load());
-
-        AuthenticationController controller = fxmlLoader.getController();
-        controller.setService(socialNetworkService);
-
-        stage.setTitle("Log in");
-        stage.setScene(scene);
-        stage.show();
+    public static Stage getPrimaryStage(){
+        return primaryStage;
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
+
+    public static void showPopUpWindow(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.NONE, message, ButtonType.OK);
+        alert.setTitle(title);
+        alert.showAndWait();
+    }
+
 }

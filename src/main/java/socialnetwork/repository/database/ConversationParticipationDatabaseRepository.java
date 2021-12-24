@@ -3,7 +3,6 @@ package socialnetwork.repository.database;
 import socialnetwork.domain.entities.ConversationParticipation;
 import socialnetwork.domain.entities.ConversationParticipationId;
 import socialnetwork.exceptions.UnimplemetedException;
-import socialnetwork.utils.containers.OrderedPair;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
