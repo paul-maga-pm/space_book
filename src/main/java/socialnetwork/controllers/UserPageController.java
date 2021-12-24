@@ -84,8 +84,10 @@ public class UserPageController {
                 friendRequestToggleButton.setText("Send friend request");
             else {
                 Status status = friendRequest.get().getStatus();
-                if (status == Status.REJECTED)
+                if (status == Status.REJECTED) {
                     friendRequestToggleButton.setText("Send friend request");
+                    friendRequestToggleButton.setDisable(true);
+                }
                 else {
                     friendRequestToggleButton.setText(status.toString());
                     friendRequestToggleButton.setDisable(true);

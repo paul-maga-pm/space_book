@@ -17,6 +17,6 @@ public class ApprovedFriendRequestModel extends NotificationModel {
     public Node getViewForModel() {
         return new Label(super.toString() + " You accepted the friend request sent by " +
                 dto.getSender() + " on " +
-                dto.getFriendRequest().getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm")));
+                dto.getFriendRequest().getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

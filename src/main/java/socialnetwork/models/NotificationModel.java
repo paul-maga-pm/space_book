@@ -3,6 +3,7 @@ package socialnetwork.models;
 import javafx.scene.Node;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public abstract class NotificationModel {
     public LocalDateTime getDate() {
@@ -19,6 +20,6 @@ public abstract class NotificationModel {
 
     @Override
     public String toString() {
-        return date.toString();
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }
