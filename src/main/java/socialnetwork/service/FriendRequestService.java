@@ -100,7 +100,7 @@ public class FriendRequestService {
      * @param idOfUser identifier of the user
      * @return lists of all the friendRequests sent to the user with the given id
      */
-    public List<FriendRequest> getAllFriendRequestsForUserService(Long idOfUser){
+    public List<FriendRequest> getAllFriendRequestsSentToUser(Long idOfUser){
         List<FriendRequest> friendRequests = friendRequestRepository.getAll();
         List<FriendRequest> friendRequestsForUser = new ArrayList<>();
 

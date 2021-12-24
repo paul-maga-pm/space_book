@@ -1,6 +1,5 @@
 package socialnetwork.domain.entities;
 
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Objects;
 

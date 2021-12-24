@@ -3,18 +3,13 @@ package socialnetwork.service;
 import socialnetwork.domain.entities.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SocialNetworkService {
     private UserService userService;
     private NetworkService networkService;
     private FriendRequestService friendRequestService;
     private ConversationService conversationService;
-    private Long loggedUserId;
-    private User loggedUser;
 
     public SocialNetworkService(UserService userService,
                                 NetworkService networkService,
@@ -26,71 +21,63 @@ public class SocialNetworkService {
         this.conversationService = conversationService;
     }
 
-    public Long getLoggedUserId(){
-        return loggedUserId;
+    public User signUpUserService(String firstName, String lastName, String userName, String password){
+        User signedUser = userService.signUpUser(firstName, lastName, userName, password);
+        signedUser.setUserName(userName);
+        return signedUser;
     }
 
-    public User getLoggedUser(){
-        return loggedUser;
+    public User loginUserService(String userName, String password){
+        return userService.loginUser(userName, password);
     }
 
-    public void signUpUserService(String firstName, String lastName, String userName, String password){
-        loggedUser = userService.signUpUser(firstName, lastName, userName, password);
-        loggedUserId = loggedUser.getId();
-        loggedUser.setUserName(userName);
+    public void sendFriendRequestService(Long senderId, Long receiverId){
+        friendRequestService.sendFriendRequestService(senderId, receiverId);
     }
 
-    public void loginUserService(String userName, String password){
-        loggedUser = userService.loginUser(userName, password);
-        loggedUserId = loggedUser.getId();
+    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long firstUserId, Long secondUserId, Status status){
+        return friendRequestService.acceptOrRejectFriendRequestService(firstUserId, secondUserId, status);
     }
 
-    public void sendFriendRequestService(Long idOfFriend){
-        friendRequestService.sendFriendRequestService(loggedUserId, idOfFriend);
-    }
-
-    public Optional<FriendRequest> acceptOrRejectFriendRequestService(Long idOfFriend, Status status){
-        return friendRequestService.acceptOrRejectFriendRequestService(idOfFriend, loggedUserId, status);
-    }
-
-    public Optional<Friendship> removeFriendshipService(Long idOfFriend){
-        Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(loggedUserId, idOfFriend);
+    public Optional<Friendship> removeFriendshipService(Long firstUserId, Long secondUserId){
+        Optional<Friendship> existingFriendshipOptional = networkService.removeFriendshipService(firstUserId, secondUserId);
         if(existingFriendshipOptional.isPresent())
             friendRequestService.rejectADeletedFriendship(existingFriendshipOptional.get().getId().first,
                     existingFriendshipOptional.get().getId().second);
         return existingFriendshipOptional;
     }
 
-    public Optional<FriendRequest> withdrawFriendRequest(Long idOfFriend){
-        return friendRequestService.removeFriendRequestService(loggedUserId, idOfFriend);
+    public Optional<FriendRequest> withdrawFriendRequest(Long senderId, Long receiverId){
+        return friendRequestService.removeFriendRequestService(senderId, receiverId);
     }
 
-    public Optional<FriendRequest> findOneFriendRequestService(Long idOfFriend){
-        return friendRequestService.findOneFriendRequest(loggedUserId, idOfFriend);
+    public Optional<FriendRequest> findOneFriendRequestService(Long senderId, Long receiverId){
+        return friendRequestService.findOneFriendRequest(senderId, receiverId);
     }
 
-    public Map<FriendRequest, User> getAllFriendRequestsOfLoggedUser(){
-        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsForUserService(loggedUserId);
+    public List<FriendRequestDto> getAllFriendRequestsSentToUser(Long userId){
+        List<FriendRequestDto> friendRequestDtoList = new ArrayList<>();
+        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsSentToUser(userId);
         List<User> users = userService.getAllUsers();
-        Map<FriendRequest, User>  friendRequestsAndSendersForLoggedUser = new HashMap<>();
         for(FriendRequest friendRequest: friendRequestsForUser){
-            Optional<User> sender = users.stream().filter(user -> user.getId()==friendRequest.getId().first).findFirst();
-            friendRequestsAndSendersForLoggedUser.put(friendRequest, sender.get());
+            Optional<User> sender = users.stream()
+                    .filter(user -> user.getId()==friendRequest.getSenderId()).findFirst();
+            FriendRequestDto dto = new FriendRequestDto(friendRequest, sender.get());
+            friendRequestDtoList.add(dto);
         }
-        return friendRequestsAndSendersForLoggedUser;
+        return friendRequestDtoList;
     }
 
-    public Map<Optional<User>, LocalDateTime> findAllFriendsOfLoggedUser(){
-        Map<Optional<User>, LocalDateTime> friends = networkService.findAllFriendsForUserService(loggedUserId);
-
-        return friends;
+    public List<FriendshipDto> findAllFriendsOfUser(Long userId){
+        return networkService.findAllFriendsForUserService(userId);
     }
 
     public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
         return userService.findUsersThatHaveInTheirFullNameTheString(str);
     }
 
-    public ConversationDto createConversation(String conversationName,
+    public ConversationDto createConversation(Long loggedUserId,
+                                              String conversationName,
                                               String conversationDescription,
                                               List<Long> participantsIdWithoutLoggedUser){
         participantsIdWithoutLoggedUser.add(loggedUserId);
@@ -99,11 +86,15 @@ public class SocialNetworkService {
                 participantsIdWithoutLoggedUser);
     }
 
-    public void sendMessageInConversation(Long conversationId, String text, LocalDateTime date){
-        conversationService.sendMessageInConversation(conversationId, loggedUserId, text, date);
+    public void sendMessageInConversation(Long senderId, Long conversationId, String text, LocalDateTime date){
+        conversationService.sendMessageInConversation(conversationId, senderId, text, date);
     }
 
-    public List<ConversationDto> getLoggedUsersConversations(){
-        return conversationService.getConversationsOfUser(loggedUserId);
+    public LocalDateTime findDateOfFriendship(Long firstUserId, Long secondUserId){
+        return networkService.findDateOfFriendship(firstUserId, secondUserId);
+    }
+
+    public List<ConversationDto> getConversationsOfUser(Long userId){
+        return conversationService.getConversationsOfUser(userId);
     }
 }

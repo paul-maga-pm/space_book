@@ -104,7 +104,7 @@ public class User extends Entity<Long>{
      */
     @Override
     public String toString() {
-        String userStringFormat = ", First Name: %s, Last Name: %s";
-        return super.toString().concat(String.format(userStringFormat, firstName, lastName));
+        String userStringFormat = "%s %s %s";
+        return String.format(userStringFormat, firstName, lastName, userName);
     }
 }

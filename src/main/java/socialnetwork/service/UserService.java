@@ -6,9 +6,10 @@ import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.Repository;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 public class UserService {
     private EntityValidator<Long, User> userValidator;
@@ -45,20 +46,31 @@ public class UserService {
         return user;
     }
 
-    // Each user from the returned list will contain their username
     public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
         if(str.length() < 3)
             return new ArrayList<>();
 
+//        final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
+//        Predicate<User> fullNameContainsString
+//                = user -> {
+//                String firstName = user.getFirstName().toLowerCase(Locale.ROOT);
+//                String lastName = user.getLastName().toLowerCase(Locale.ROOT);
+//
+//                return (firstName.concat(" ").concat(lastName)).contains(lowerCasedStr);
+//        };
+//        List<User> users = userRepository
+//                .getAll()
+//                .stream()
+//                .filter(fullNameContainsString)
+//                .collect(Collectors.toList());
         final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
-        Predicate<User> fullNameContainsString
-                = user -> user.getFirstName().toLowerCase(Locale.ROOT).contains(lowerCasedStr)
-                || user.getLastName().toLowerCase(Locale.ROOT).contains(lowerCasedStr);
-        List<User> users = userRepository
-                .getAll()
-                .stream()
-                .filter(fullNameContainsString)
-                .collect(Collectors.toList());
+        List<User> users = new ArrayList<>();
+        for(var user : userRepository.getAll()){
+            String firstName = user.getFirstName().toLowerCase(Locale.ROOT);
+            String lastName = user.getLastName().toLowerCase(Locale.ROOT);
+            if (firstName.concat(" ").concat(lastName).contains(lowerCasedStr))
+                users.add(user);
+        }
         return users;
     }
 

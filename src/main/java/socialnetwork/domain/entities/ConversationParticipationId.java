@@ -1,7 +1,5 @@
 package socialnetwork.domain.entities;
 
-import socialnetwork.utils.containers.OrderedPair;
-
 import java.util.Objects;
 
 public class ConversationParticipationId {
