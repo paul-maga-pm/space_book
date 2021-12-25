@@ -1,8 +1,10 @@
 package socialnetwork.controllers;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleButton;
@@ -35,11 +37,16 @@ public class UserPageController {
     @FXML
     ListView<FriendshipDto> userFriendsListView;
 
+    ObservableList<FriendshipDto> userFriendsModel = FXCollections.observableArrayList();
+
     @FXML
     ToggleButton friendRequestToggleButton;
 
     @FXML
     ImageView userPageProfileView;
+
+    @FXML
+    Button removeFriendButton;
 
     public void setService(SocialNetworkService service) {
         this.service = service;
@@ -51,6 +58,11 @@ public class UserPageController {
 
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
+    }
+
+    @FXML
+    void initialize(){
+        userFriendsListView.setItems(userFriendsModel);
     }
 
     public void loadUserInformationOnPage(){
@@ -72,11 +84,12 @@ public class UserPageController {
             return;
         }
         setStateOfFriendRequestButton(friendRequest);
+        setStateOfRemoveFriendButton();
         loadProfilePictureOnPage();
     }
 
     private void setStateOfFriendRequestButton(Optional<FriendRequest> friendRequest) {
-        if(loggedUser == userThatOwnsThePage) {
+        if(loggedUser.getId().equals(userThatOwnsThePage.getId())) {
             friendRequestToggleButton.setVisible(false);
         }
         else {
@@ -88,6 +101,13 @@ public class UserPageController {
                     friendRequestToggleButton.setText("Send friend request");
                     friendRequestToggleButton.setDisable(true);
                 }
+                else if(status == Status.PENDING && friendRequest.get().getReceiverId().equals(loggedUser.getId())) {
+                    friendRequestToggleButton.setText("Send friend request");
+                    friendRequestToggleButton.setDisable(true);
+                } else if(status == Status.APPROVED) {
+                    friendRequestToggleButton.setText("Friends");
+                    friendRequestToggleButton.setDisable(true);
+                }
                 else {
                     friendRequestToggleButton.setText(status.toString());
                     friendRequestToggleButton.setDisable(true);
@@ -96,14 +116,18 @@ public class UserPageController {
         }
     }
 
+    private void setStateOfRemoveFriendButton(){
+        if(!loggedUser.getId().equals(userThatOwnsThePage.getId()))
+            removeFriendButton.setVisible(false);
+    }
+
     private void loadProfilePictureOnPage() {
         Image profilePic = new Image(String.valueOf(Run.class.getResource("rick.jpg")));
         userPageProfileView.setImage(profilePic);
     }
 
     private void loadFriendsOfPageOwner() {
-        userFriendsListView
-                .setItems(FXCollections.observableArrayList(service.findAllFriendsOfUser(userThatOwnsThePage.getId())));
+        userFriendsModel.setAll(service.findAllFriendsOfUser(userThatOwnsThePage.getId()));
 
     }
 
@@ -127,6 +151,16 @@ public class UserPageController {
         } catch (ExceptionBaseClass exception){
             Run.showPopUpWindow("Warning", exception.getMessage());
             return;
+        }
+    }
+
+    @FXML
+    void handleClickOnRemoveFriendButton(ActionEvent event){
+        FriendshipDto dto = userFriendsListView.getSelectionModel().getSelectedItem();
+
+        if (dto != null){
+            service.removeFriendshipService(loggedUser.getId(), dto.getFriend().getId());
+            userFriendsModel.remove(dto);
         }
     }
 }
