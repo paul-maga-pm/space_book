@@ -22,7 +22,7 @@
             <TextField fx:id="userSearchTextField" layoutX="25.0" layoutY="20.0" />
             <Button fx:id="userSearchButton" layoutX="174.0" layoutY="20.0" mnemonicParsing="false" onAction="#handleUserSearchButtonClick" text="Search" />
             <Button fx:id="notificationsButton" layoutX="374.0" layoutY="20.0" mnemonicParsing="false" onAction="#handleClickOnNotificationsButton" text="Notifications" />
-            <Button layoutX="477.0" layoutY="20.0" mnemonicParsing="false" text="Messages" />
+            <Button fx:id="messagesButton" layoutX="477.0" layoutY="20.0" mnemonicParsing="false" onAction="#handleClickOnMessagesButton" text="Messages" />
          </children>
       </AnchorPane>
    </top>

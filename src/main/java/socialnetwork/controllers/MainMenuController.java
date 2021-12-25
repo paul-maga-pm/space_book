@@ -5,13 +5,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.FriendRequestDto;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
-import socialnetwork.pagination.UserSearchResultPagination;
+import socialnetwork.pagination.UserSearchResultPaginationWithOpeningUserPage;
 import socialnetwork.service.SocialNetworkService;
 
 import java.io.IOException;
@@ -41,6 +42,9 @@ public class MainMenuController {
     Button notificationsButton;
 
     @FXML
+    Button messagesButton;
+
+    @FXML
     BorderPane mainMenuBorderPane;
 
     @FXML
@@ -60,10 +64,11 @@ public class MainMenuController {
             return;
         }
 
-        UserSearchResultPagination pagination = new UserSearchResultPagination(foundUsers, 10);
+        UserSearchResultPaginationWithOpeningUserPage pagination =
+                new UserSearchResultPaginationWithOpeningUserPage(foundUsers, 10);
+        pagination.setMainMenuBorderPane(mainMenuBorderPane);
         pagination.setService(service);
         pagination.setLoggedUser(loggedUser);
-        pagination.setMainMenuBorderPane(mainMenuBorderPane);
         mainMenuBorderPane.setCenter(pagination);
     }
 
@@ -117,15 +122,28 @@ public class MainMenuController {
             return;
         }
 
-        if (friendRequestDtoList.size() == 0)
+        if (friendRequestDtoList.size() == 0) {
+            Label label = new Label("You don't have new notifications");
+            mainMenuBorderPane.setCenter(label);
             return;
-
+        }
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("notification-pagination.fxml"));
         Scene scene = new Scene(loader.load());
         NotificationPaginationController controller = loader.getController();
         controller.setService(service);
         controller.setLoggedUser(loggedUser);
         controller.init();
+        mainMenuBorderPane.setCenter(scene.getRoot());
+    }
+
+    @FXML
+    void handleClickOnMessagesButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-view.fxml"));
+        Scene scene = new Scene(loader.load());
+        ConversationController controller = loader.getController();
+        controller.setService(service);
+        controller.setLoggedUser(loggedUser);
+        controller.loadExistingConversations();
         mainMenuBorderPane.setCenter(scene.getRoot());
     }
 }

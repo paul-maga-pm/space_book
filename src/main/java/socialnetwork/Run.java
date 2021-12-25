@@ -14,14 +14,8 @@ import socialnetwork.domain.entities.User;
 import socialnetwork.domain.entities.UserCredential;
 import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
-import socialnetwork.repository.database.FriendRequestDatabaseRepository;
-import socialnetwork.repository.database.FriendshipDatabaseRepository;
-import socialnetwork.repository.database.UserCredentialDatabaseRepository;
-import socialnetwork.repository.database.UserDatabaseRepository;
-import socialnetwork.service.FriendRequestService;
-import socialnetwork.service.NetworkService;
-import socialnetwork.service.SocialNetworkService;
-import socialnetwork.service.UserService;
+import socialnetwork.repository.database.*;
+import socialnetwork.service.*;
 import socialnetwork.utils.containers.UnorderedPair;
 
 public class Run extends Application {
@@ -49,10 +43,22 @@ public class Run extends Application {
         NetworkService networkService = new NetworkService(friendshipRepo, userRepo, friendshipVal);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepo, friendshipRepo, friendRequestVal);
 
+
+        ConversationDatabaseRepository conversationRepo = new ConversationDatabaseRepository(url, user, password);
+        MessageDatabaseRepository messageRepo = new MessageDatabaseRepository(url, user, password);
+        ConversationParticipationDatabaseRepository participationRepo =
+                new ConversationParticipationDatabaseRepository(url, user, password);
+        ConversationService conversationService = new ConversationService(userRepo,
+                conversationRepo,
+                participationRepo,
+                messageRepo,
+                new MessageValidator(participationRepo),
+                new ConversationValidator(),
+                new ConversationParticipationValidator(userRepo, conversationRepo));
         return new SocialNetworkService(userService,
                 networkService,
                 friendRequestService,
-                null);
+                conversationService);
     }
 
     @Override

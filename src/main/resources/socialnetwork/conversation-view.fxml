@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="499.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.ConversationController">
+   <left>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="createConversationButton" mnemonicParsing="false" onAction="#handleClickOnCreateConversation" text="New" />
+            <ListView fx:id="conversationListView" layoutX="10.0" layoutY="52.0" prefHeight="277.0" prefWidth="129.0" />
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <BorderPane prefHeight="308.0" prefWidth="363.0" BorderPane.alignment="CENTER">
+         <bottom>
+            <HBox prefHeight="54.0" prefWidth="363.0" BorderPane.alignment="BOTTOM_CENTER">
+               <children>
+                  <TextField fx:id="messageTextField" prefHeight="44.0" prefWidth="350.0" />
+                  <Button fx:id="sendMessageButton" mnemonicParsing="false" onAction="#handleClickOnSendButton" text="Send" />
+               </children>
+            </HBox>
+         </bottom>
+         <center>
+            <ListView fx:id="messageListView" prefHeight="276.0" prefWidth="407.0" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+   </center>
+</BorderPane>

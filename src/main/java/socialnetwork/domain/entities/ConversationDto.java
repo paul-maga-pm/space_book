@@ -67,4 +67,8 @@ public class ConversationDto extends Entity<Long> {
     public int hashCode() {
         return Objects.hash(participants, messages);
     }
+
+    public void addMessage(MessageDto message) {
+        this.messages.add(message);
+    }
 }
