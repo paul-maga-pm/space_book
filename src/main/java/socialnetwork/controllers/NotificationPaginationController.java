@@ -12,10 +12,7 @@ import javafx.scene.control.Pagination;
 import javafx.util.Callback;
 import socialnetwork.domain.entities.Status;
 import socialnetwork.domain.entities.User;
-import socialnetwork.models.ApprovedFriendRequestModel;
-import socialnetwork.models.NotificationModel;
-import socialnetwork.models.PendingFriendRequestModel;
-import socialnetwork.models.RejectedFriendRequestModel;
+import socialnetwork.models.*;
 import socialnetwork.service.SocialNetworkService;
 
 import java.time.LocalDateTime;
@@ -74,25 +71,36 @@ public class NotificationPaginationController {
 
     }
 
-    private List<NotificationModel> getNotificationsModels() {
+    public List<NotificationModel> getNotificationsModels() {
         List<NotificationModel> models = new ArrayList<>();
         for(var dto : service.getAllFriendRequestsSentToUser(loggedUser.getId())){
             NotificationModel model;
             Status status = dto.getFriendRequest().getStatus();
             if (status == Status.PENDING){
-                model = new PendingFriendRequestModel(dto,
+                model = new PendingFriendRequestReceivedByUserModel(dto,
                         this::handleAcceptFriendRequest,
                         this::handleDeclineFriendRequest);
                 model.setDate(dto.getFriendRequest().getDate());
             } else if(status == Status.APPROVED){
-                model = new ApprovedFriendRequestModel(dto);
+                model = new ApprovedFriendRequestReceivedByUserModel(dto);
                 LocalDateTime date = service.findDateOfFriendship(loggedUser.getId(), dto.getSender().getId());
                 model.setDate(date);
             } else {
-                model = new RejectedFriendRequestModel(dto);
+                model = new RejectedFriendRequestReceivedByUserModel(dto);
                 model.setDate(dto.getFriendRequest().getDate());
             }
             models.add(model);
+        }
+
+        for(var dto : service.getAllFriendRequestsSentByUser(loggedUser.getId())){
+            Status status = dto.getFriendRequest().getStatus();
+
+            if (status == Status.APPROVED){
+                var model = new ApprovedFriendRequestSentByUserModel(dto);
+                LocalDateTime date = service.findDateOfFriendship(dto.getSender().getId(), dto.getReceiver().getId());
+                model.setDate(date);
+                models.add(model);
+            }
         }
         return models.stream().sorted((m1, m2) -> m2.getDate().compareTo(m1.getDate()))
                 .collect(Collectors.toList());

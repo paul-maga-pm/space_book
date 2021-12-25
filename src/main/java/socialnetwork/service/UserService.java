@@ -6,10 +6,7 @@ import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.Repository;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class UserService {
     private EntityValidator<Long, User> userValidator;
@@ -94,5 +91,9 @@ public class UserService {
                 return userRepository.findById(credential.getId()).get();
 
         throw new EntityNotFoundValidationException("Username or password incorrect. User doesn't exist");
+    }
+
+    public Optional<User> findUserById(Long senderId) {
+        return userRepository.findById(senderId);
     }
 }

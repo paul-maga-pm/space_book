@@ -55,14 +55,32 @@ public class SocialNetworkService {
         return friendRequestService.findOneFriendRequest(senderId, receiverId);
     }
 
-    public List<FriendRequestDto> getAllFriendRequestsSentToUser(Long userId){
+    public List<FriendRequestDto> getAllFriendRequestsSentToUser(Long receiverId){
         List<FriendRequestDto> friendRequestDtoList = new ArrayList<>();
-        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsSentToUser(userId);
+        List<FriendRequest> friendRequestsForUser = friendRequestService.getAllFriendRequestsReceivedByUser(receiverId);
         List<User> users = userService.getAllUsers();
         for(FriendRequest friendRequest: friendRequestsForUser){
             Optional<User> sender = users.stream()
                     .filter(user -> user.getId()==friendRequest.getSenderId()).findFirst();
             FriendRequestDto dto = new FriendRequestDto(friendRequest, sender.get());
+            friendRequestDtoList.add(dto);
+        }
+        return friendRequestDtoList;
+    }
+
+    public List<FriendRequestDto> getAllFriendRequestsSentByUser(Long senderId){
+        List<FriendRequestDto> friendRequestDtoList = new ArrayList<>();
+        List<FriendRequest> friendRequestsSentByUser = friendRequestService.getAllFriendRequestsSentByUser(senderId);
+        User sender = userService.findUserById(senderId).get();
+        Map<Long, User> allUsersMap = new HashMap<>();
+
+        for(var user : userService.getAllUsers())
+            allUsersMap.put(user.getId(), user);
+
+        for(var request : friendRequestsSentByUser){
+            var dto = new FriendRequestDto(request, sender);
+            var receiver = allUsersMap.get(request.getReceiverId());
+            dto.setReceiver(receiver);
             friendRequestDtoList.add(dto);
         }
         return friendRequestDtoList;
@@ -96,5 +114,18 @@ public class SocialNetworkService {
 
     public List<ConversationDto> getConversationsOfUser(Long userId){
         return conversationService.getConversationsOfUser(userId);
+    }
+
+    public int countAcceptedFriendRequestsSentByUser(Long senderId) {
+        int count = 0;
+
+        for(var friendRequest : friendRequestService.getAllFriendRequestsSentByUser(senderId))
+            if (friendRequest.getStatus() == Status.APPROVED)
+                count ++;
+        return count;
+    }
+
+    public int countFriendRequestsReceivedByUser(Long receiverId) {
+        return friendRequestService.getAllFriendRequestsReceivedByUser(receiverId).size();
     }
 }

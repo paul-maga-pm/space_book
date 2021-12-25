@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import socialnetwork.Run;
-import socialnetwork.domain.entities.FriendRequestDto;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.pagination.UserSearchResultPaginationWithOpeningUserPage;
@@ -113,16 +112,10 @@ public class MainMenuController {
 
     @FXML
     void handleClickOnNotificationsButton(ActionEvent event) throws IOException{
-        List<FriendRequestDto> friendRequestDtoList;
+        int notificationCount = service.countAcceptedFriendRequestsSentByUser(loggedUser.getId());
+        notificationCount += service.countFriendRequestsReceivedByUser(loggedUser.getId());
 
-        try{
-            friendRequestDtoList = service.getAllFriendRequestsSentToUser(loggedUser.getId());
-        } catch (ExceptionBaseClass exception){
-            Run.showPopUpWindow("Warning", exception.getMessage());
-            return;
-        }
-
-        if (friendRequestDtoList.size() == 0) {
+        if (notificationCount == 0) {
             Label label = new Label("You don't have new notifications");
             mainMenuBorderPane.setCenter(label);
             return;

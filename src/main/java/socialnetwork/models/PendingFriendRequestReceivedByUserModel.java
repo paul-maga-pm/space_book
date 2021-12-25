@@ -8,13 +8,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import socialnetwork.domain.entities.FriendRequestDto;
 
-public class PendingFriendRequestModel extends NotificationModel{
+public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
     private FriendRequestDto dto;
     private EventHandler<ActionEvent> acceptHandler;
     private EventHandler<ActionEvent> declineHandler;
-    public PendingFriendRequestModel(FriendRequestDto dto,
-                                     EventHandler<ActionEvent> acceptHandler,
-                                     EventHandler<ActionEvent> declineHandler) {
+    public PendingFriendRequestReceivedByUserModel(FriendRequestDto dto,
+                                                   EventHandler<ActionEvent> acceptHandler,
+                                                   EventHandler<ActionEvent> declineHandler) {
         this.dto = dto;
         this.acceptHandler = acceptHandler;
         this.declineHandler = declineHandler;

@@ -6,10 +6,10 @@ import socialnetwork.domain.entities.FriendRequestDto;
 
 import java.time.format.DateTimeFormatter;
 
-public class ApprovedFriendRequestModel extends NotificationModel {
+public class ApprovedFriendRequestReceivedByUserModel extends NotificationModel {
     private FriendRequestDto dto;
 
-    public ApprovedFriendRequestModel(FriendRequestDto dto){
+    public ApprovedFriendRequestReceivedByUserModel(FriendRequestDto dto){
         this.dto = dto;
     }
 

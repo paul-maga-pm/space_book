@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Business layer for FriendRequest model
@@ -97,19 +98,25 @@ public class FriendRequestService {
 
     /**
      * Get all friendRequests that were sent to the user with the given id
-     * @param idOfUser identifier of the user
+     * @param receiverId identifier of the user
      * @return lists of all the friendRequests sent to the user with the given id
      */
-    public List<FriendRequest> getAllFriendRequestsSentToUser(Long idOfUser){
+    public List<FriendRequest> getAllFriendRequestsReceivedByUser(Long receiverId){
         List<FriendRequest> friendRequests = friendRequestRepository.getAll();
         List<FriendRequest> friendRequestsForUser = new ArrayList<>();
 
         friendRequests.forEach(friendRequest -> {
-            if(friendRequest.getId().second.equals(idOfUser))
+            if(friendRequest.getId().second.equals(receiverId))
                 friendRequestsForUser.add(friendRequest);
         });
 
         return friendRequestsForUser;
+    }
+
+    public List<FriendRequest> getAllFriendRequestsSentByUser(Long senderId){
+        return friendRequestRepository.getAll().stream()
+                .filter(request -> request.getSenderId().equals(senderId))
+                .collect(Collectors.toList());
     }
 
     public Optional<FriendRequest> findOneFriendRequest(Long idOfFirstUser, Long idOfSecondUser){

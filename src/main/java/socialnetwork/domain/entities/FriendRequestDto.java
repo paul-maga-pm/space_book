@@ -5,6 +5,15 @@ import java.util.Objects;
 public class FriendRequestDto{
     private FriendRequest friendRequest;
     private User sender;
+    private User receiver;
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
 
     public FriendRequestDto(FriendRequest friendRequest, User sender) {
         this.friendRequest = friendRequest;
