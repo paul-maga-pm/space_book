@@ -109,8 +109,8 @@ public class UserPageController {
                     friendRequestToggleButton.setDisable(true);
                 }
                 else {
-                    friendRequestToggleButton.setText(status.toString());
-                    friendRequestToggleButton.setDisable(true);
+                    friendRequestToggleButton.setText("Sent");
+                    friendRequestToggleButton.setSelected(true);
                 }
             }
         }
@@ -145,8 +145,11 @@ public class UserPageController {
 
             if (friendRequest.isEmpty()) {
                 service.sendFriendRequestService(loggedUser.getId(), userThatOwnsThePage.getId());
-                friendRequestToggleButton.setDisable(true);
-                friendRequestToggleButton.setText("Pending");
+                friendRequestToggleButton.setText("Sent");
+            }
+            else if (friendRequest.get().getStatus().equals(Status.PENDING)){
+                service.withdrawFriendRequest(loggedUser.getId(), userThatOwnsThePage.getId());
+                friendRequestToggleButton.setText("Send friend request");
             }
         } catch (ExceptionBaseClass exception){
             Run.showPopUpWindow("Warning", exception.getMessage());
