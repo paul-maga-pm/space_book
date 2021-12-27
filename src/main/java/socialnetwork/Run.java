@@ -8,15 +8,16 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import socialnetwork.config.ApplicationContext;
 import socialnetwork.controllers.AuthenticationController;
-import socialnetwork.domain.entities.FriendRequest;
-import socialnetwork.domain.entities.Friendship;
-import socialnetwork.domain.entities.User;
-import socialnetwork.domain.entities.UserCredential;
+import socialnetwork.domain.entities.*;
 import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.database.*;
 import socialnetwork.service.*;
 import socialnetwork.utils.containers.UnorderedPair;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 public class Run extends Application {
     private static Stage primaryStage;
@@ -33,16 +34,20 @@ public class Run extends Application {
         Repository<UnorderedPair<Long, Long>, FriendRequest> friendRequestRepo =
                 new FriendRequestDatabaseRepository(url, user, password);
         Repository<Long, UserCredential> credentialRepo = new UserCredentialDatabaseRepository(url, user, password);
+        Repository<Long, Event> eventRepository = new EventDatabaseRepository(url, user, password);
+        Repository<UnorderedPair<Long, Long>, EventParticipant> eventParticipantRepository = new EventParticipantDatabaseRepository(url, user, password);
 
         EntityValidator<Long, User> userVal = new UserValidator();
         EntityValidator<UnorderedPair<Long, Long>, Friendship> friendshipVal = new FriendshipValidator(userRepo);
         EntityValidator<UnorderedPair<Long, Long>, FriendRequest> friendRequestVal = new FriendRequestValidator(userRepo);
         EntityValidator<Long, UserCredential> signUpCredentialVal = new UserSignUpCredentialValidator(credentialRepo);
+        EntityValidator<Long, Event> eventValidator = new EventValidator();
+        EntityValidator<UnorderedPair<Long, Long>, EventParticipant> eventParticipantValidator = new EventParticipantValidator(userRepo, eventRepository);
 
         UserService userService = new UserService(userRepo, credentialRepo, signUpCredentialVal, userVal);
         NetworkService networkService = new NetworkService(friendshipRepo, userRepo, friendshipVal);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepo, friendshipRepo, friendRequestVal);
-
+        EventService eventService = new EventService(eventValidator, eventRepository, eventParticipantValidator, eventParticipantRepository);
 
         ConversationDatabaseRepository conversationRepo = new ConversationDatabaseRepository(url, user, password);
         MessageDatabaseRepository messageRepo = new MessageDatabaseRepository(url, user, password);
@@ -58,7 +63,8 @@ public class Run extends Application {
         return new SocialNetworkService(userService,
                 networkService,
                 friendRequestService,
-                conversationService);
+                conversationService,
+                eventService);
     }
 
     @Override

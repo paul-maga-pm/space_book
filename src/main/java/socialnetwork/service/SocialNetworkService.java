@@ -10,15 +10,18 @@ public class SocialNetworkService {
     private NetworkService networkService;
     private FriendRequestService friendRequestService;
     private ConversationService conversationService;
+    private EventService eventService;
 
     public SocialNetworkService(UserService userService,
                                 NetworkService networkService,
                                 FriendRequestService friendRequestService,
-                                ConversationService conversationService) {
+                                ConversationService conversationService,
+                                EventService eventService) {
         this.userService = userService;
         this.networkService = networkService;
         this.friendRequestService = friendRequestService;
         this.conversationService = conversationService;
+        this.eventService = eventService;
     }
 
     public User signUpUserService(String firstName, String lastName, String userName, String password){
