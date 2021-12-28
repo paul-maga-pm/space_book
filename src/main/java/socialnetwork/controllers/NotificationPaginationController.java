@@ -102,6 +102,13 @@ public class NotificationPaginationController {
                 models.add(model);
             }
         }
+
+        for(var event: service.getAllEventsThatAreCloseToCurrentDateForUser(loggedUser.getId())){
+            var model = new EventModel(event);
+            model.setDate(event.getDate().atStartOfDay());
+            models.add(model);
+        }
+
         return models.stream().sorted((m1, m2) -> m2.getDate().compareTo(m1.getDate()))
                 .collect(Collectors.toList());
     }

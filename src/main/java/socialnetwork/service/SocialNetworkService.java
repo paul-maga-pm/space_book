@@ -2,7 +2,9 @@ package socialnetwork.service;
 
 import socialnetwork.domain.entities.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class SocialNetworkService {
@@ -130,5 +132,42 @@ public class SocialNetworkService {
 
     public int countFriendRequestsReceivedByUser(Long receiverId) {
         return friendRequestService.getAllFriendRequestsReceivedByUser(receiverId).size();
+    }
+
+    public Event addEventService(String name, String description, LocalDate date, String imageFile){
+        return eventService.addEvent(name, description, date, imageFile);
+    }
+
+    public List<Event> getAllEventsService(){
+        return eventService.getAllEvents();
+    }
+
+    public Optional<EventParticipant> findOneEventParticipantService(Long userId, Long eventId){
+        return eventService.findOneEventParticipant(userId, eventId);
+    }
+
+    public EventParticipant addEventParticipantService(Long userId, Long eventId){
+        return eventService.addEventParticipant(userId, eventId);
+    }
+
+    public Optional<EventParticipant> removeEventParticipantService(Long userId, Long eventId){
+        return eventService.removeEventParticipant(userId, eventId);
+    }
+
+    public List<Event> getAllEventsThatAreCloseToCurrentDateForUser(Long userId){
+        List<Event> events = eventService.getAllEvents();
+        List<Event> closeEvents = new ArrayList<>();
+
+        for(Event event: events){
+            Optional<EventParticipant> eventParticipant = eventService.findOneEventParticipant(userId, event.getId());
+            if(eventParticipant.isPresent()){
+                LocalDate eventDate = event.getDate();
+                long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+                if(days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
+                    closeEvents.add(event);
+            }
+        }
+
+        return closeEvents;
     }
 }
