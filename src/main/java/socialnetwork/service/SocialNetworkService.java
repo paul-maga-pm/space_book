@@ -2,6 +2,7 @@ package socialnetwork.service;
 
 import socialnetwork.domain.entities.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -130,5 +131,25 @@ public class SocialNetworkService {
 
     public int countFriendRequestsReceivedByUser(Long receiverId) {
         return friendRequestService.getAllFriendRequestsReceivedByUser(receiverId).size();
+    }
+
+    public Event addEventService(String name, String description, LocalDate date, String imageFile){
+        return eventService.addEvent(name, description, date, imageFile);
+    }
+
+    public List<Event> getAllEventsService(){
+        return eventService.getAllEvents();
+    }
+
+    public Optional<EventParticipant> findOneEventParticipantService(Long userId, Long eventId){
+        return eventService.findOneEventParticipant(userId, eventId);
+    }
+
+    public EventParticipant addEventParticipantService(Long userId, Long eventId){
+        return eventService.addEventParticipant(userId, eventId);
+    }
+
+    public Optional<EventParticipant> removeEventParticipantService(Long userId, Long eventId){
+        return eventService.removeEventParticipant(userId, eventId);
     }
 }
