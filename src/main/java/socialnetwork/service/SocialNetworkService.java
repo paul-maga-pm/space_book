@@ -4,6 +4,7 @@ import socialnetwork.domain.entities.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class SocialNetworkService {
@@ -151,5 +152,22 @@ public class SocialNetworkService {
 
     public Optional<EventParticipant> removeEventParticipantService(Long userId, Long eventId){
         return eventService.removeEventParticipant(userId, eventId);
+    }
+
+    public List<Event> getAllEventsThatAreCloseToCurrentDateForUser(Long userId){
+        List<Event> events = eventService.getAllEvents();
+        List<Event> closeEvents = new ArrayList<>();
+
+        for(Event event: events){
+            Optional<EventParticipant> eventParticipant = eventService.findOneEventParticipant(userId, event.getId());
+            if(eventParticipant.isPresent()){
+                LocalDate eventDate = event.getDate();
+                long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+                if(days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
+                    closeEvents.add(event);
+            }
+        }
+
+        return closeEvents;
     }
 }
