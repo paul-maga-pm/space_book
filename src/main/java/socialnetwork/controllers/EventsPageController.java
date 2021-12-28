@@ -17,6 +17,7 @@ import socialnetwork.service.SocialNetworkService;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,8 +110,13 @@ public class EventsPageController {
         }
     }
 
-    private void setSignUpToggleButtonState(ToggleButton signUp, Long eventId){
-        Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), eventId);
+    private void setSignUpToggleButtonState(ToggleButton signUp, Event event){
+        if(ChronoUnit.DAYS.between(LocalDate.now(), event.getDate()) < 0){
+            signUp.setText("Sign Up");
+            signUp.setDisable(true);
+            return;
+        }
+        Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), event.getId());
         if(eventParticipant.isPresent()){
             signUp.setSelected(true);
             signUp.setText("Signed Up");
@@ -129,7 +135,7 @@ public class EventsPageController {
         Label descriptionLabel = new Label(event.getDescription());
         Label dateLabel = new Label(event.getDate().toString());
         ToggleButton signUp = new ToggleButton();
-        setSignUpToggleButtonState(signUp, event.getId());
+        setSignUpToggleButtonState(signUp, event);
         signUp.setOnAction((ActionEvent e) -> handleClickOnSignUpToEventToggleButton(e, event.getId(), signUp));
         signUpToggleButtons.add(signUp);
         vBox.getChildren().addAll(nameLabel, descriptionLabel, dateLabel, signUp);
