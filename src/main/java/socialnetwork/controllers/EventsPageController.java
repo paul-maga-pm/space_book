@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.Event;
 import socialnetwork.domain.entities.EventParticipant;
@@ -17,6 +18,7 @@ import socialnetwork.service.SocialNetworkService;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,27 @@ public class EventsPageController {
     @FXML
     public void initialize(){
         datePicker.setValue(LocalDate.now());
+        StringConverter stringConverter = new StringConverter<LocalDate>() {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+            @Override
+            public String toString(LocalDate date) {
+                if(date != null)
+                    return dateFormatter.format(date);
+                else
+                    return "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                if(string != null && !string.isEmpty())
+                    return LocalDate.parse(string, dateFormatter);
+                else
+                    return null;
+            }
+        };
+        datePicker.setConverter(stringConverter);
+        datePicker.setPromptText("yyyy-mm-dd");
 
         fileChooserButton.setOnAction((ActionEvent event) -> {
             File file = fileChooser.showOpenDialog(Run.getPrimaryStage());
