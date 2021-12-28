@@ -163,8 +163,14 @@ public class EventsPageController {
         signUpToggleButtons.add(signUp);
         vBox.getChildren().addAll(nameLabel, descriptionLabel, dateLabel, signUp);
 
+        //String imageFile = event.getImageFile();
+        //int index = imageFile.lastIndexOf('\\');
+        //imageFile = imageFile.substring(index+1);
+        //Image eventImage = new Image(String.valueOf(Run.class.getResource(imageFile)));
         Image eventImage = new Image(String.valueOf(Run.class.getResource("rick.jpg")));
         ImageView imageView = new ImageView(eventImage);
+        imageView.setFitWidth(250);
+        imageView.setPreserveRatio(true);
         HBox hBox = new HBox(imageView, vBox);
 
         return hBox;
@@ -174,6 +180,11 @@ public class EventsPageController {
         signUpToggleButtons.removeAll(signUpToggleButtons);
         events = service.getAllEventsService();
         pagination.setPageCount(events.size());
-        pagination.setPageFactory((Integer pageIndex) -> createPage(pageIndex));
+        pagination.setPageFactory((Integer pageIndex) -> {
+            if(pageIndex >= events.size())
+                return null;
+            else
+                return createPage(pageIndex);
+        });
     }
 }
