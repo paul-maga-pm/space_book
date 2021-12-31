@@ -1,10 +1,12 @@
 package socialnetwork.service;
 
+
 import socialnetwork.domain.entities.User;
 import socialnetwork.domain.entities.UserCredential;
 import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.Repository;
+import socialnetwork.utils.containers.PasswordEncryptor;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ public class UserService {
     private Repository<Long, User> userRepository;
     private Repository<Long, UserCredential> credentialRepository;
     private EntityValidator<Long, UserCredential> signupCredentialValidator;
+    private final PasswordEncryptor encryptor = new PasswordEncryptor();
 
     public UserService(Repository<Long, User> userRepository,
                        Repository<Long, UserCredential> credentialRepository,
@@ -32,6 +35,8 @@ public class UserService {
     public User signUpUser(String firstName, String lastName, String userName, String password){
         Long id = findAvailableId();
 
+        password = encryptor.hash(password);
+
         UserCredential credential = new UserCredential(id, userName, password);
         signupCredentialValidator.validate(credential);
 
@@ -47,19 +52,6 @@ public class UserService {
         if(str.length() < 3)
             return new ArrayList<>();
 
-//        final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
-//        Predicate<User> fullNameContainsString
-//                = user -> {
-//                String firstName = user.getFirstName().toLowerCase(Locale.ROOT);
-//                String lastName = user.getLastName().toLowerCase(Locale.ROOT);
-//
-//                return (firstName.concat(" ").concat(lastName)).contains(lowerCasedStr);
-//        };
-//        List<User> users = userRepository
-//                .getAll()
-//                .stream()
-//                .filter(fullNameContainsString)
-//                .collect(Collectors.toList());
         final String lowerCasedStr = str.toLowerCase(Locale.ROOT);
         List<User> users = new ArrayList<>();
         for(var user : userRepository.getAll()){
@@ -87,7 +79,8 @@ public class UserService {
 
     private User findUserWithCredentials(String userName, String password){
         for(UserCredential credential : credentialRepository.getAll())
-            if(credential.getUserName().equals(userName) && credential.getPassword().equals(password))
+            if(credential.getUserName().equals(userName) &&
+            encryptor.authenticate(password, credential.getPassword()))
                 return userRepository.findById(credential.getId()).get();
 
         throw new EntityNotFoundValidationException("Username or password incorrect. User doesn't exist");
