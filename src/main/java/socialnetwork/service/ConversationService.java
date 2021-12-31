@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ConversationService {
@@ -78,6 +79,28 @@ public class ConversationService {
             conversationDtoList.add(conversationDto);
         }
         return conversationDtoList;
+    }
+
+    public List<Message> getMessagesReceivedByUserSentInMonth(Long receiverId, int month){
+        List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
+                .filter(convo -> convo.getParticipantId().equals(receiverId))
+                .map(convo -> convo.getConversationId())
+                .collect(Collectors.toList());
+
+        List<Message> userMessages = new ArrayList<>();
+        for(var conversationId : userConversationsIdList)
+            userMessages.addAll(getConversationMessagesSentInMonth(conversationId, month));
+
+        return userMessages;
+    }
+
+
+    private List<Message> getConversationMessagesSentInMonth(Long conversationId, int month){
+        Predicate<Message> messageIsInConversationAndWasSentInMonth =
+                m -> m.getConversationId().equals(conversationId) && m.getDate().getMonth().getValue() == month;
+        return messageRepository.getAll().stream()
+                .filter(messageIsInConversationAndWasSentInMonth)
+                .collect(Collectors.toList());
     }
 
     private ConversationDto getConversationDtoWithId(Long conversationId) {
