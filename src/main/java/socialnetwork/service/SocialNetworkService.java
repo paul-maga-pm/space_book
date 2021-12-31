@@ -1,11 +1,18 @@
 package socialnetwork.service;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import socialnetwork.domain.entities.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 
 public class SocialNetworkService {
     private UserService userService;
@@ -171,11 +178,62 @@ public class SocialNetworkService {
         return closeEvents;
     }
 
-    public void exportNewFriendsAndNewMessagesOfUserFromMonth(String fileUrl, User user, int month){
-        var userId = user.getId();
+    public void exportNewFriendsAndNewMessagesOfUserFromMonth(String fileUrl, Long userId, int month) throws IOException {
         var messagesFromMonth = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
         var newFriendshipsFromMonth = networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
 
-        PDDocument doc;
+
+        PDDocument document = new PDDocument();
+        exportToPdfDocumentEntities(document, messagesFromMonth, Message::getText, 10);
+        exportToPdfDocumentEntities(document, newFriendshipsFromMonth, FriendshipDto::toString, 10);
+        document.save(fileUrl);
+        document.close();
+    }
+
+    public void exportMessagesReceivedByUserSentByOtherUserInMonth(String fileUrl,
+                                                                   Long receiverId,
+                                                                   Long senderId,
+                                                                   int month) throws IOException {
+        List<Message> messages = conversationService.getMessagesReceivedByUserSentByOtherUserInMonth(receiverId,
+                senderId,
+                month);
+
+        PDDocument doc = new PDDocument();
+        exportToPdfDocumentEntities(doc, messages, Message::getText, 5);
+        doc.save(fileUrl);
+        doc.close();
+    }
+
+    private <E> void exportToPdfDocumentEntities(PDDocument document,
+                                                 List<E> entities,
+                                                 Function<E, String> entityToDocumentLineFunction,
+                                                 int entitiesPerPageCount) throws IOException {
+        int pagesCount = 1;
+
+        if (entities.size() > 10){
+            pagesCount = entities.size() / entitiesPerPageCount;
+
+            if (entities.size() % entitiesPerPageCount != 0)
+                pagesCount++;
+        }
+
+        for(int i = 0; i < pagesCount; i++){
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDPageContentStream stream = new PDPageContentStream(document, page);
+
+            stream.beginText();
+            stream.setLeading(14.5f);
+            stream.newLineAtOffset(25, 700);
+            stream.setFont(PDType1Font.COURIER, 14);
+
+            for(int j = i * entitiesPerPageCount; j <  entities.size() && j < (i + 1) * entitiesPerPageCount; j++) {
+                var entity = entities.get(j);
+                stream.showText(entityToDocumentLineFunction.apply(entity));
+                stream.newLine();
+            }
+            stream.endText();
+            stream.close();
+        }
     }
 }

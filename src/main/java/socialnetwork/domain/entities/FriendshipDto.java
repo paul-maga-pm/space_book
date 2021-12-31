@@ -37,6 +37,7 @@ public class FriendshipDto {
 
     @Override
     public String toString() {
-        return friend.toString() + " " + friendshipDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:SS"));
+        return friendshipDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")) + " from "
+                + friend.toString();
     }
 }
