@@ -116,7 +116,7 @@ public class NetworkService {
      * @return a Map with the key representing the friend of the user and the value the date when the users became
      * friends
      */
-    public List<FriendshipDto> findAllFriendsForUserFromMonthService(Long idOfUser, int month){
+    public List<FriendshipDto> getAllNewFriendshipsOfUserFromMonth(Long idOfUser, int month){
         List<FriendshipDto> usersFriendshipsDtoList = findAllFriendsForUserService(idOfUser);
         int year = LocalDateTime.now().getYear();
         return  usersFriendshipsDtoList.stream()

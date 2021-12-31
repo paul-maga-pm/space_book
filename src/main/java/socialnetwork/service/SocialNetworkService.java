@@ -170,4 +170,12 @@ public class SocialNetworkService {
 
         return closeEvents;
     }
+
+    public void exportNewFriendsAndNewMessagesOfUserFromMonth(String fileUrl, User user, int month){
+        var userId = user.getId();
+        var messagesFromMonth = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
+        var newFriendshipsFromMonth = networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
+
+        PDDocument doc;
+    }
 }
