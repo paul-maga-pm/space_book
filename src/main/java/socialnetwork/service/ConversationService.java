@@ -94,10 +94,19 @@ public class ConversationService {
         return userMessages;
     }
 
+    public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
+        Predicate<Message> messageWasSentBy = m -> m.getSenderId().equals(senderId);
+        return getMessagesReceivedByUserSentInMonth(receiverId, month).stream()
+                .filter(messageWasSentBy)
+                .collect(Collectors.toList());
+    }
+
 
     private List<Message> getConversationMessagesSentInMonth(Long conversationId, int month){
         Predicate<Message> messageIsInConversationAndWasSentInMonth =
-                m -> m.getConversationId().equals(conversationId) && m.getDate().getMonth().getValue() == month;
+                m -> m.getConversationId().equals(conversationId) &&
+                        m.getDate().getMonth().getValue() == month &&
+                        m.getDate().getYear() == LocalDateTime.now().getYear();
         return messageRepository.getAll().stream()
                 .filter(messageIsInConversationAndWasSentInMonth)
                 .collect(Collectors.toList());

@@ -24,7 +24,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'socialnetwork'
-    mainClass = 'socialnetwork.HelloApplication'
+    mainClass = 'socialnetwork.Run'
 }
 
 javafx {
@@ -38,8 +38,9 @@ dependencies {
         exclude(group: 'org.openjfx')
     }
     implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
-    implementation 'org.postgresql:postgresql:42.3.1'
-    implementation files("libs/pdfbox-3.0.0-alpha2.jar")
+    implementation('org.postgresql:postgresql:42.3.1')
+
+    implementation('org.apache.pdfbox:pdfbox-tools:2.0.20')
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

@@ -6,9 +6,7 @@ module socialnetwork {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires java.sql;
-
-    opens socialnetwork to javafx.fxml;
-    opens socialnetwork.domain.entities to javafx.base;
+    requires org.apache.pdfbox;
     exports socialnetwork;
     exports socialnetwork.controllers;
     opens socialnetwork.controllers to javafx.fxml;
