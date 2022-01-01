@@ -29,6 +29,7 @@ public class Main {
         connection.prepareStatement("delete from friend_requests").executeUpdate();
         connection.prepareStatement("delete from user_credentials").executeUpdate();
         connection.prepareStatement("delete from event_participants").executeUpdate();
+        connection.prepareStatement("delete from events").executeUpdate();
         connection.prepareStatement("delete from users").executeUpdate();
 
         String userFilePath = ApplicationContext.getProperty("socialnetwork.csv.users");

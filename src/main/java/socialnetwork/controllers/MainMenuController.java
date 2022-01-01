@@ -47,6 +47,21 @@ public class MainMenuController {
     BorderPane mainMenuBorderPane;
 
     @FXML
+    Button activityReportButton;
+
+    @FXML
+    void handleClickOnActivityReportButton(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Run.class.getResource("activity-report.fxml"));
+        Scene scene = new Scene(loader.load());
+        ActivityReportController controller = loader.getController();
+
+        controller.setLoggedUser(loggedUser);
+        controller.setService(service);
+
+        mainMenuBorderPane.setCenter(scene.getRoot());
+    }
+
+    @FXML
     void handleUserSearchButtonClick(ActionEvent event){
         String userNameSearchField = userSearchTextField.getText().strip();
 
@@ -124,6 +139,7 @@ public class MainMenuController {
     void handleClickOnNotificationsButton(ActionEvent event) throws IOException{
         int notificationCount = service.countAcceptedFriendRequestsSentByUser(loggedUser.getId());
         notificationCount += service.countFriendRequestsReceivedByUser(loggedUser.getId());
+        notificationCount += service.getAllEventsThatAreCloseToCurrentDateForUser(loggedUser.getId()).size();
 
         if (notificationCount == 0) {
             Label label = new Label("You don't have new notifications");

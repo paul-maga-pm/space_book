@@ -117,18 +117,18 @@ public class ConversationController {
     @FXML
     void handleClickOnCreateConversation(ActionEvent event) throws IOException {
         try{
-        Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-participants-selection.fxml"));
-        Scene scene = new Scene(loader.load());
-        ConversationParticipantsSelectionController controller = loader.getController();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        controller.setService(service);
-        controller.setLoggedUser(loggedUser);
-        controller.setConversationDtoObservableList(conversationDtoObservableList);
-        controller.setStage(stage);
-        stage.initOwner(Run.getPrimaryStage());
-        stage.setScene(scene);
-        stage.show();
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-participants-selection.fxml"));
+            Scene scene = new Scene(loader.load());
+            ConversationParticipantsSelectionController controller = loader.getController();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            controller.setService(service);
+            controller.setLoggedUser(loggedUser);
+            controller.setConversationDtoObservableList(conversationDtoObservableList);
+            controller.setStage(stage);
+            stage.initOwner(Run.getPrimaryStage());
+            stage.setScene(scene);
+            stage.show();
         } catch (IOException exception){
             exception.printStackTrace();
             System.exit(1);
