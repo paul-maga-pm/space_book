@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import socialnetwork.Run;
+import socialnetwork.domain.entities.Message;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.pagination.UserSearchResultPaginationWithOpeningUserPage;
@@ -48,6 +49,21 @@ public class MainMenuController {
 
     @FXML
     Button activityReportButton;
+
+    @FXML
+    Button messagesReportButton;
+
+    @FXML
+    void handleClickOnMessagesReportButton(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Run.class.getResource("message-report.fxml"));
+        Scene scene = new Scene(loader.load());
+        MessageReportController controller = loader.getController();
+
+        controller.setService(service);
+        controller.setLoggedUser(loggedUser);
+
+        mainMenuBorderPane.setCenter(scene.getRoot());
+    }
 
     @FXML
     void handleClickOnActivityReportButton(ActionEvent event) throws IOException {

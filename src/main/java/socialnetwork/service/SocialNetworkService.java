@@ -207,6 +207,12 @@ public class SocialNetworkService {
         document.close();
     }
 
+    public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
+        return conversationService.getMessagesReceivedByUserSentByOtherUserInMonth(receiverId,
+                senderId,
+                month);
+    }
+
     public void exportMessagesReceivedByUserSentByOtherUserInMonth(String fileUrl,
                                                                    Long receiverId,
                                                                    Long senderId,

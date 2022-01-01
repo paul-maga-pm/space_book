@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="328.0" prefWidth="384.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.MessageReportController">
+   <children>
+      <HBox fx:id="listAndPaginationLayout" layoutX="15.0" layoutY="16.0" prefHeight="185.0" prefWidth="355.0">
+         <children>
+            <ListView fx:id="messageListView" prefHeight="170.0" prefWidth="151.0" />
+         </children>
+      </HBox>
+      <TextField fx:id="userNameTextField" layoutX="171.0" layoutY="221.0" prefHeight="25.0" prefWidth="98.0" />
+      <Button fx:id="searchUserButton" layoutX="278.0" layoutY="221.0" mnemonicParsing="false" onAction="#handleClickOnSearchUserButton" text="Search sender" />
+      <Button fx:id="saveAsButton" layoutX="164.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleClickOnSaveAsButton" text="Save as" />
+      <Spinner fx:id="monthChooser" layoutX="29.0" layoutY="221.0" prefHeight="25.0" prefWidth="119.0" />
+      <Label layoutX="52.0" layoutY="200.0" text="Select month:" />
+      <Button fx:id="previewReportButton" layoutX="146.0" layoutY="256.0" mnemonicParsing="false" onAction="#handleClickOnPreviewReportButton" text="Preview report" />
+   </children>
+</AnchorPane>
