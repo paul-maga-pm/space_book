@@ -180,16 +180,37 @@ public class SocialNetworkService {
         return closeEvents;
     }
 
+    public List<MessageDto> getMessagesReceivedByUserSentInMonth(Long userId, int month){
+        List<Message> messageList = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
+        List<MessageDto> messageDtos = new ArrayList<>();
+
+        for(var msg : messageList){
+            var sender = userService.findUserById(msg.getSenderId()).get();
+            var dto = new MessageDto(sender, msg.getText(), msg.getDate());
+            messageDtos.add(dto);
+        }
+        return messageDtos;
+    }
+
+    public List<FriendshipDto> getAllNewFriendshipsOfUserFromMonth(Long userId, int month){
+        return networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
+    }
+
     public void exportNewFriendsAndNewMessagesOfUserFromMonth(String fileUrl, Long userId, int month) throws IOException {
         var messagesFromMonth = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
         var newFriendshipsFromMonth = networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
-
 
         PDDocument document = new PDDocument();
         exportToPdfDocumentEntities(document, messagesFromMonth, Message::getText, 10);
         exportToPdfDocumentEntities(document, newFriendshipsFromMonth, FriendshipDto::toString, 10);
         document.save(fileUrl);
         document.close();
+    }
+
+    public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
+        return conversationService.getMessagesReceivedByUserSentByOtherUserInMonth(receiverId,
+                senderId,
+                month);
     }
 
     public void exportMessagesReceivedByUserSentByOtherUserInMonth(String fileUrl,
