@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import socialnetwork.Run;
-import socialnetwork.domain.entities.Message;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.pagination.UserSearchResultPaginationWithOpeningUserPage;
@@ -164,7 +163,7 @@ public class MainMenuController {
         }
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("notification-pagination.fxml"));
         Scene scene = new Scene(loader.load());
-        NotificationPaginationController controller = loader.getController();
+        NotificationController controller = loader.getController();
         controller.setService(service);
         controller.setLoggedUser(loggedUser);
         controller.init();

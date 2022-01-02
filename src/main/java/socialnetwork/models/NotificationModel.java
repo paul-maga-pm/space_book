@@ -5,7 +5,7 @@ import javafx.scene.Node;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public abstract class NotificationModel {
+public abstract class NotificationModel  {
     public LocalDateTime getDate() {
         return date;
     }

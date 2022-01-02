@@ -1,7 +1,9 @@
 package socialnetwork.controllers;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -10,23 +12,29 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Pagination;
 import javafx.util.Callback;
+import socialnetwork.domain.entities.FriendRequest;
+import socialnetwork.domain.entities.FriendRequestDto;
 import socialnetwork.domain.entities.Status;
 import socialnetwork.domain.entities.User;
 import socialnetwork.models.*;
 import socialnetwork.service.SocialNetworkService;
+import socialnetwork.utils.containers.UnorderedPair;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NotificationPaginationController {
+public class NotificationController {
     private SocialNetworkService service;
     private User loggedUser;
-    private List<NotificationModel> models;
-    private ObservableList<NotificationModel> pageObsList;
-    private ListView<NotificationModel> mainView = new ListView<>();
-    private static final int itemsPerPageCount = 4;
+
+    private SortedList<NotificationModel> sortedModels;
+    private ObservableList<NotificationModel> allModels = FXCollections.observableArrayList();
+    private ObservableList<NotificationModel> modelsPerCurrentPage = FXCollections.observableArrayList();
+
+    private static final int itemsPerPageCount = 2;
 
 
 
@@ -42,33 +50,39 @@ public class NotificationPaginationController {
     Pagination notificationPagination;
 
     void init(){
-        models = getNotificationsModels();
-        notificationPagination.setPageCount(calculateNumberOfPages(models.size(),
+        //models = getNotificationsModels();
+        allModels.addAll(getNotificationsModels());
+        Comparator<NotificationModel> cmp = (m1, m2) -> m2.getDate().compareTo(m1.getDate());
+        sortedModels = new SortedList<NotificationModel>(allModels, cmp);
+
+        notificationPagination.setPageCount(calculateNumberOfPages(sortedModels.size(),
                 itemsPerPageCount));
-        notificationPagination.setPageFactory(new Callback<Integer, Node>() {
+        notificationPagination.setPageFactory(this::createPage);
+    }
+
+    private Node createPage(int pageIndex){
+        ListView<NotificationModel> view = new ListView<>();
+        view.setCellFactory(list -> new ListCell<NotificationModel>(){
             @Override
-            public Node call(Integer pageIndex) {
-                ListView<NotificationModel> view = new ListView<>();
-                view.setCellFactory(list -> new ListCell<NotificationModel>(){
-                    @Override
-                    protected void updateItem(NotificationModel item, boolean empty){
-                        super.updateItem(item, empty);
-                        if(item == null || empty){
-                            setText(null);
-                        }else{
-                            Node view = item.getViewForModel();
-                            setGraphic(view);
-                        }
-                    }
-                });
-                int start = pageIndex * itemsPerPageCount;
-                int end = Math.min((pageIndex + 1) * itemsPerPageCount, models.size());
-                pageObsList = FXCollections.observableArrayList(models.subList(start, end));
-                view.setItems(pageObsList);
-                return view;
+            protected void updateItem(NotificationModel item, boolean empty){
+                super.updateItem(item, empty);
+                if(item == null || empty){
+                    setText(null);
+                }else{
+                    Node view = item.getViewForModel();
+                    setGraphic(view);
+                }
             }
         });
+        setModelsOnPage(pageIndex);
+        view.setItems(modelsPerCurrentPage);
+        return view;
+    }
 
+    private void setModelsOnPage(int pageIndex){
+        int start = pageIndex * itemsPerPageCount;
+        int end = Math.min((pageIndex + 1) * itemsPerPageCount, sortedModels.size());
+        modelsPerCurrentPage.setAll(sortedModels.subList(start, end));
     }
 
     public List<NotificationModel> getNotificationsModels() {
@@ -105,20 +119,11 @@ public class NotificationPaginationController {
 
         for(var event: service.getAllEventsThatAreCloseToCurrentDateForUser(loggedUser.getId())){
             var model = new EventModel(event);
-            model.setDate(event.getDate().atStartOfDay());
+            model.setDate(LocalDateTime.now());
             models.add(model);
         }
 
-        return models.stream().sorted((m1, m2) -> m2.getDate().compareTo(m1.getDate()))
-                .collect(Collectors.toList());
-    }
-
-    public void refreshObservableList(){
-        models = getNotificationsModels();
-        int pageIndex = notificationPagination.getCurrentPageIndex();
-        int start = pageIndex * itemsPerPageCount;
-        int end = Math.min((pageIndex + 1) * itemsPerPageCount, models.size());
-        pageObsList.setAll(models.subList(start, end));
+        return models;
     }
 
     public void handleAcceptFriendRequest(ActionEvent event){
@@ -126,16 +131,39 @@ public class NotificationPaginationController {
         User sender = (User)btn.getUserData();
         System.out.println("accept" + "  " + sender);
         service.acceptOrRejectFriendRequestService(loggedUser.getId(), sender.getId(), Status.APPROVED);
-        refreshObservableList();
+        allModels.removeIf(model -> isNotificationPendingFriendRequestBetween(model,
+                sender.getId(),
+                loggedUser.getId() ));
+        var dto = service.findFriendRequestDto(sender.getId(), loggedUser.getId());
+        var model = new ApprovedFriendRequestReceivedByUserModel(dto);
+        model.setDate(LocalDateTime.now());
+        allModels.add(model);
+        setModelsOnPage(notificationPagination.getCurrentPageIndex());
+    }
 
+    private boolean isNotificationPendingFriendRequestBetween(NotificationModel model, Long senderId, Long receiverId){
+        if (model instanceof PendingFriendRequestReceivedByUserModel) {
+            var pending = (PendingFriendRequestReceivedByUserModel)model;
+            var requestId = pending.getFriendRequestDto().getFriendRequest().getId();
+            return requestId.equals(new UnorderedPair<>(senderId, receiverId));
+        }
+        return false;
     }
 
     public void handleDeclineFriendRequest(ActionEvent event){
         Button btn = (Button) event.getSource();
         User sender = (User)btn.getUserData();
         service.acceptOrRejectFriendRequestService(loggedUser.getId(), sender.getId(), Status.REJECTED);
-        refreshObservableList();
+        allModels.removeIf(model -> isNotificationPendingFriendRequestBetween(model,
+                sender.getId(),
+                loggedUser.getId() ));
+
+        var dto = service.findFriendRequestDto(sender.getId(), loggedUser.getId());
+        var model = new RejectedFriendRequestReceivedByUserModel(dto);
+        model.setDate(LocalDateTime.now());
+        allModels.add(model);
         System.out.println("decline" + "  " + sender);
+        setModelsOnPage(notificationPagination.getCurrentPageIndex());
     }
 
     private int calculateNumberOfPages(int itemsNumber, int itemsPerPageNumber) {

@@ -259,4 +259,9 @@ public class SocialNetworkService {
             stream.close();
         }
     }
+
+    public FriendRequestDto findFriendRequestDto(Long senderId, Long receiverId) {
+        FriendRequest request = friendRequestService.findOneFriendRequest(senderId, receiverId).get();
+        return new FriendRequestDto(request, userService.findUserById(senderId).get());
+    }
 }

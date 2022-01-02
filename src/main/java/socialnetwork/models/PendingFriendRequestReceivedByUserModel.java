@@ -10,6 +10,7 @@ import socialnetwork.domain.entities.FriendRequestDto;
 
 public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
     private FriendRequestDto dto;
+
     private EventHandler<ActionEvent> acceptHandler;
     private EventHandler<ActionEvent> declineHandler;
     public PendingFriendRequestReceivedByUserModel(FriendRequestDto dto,
@@ -19,7 +20,6 @@ public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
         this.acceptHandler = acceptHandler;
         this.declineHandler = declineHandler;
     }
-
     @Override
     public Node getViewForModel() {
         HBox box = new HBox();
@@ -33,5 +33,9 @@ public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
         acceptButton.setUserData(dto.getSender());
         declineButton.setUserData(dto.getSender());
         return box;
+    }
+
+    public FriendRequestDto getFriendRequestDto() {
+        return dto;
     }
 }
