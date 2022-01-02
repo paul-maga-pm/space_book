@@ -5,11 +5,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import socialnetwork.Run;
@@ -68,7 +72,7 @@ public class ConversationController {
                 handleSelectionChangeInConversationListView());
 
         messageListView.setItems(messageDtoObservableList);
-        messageListView.setCellFactory(list -> new ListCell<MessageDto>(){
+        /*messageListView.setCellFactory(list -> new ListCell<MessageDto>(){
             @Override
             protected void updateItem(MessageDto item, boolean empty){
                 super.updateItem(item, empty);
@@ -81,7 +85,32 @@ public class ConversationController {
                     );
                 }
             }
-        });
+        });*/
+        messageListView.setCellFactory(list -> new ChatCell());
+    }
+
+    class ChatCell extends ListCell<MessageDto>{
+        HBox graphic = new HBox();
+        Text message = new Text();
+        Label label = new Label();
+
+        public ChatCell(){
+            graphic.getChildren().add(new VBox(label, message));
+        }
+
+        @Override
+        public void updateItem(MessageDto item, boolean empty){
+            super.updateItem(item, empty);
+            if(!empty && (item != null)){
+                label.setText(item.getSender().getId().equals(loggedUser.getId()) ? "" : item.getSender().getFirstName()+" "+item.getSender().getLastName());
+                message.setText(item.getText());
+                graphic.setAlignment(item.getSender().getId().equals(loggedUser.getId()) ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+                setGraphic(graphic);
+            } else {
+                message.setText("");
+                setGraphic(null);
+            }
+        }
     }
 
     void handleSelectionChangeInConversationListView(){
