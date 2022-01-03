@@ -45,6 +45,10 @@ public class SocialNetworkService {
         return userService.loginUser(userName, password);
     }
 
+    public Optional<User> updateUserService(User newUser){
+        return userService.updateUser(newUser);
+    }
+
     public void sendFriendRequestService(Long senderId, Long receiverId){
         friendRequestService.sendFriendRequestService(senderId, receiverId);
     }

@@ -89,4 +89,8 @@ public class UserService {
     public Optional<User> findUserById(Long senderId) {
         return userRepository.findById(senderId);
     }
+
+    public Optional<User> updateUser(User newUser){
+        return userRepository.update(newUser);
+    }
 }
