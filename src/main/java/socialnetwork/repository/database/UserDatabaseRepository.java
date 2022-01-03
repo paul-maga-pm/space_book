@@ -90,13 +90,14 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      */
     @Override
     public PreparedStatement createUpdateStatementForEntity(Connection connection, User newValue) throws SQLException {
-        String updateSqlStr = "UPDATE users SET first_name=?, last_name=? WHERE id=?";
+        String updateSqlStr = "UPDATE users SET first_name=?, last_name=?, profile_picture_file=? WHERE id=?";
         PreparedStatement updateSql = null;
         try{
             updateSql = connection.prepareStatement(updateSqlStr);
             updateSql.setString(1, newValue.getFirstName());
             updateSql.setString(2, newValue.getLastName());
-            updateSql.setLong(3, newValue.getId());
+            updateSql.setString(3, newValue.getProfilePictureFile());
+            updateSql.setLong(4, newValue.getId());
             return updateSql;
         } catch (SQLException exception){
             closePreparedStatement(updateSql);
@@ -112,13 +113,14 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
      */
     @Override
     public PreparedStatement createInsertStatementForEntity(Connection connection, User user) throws SQLException {
-        String insertSqlStr = "INSERT INTO users(id, first_name, last_name) values (?,?,?)";
+        String insertSqlStr = "INSERT INTO users(id, first_name, last_name, profile_picture_file) values (?,?,?,?)";
         PreparedStatement insertSql = null;
         try{
             insertSql = connection.prepareStatement(insertSqlStr);
             insertSql.setLong(1, user.getId());
             insertSql.setString(2, user.getFirstName());
             insertSql.setString(3, user.getLastName());
+            insertSql.setString(4, user.getProfilePictureFile());
             return insertSql;
         } catch (SQLException exception){
             closePreparedStatement(insertSql);
@@ -137,7 +139,8 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
             String firstName = resultSet.getString("first_name");
             String lastName = resultSet.getString("last_name");
             String userName = resultSet.getString("username");
-            User user = new User(id, firstName, lastName);
+            String profilePictureFile = resultSet.getString("profile_picture_file");
+            User user = new User(id, firstName, lastName, profilePictureFile);
             user.setUserName(userName);
             return user;
         } catch (SQLException exception){

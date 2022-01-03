@@ -47,7 +47,7 @@ public class Main {
             String firstName = u.getFirstName();
             String lastName = u.getLastName();
             String email = firstName.toLowerCase(Locale.ROOT) + "." + lastName.toLowerCase(Locale.ROOT) + "@gmail.com";
-            service.signUpUserService(firstName, lastName, email, "parola");
+            service.signUpUserService(firstName, lastName, email, "parola", "rick.jpg");
         }
 
     }

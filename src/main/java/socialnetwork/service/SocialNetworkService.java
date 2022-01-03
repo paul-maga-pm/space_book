@@ -35,8 +35,8 @@ public class SocialNetworkService {
         this.eventService = eventService;
     }
 
-    public User signUpUserService(String firstName, String lastName, String userName, String password){
-        User signedUser = userService.signUpUser(firstName, lastName, userName, password);
+    public User signUpUserService(String firstName, String lastName, String userName, String password, String profilePictureFile){
+        User signedUser = userService.signUpUser(firstName, lastName, userName, password, profilePictureFile);
         signedUser.setUserName(userName);
         return signedUser;
     }

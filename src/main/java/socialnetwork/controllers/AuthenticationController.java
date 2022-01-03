@@ -52,7 +52,7 @@ public class AuthenticationController {
         String email = signInEmailTextField.getText();
         String password = signInPasswordPasswordField.getText();
         try{
-            User signedUser = service.signUpUserService(firstName, lastName, email, password);
+            User signedUser = service.signUpUserService(firstName, lastName, email, password, "rick.jpg");
             openUserPage(signedUser);
         } catch (ExceptionBaseClass exception){
             Run.showPopUpWindow("Warning", exception.getMessage());
