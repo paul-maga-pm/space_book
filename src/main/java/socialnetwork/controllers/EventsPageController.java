@@ -12,6 +12,7 @@ import javafx.util.StringConverter;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.Event;
 import socialnetwork.domain.entities.EventParticipant;
+import socialnetwork.domain.entities.NotificationStatus;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkService;
@@ -127,7 +128,7 @@ public class EventsPageController {
             signUp.setText("Sign Up");
         }
         else{
-            service.addEventParticipantService(loggedUser.getId(), eventId);
+            service.addEventParticipantService(loggedUser.getId(), eventId, NotificationStatus.SUBSCRIBED);
             signUp.setSelected(true);
             signUp.setText("Signed Up");
         }

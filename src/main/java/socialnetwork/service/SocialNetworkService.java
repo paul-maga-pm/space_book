@@ -159,8 +159,8 @@ public class SocialNetworkService {
         return eventService.findOneEventParticipant(userId, eventId);
     }
 
-    public EventParticipant addEventParticipantService(Long userId, Long eventId){
-        return eventService.addEventParticipant(userId, eventId);
+    public EventParticipant addEventParticipantService(Long userId, Long eventId, NotificationStatus notificationStatus){
+        return eventService.addEventParticipant(userId, eventId, notificationStatus);
     }
 
     public Optional<EventParticipant> removeEventParticipantService(Long userId, Long eventId){

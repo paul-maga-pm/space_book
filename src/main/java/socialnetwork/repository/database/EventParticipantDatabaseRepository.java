@@ -1,6 +1,7 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.entities.EventParticipant;
+import socialnetwork.domain.entities.NotificationStatusSupplier;
 import socialnetwork.utils.containers.UnorderedPair;
 
 import java.sql.Connection;
@@ -18,17 +19,19 @@ public class EventParticipantDatabaseRepository extends AbstractDatabaseReposito
     public EventParticipant createEntityFromResultSet(ResultSet resultSet) throws SQLException {
         Long userId = resultSet.getLong("user_id");
         Long eventId = resultSet.getLong("event_id");
-        return new EventParticipant(userId, eventId);
+        String notificationStatus = resultSet.getString("notification_status");
+        return new EventParticipant(userId, eventId, NotificationStatusSupplier.getStatus(notificationStatus));
     }
 
     @Override
     public PreparedStatement createInsertStatementForEntity(Connection connection, EventParticipant eventParticipant) throws SQLException {
-        String insertSqlString = "insert into event_participants(user_id, event_id) values (?, ?)";
+        String insertSqlString = "insert into event_participants(user_id, event_id, notification_status) values (?, ?, ?)";
         PreparedStatement insertStatement = null;
         try{
             insertStatement = connection.prepareStatement(insertSqlString);
             insertStatement.setLong(1, eventParticipant.getId().first);
             insertStatement.setLong(2, eventParticipant.getId().second);
+            insertStatement.setString(3, eventParticipant.getNotificationStatus().name());
             return insertStatement;
         } catch (SQLException exception){
             closePreparedStatement(insertStatement);
@@ -73,6 +76,17 @@ public class EventParticipantDatabaseRepository extends AbstractDatabaseReposito
 
     @Override
     public PreparedStatement createUpdateStatementForEntity(Connection connection, EventParticipant newValue) throws SQLException {
-        return null;
+        String updateStringStatement = "UPDATE event_participants SET notification_status = ? WHERE user_id = ? AND event_id = ?";
+        PreparedStatement updateStatement = null;
+        try{
+            updateStatement = connection.prepareStatement(updateStringStatement);
+            updateStatement.setString(1, newValue.getNotificationStatus().name());
+            updateStatement.setLong(2, newValue.getId().first);
+            updateStatement.setLong(3, newValue.getId().second);
+            return updateStatement;
+        } catch (SQLException exception){
+            closePreparedStatement(updateStatement);
+            throw new SQLException(exception);
+        }
     }
 }

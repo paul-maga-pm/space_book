@@ -2,6 +2,7 @@ package socialnetwork.service;
 
 import socialnetwork.domain.entities.Event;
 import socialnetwork.domain.entities.EventParticipant;
+import socialnetwork.domain.entities.NotificationStatus;
 import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.repository.Repository;
 import socialnetwork.utils.containers.UnorderedPair;
@@ -43,8 +44,8 @@ public class EventService {
         return eventRepository.getAll();
     }
 
-    public EventParticipant addEventParticipant(Long userId, Long eventId){
-        EventParticipant eventParticipant = new EventParticipant(userId, eventId);
+    public EventParticipant addEventParticipant(Long userId, Long eventId, NotificationStatus notificationStatus){
+        EventParticipant eventParticipant = new EventParticipant(userId, eventId, notificationStatus);
         eventParticipantValidator.validate(eventParticipant);
         eventParticipantRepository.save(eventParticipant);
         return eventParticipant;
