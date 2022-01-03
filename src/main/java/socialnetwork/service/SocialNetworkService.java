@@ -35,14 +35,18 @@ public class SocialNetworkService {
         this.eventService = eventService;
     }
 
-    public User signUpUserService(String firstName, String lastName, String userName, String password){
-        User signedUser = userService.signUpUser(firstName, lastName, userName, password);
+    public User signUpUserService(String firstName, String lastName, String userName, String password, String profilePictureFile){
+        User signedUser = userService.signUpUser(firstName, lastName, userName, password, profilePictureFile);
         signedUser.setUserName(userName);
         return signedUser;
     }
 
     public User loginUserService(String userName, String password){
         return userService.loginUser(userName, password);
+    }
+
+    public Optional<User> updateUserService(User newUser){
+        return userService.updateUser(newUser);
     }
 
     public void sendFriendRequestService(Long senderId, Long receiverId){
@@ -155,12 +159,16 @@ public class SocialNetworkService {
         return eventService.findOneEventParticipant(userId, eventId);
     }
 
-    public EventParticipant addEventParticipantService(Long userId, Long eventId){
-        return eventService.addEventParticipant(userId, eventId);
+    public EventParticipant addEventParticipantService(Long userId, Long eventId, NotificationStatus notificationStatus){
+        return eventService.addEventParticipant(userId, eventId, notificationStatus);
     }
 
     public Optional<EventParticipant> removeEventParticipantService(Long userId, Long eventId){
         return eventService.removeEventParticipant(userId, eventId);
+    }
+
+    public Optional<EventParticipant> updateEventParticipantService(EventParticipant newEventParticipant){
+        return eventService.updateEventParticipant(newEventParticipant);
     }
 
     public List<Event> getAllEventsThatAreCloseToCurrentDateForUser(Long userId){
@@ -170,10 +178,12 @@ public class SocialNetworkService {
         for(Event event: events){
             Optional<EventParticipant> eventParticipant = eventService.findOneEventParticipant(userId, event.getId());
             if(eventParticipant.isPresent()){
-                LocalDate eventDate = event.getDate();
-                long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
-                if(days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
-                    closeEvents.add(event);
+                if(eventParticipant.get().getNotificationStatus().equals(NotificationStatus.SUBSCRIBED)) {
+                    LocalDate eventDate = event.getDate();
+                    long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+                    if (days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
+                        closeEvents.add(event);
+                }
             }
         }
 

@@ -4,20 +4,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import socialnetwork.Run;
-import socialnetwork.domain.entities.FriendRequest;
-import socialnetwork.domain.entities.FriendshipDto;
-import socialnetwork.domain.entities.Status;
-import socialnetwork.domain.entities.User;
+import socialnetwork.domain.entities.*;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkService;
 
+import java.io.File;
 import java.util.Optional;
 
 public class UserPageController {
@@ -48,6 +45,12 @@ public class UserPageController {
     @FXML
     Button removeFriendButton;
 
+    @FXML
+    Tooltip tooltip = new Tooltip();
+
+    @FXML
+    private FileChooser fileChooser = new FileChooser();
+
     public void setService(SocialNetworkService service) {
         this.service = service;
     }
@@ -63,6 +66,7 @@ public class UserPageController {
     @FXML
     void initialize(){
         userFriendsListView.setItems(userFriendsModel);
+        userPageProfileView.setFitWidth(100);
     }
 
     public void loadUserInformationOnPage(){
@@ -83,9 +87,18 @@ public class UserPageController {
             Run.showPopUpWindow("Warning", exception.getMessage());
             return;
         }
+
+        if(loggedUser.getId().equals(userThatOwnsThePage.getId())){
+            tooltip.setText("Click to choose\n a profile picture!");
+            Tooltip.install(userPageProfileView, tooltip);
+        }
+
+
         setStateOfFriendRequestButton(friendRequest);
         setStateOfRemoveFriendButton();
         loadProfilePictureOnPage();
+        addMouseClickEventForImageView();
+
     }
 
     private void setStateOfFriendRequestButton(Optional<FriendRequest> friendRequest) {
@@ -122,8 +135,29 @@ public class UserPageController {
     }
 
     private void loadProfilePictureOnPage() {
-        Image profilePic = new Image(String.valueOf(Run.class.getResource("rick.jpg")));
+        String profilePictureFile = userThatOwnsThePage.getProfilePictureFile();
+        int index = profilePictureFile.lastIndexOf('\\');
+        profilePictureFile = profilePictureFile.substring(index+1);
+        Image profilePic = new Image(String.valueOf(Run.class.getResource(profilePictureFile)));
         userPageProfileView.setImage(profilePic);
+    }
+
+    private void addMouseClickEventForImageView(){
+        if(loggedUser.getId().equals(userThatOwnsThePage.getId())){
+            userPageProfileView.setOnMouseClicked((MouseEvent mouseEvent) -> handleModifyProfilePictureEvent());
+        }
+    }
+
+    public void handleModifyProfilePictureEvent() {
+        File file = fileChooser.showOpenDialog(Run.getPrimaryStage());
+        if(file != null){
+            loggedUser.setProfilePictureFile(file.getAbsolutePath());
+            service.updateUserService(loggedUser);
+            loadProfilePictureOnPage();
+        }
+        else{
+            Run.showPopUpWindow("Warning", "Must choose an image file!");
+        }
     }
 
     private void loadFriendsOfPageOwner() {
@@ -166,4 +200,6 @@ public class UserPageController {
             userFriendsModel.remove(dto);
         }
     }
+
+
 }

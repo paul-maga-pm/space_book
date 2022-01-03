@@ -13,6 +13,7 @@ public class User extends Entity<Long>{
     private String lastName;
     private String userName;
     private List<User> friendsList = new ArrayList<>();
+    private String profilePictureFile;
 
     /**
      * Constructor that creates a new user with the given id, first name and last name
@@ -26,12 +27,27 @@ public class User extends Entity<Long>{
         this.lastName = lastName;
     }
 
+    public User(Long id, String firstName, String lastName, String profilePictureFile) {
+        super(id);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.profilePictureFile = profilePictureFile;
+    }
+
     public void setUserName(String newUserName){
         this.userName = newUserName;
     }
 
     public String getUserName(){
         return userName;
+    }
+
+    public String getProfilePictureFile() {
+        return profilePictureFile;
+    }
+
+    public void setProfilePictureFile(String profilePictureFile) {
+        this.profilePictureFile = profilePictureFile;
     }
 
     /**

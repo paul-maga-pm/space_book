@@ -12,6 +12,7 @@ import javafx.util.StringConverter;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.Event;
 import socialnetwork.domain.entities.EventParticipant;
+import socialnetwork.domain.entities.NotificationStatus;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.service.SocialNetworkService;
@@ -30,6 +31,7 @@ public class EventsPageController {
 
     private List<Event> events = new ArrayList<>();
     private List<ToggleButton> signUpToggleButtons = new ArrayList<>();
+    private List<ToggleButton> subscribeToNotificationsToggleButtons = new ArrayList<>();
 
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
@@ -119,17 +121,39 @@ public class EventsPageController {
         }
     }
 
-    private void handleClickOnSignUpToEventToggleButton(ActionEvent event, Long eventId, ToggleButton signUp){
+    private void handleClickOnSignUpToEventToggleButton(ActionEvent event, Long eventId, ToggleButton signUp, ToggleButton subscribe){
         Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), eventId);
         if(eventParticipant.isPresent()){
             service.removeEventParticipantService(loggedUser.getId(), eventId);
             signUp.setSelected(false);
             signUp.setText("Sign Up");
+            subscribe.setDisable(true);
+            subscribe.setText("Get notifications!");
         }
         else{
-            service.addEventParticipantService(loggedUser.getId(), eventId);
+            service.addEventParticipantService(loggedUser.getId(), eventId, NotificationStatus.SUBSCRIBED);
             signUp.setSelected(true);
             signUp.setText("Signed Up");
+            subscribe.setDisable(false);
+            subscribe.setSelected(true);
+            subscribe.setText("Stop notifications");
+        }
+    }
+
+    private void handleClickOnSubscribeToNotificationsToggleButton(ActionEvent event, Long eventId, ToggleButton subscribe){
+        Optional<EventParticipant> eventParticipantOptional = service.findOneEventParticipantService(loggedUser.getId(), eventId);
+        EventParticipant eventParticipant = eventParticipantOptional.get();
+        if(eventParticipant.getNotificationStatus().equals(NotificationStatus.SUBSCRIBED)){
+            eventParticipant.setNotificationStatus(NotificationStatus.UNSUBSCRIBED);
+            service.updateEventParticipantService(eventParticipant);
+            subscribe.setSelected(false);
+            subscribe.setText("Get notifications!");
+        }
+        else{
+            eventParticipant.setNotificationStatus(NotificationStatus.SUBSCRIBED);
+            service.updateEventParticipantService(eventParticipant);
+            subscribe.setSelected(true);
+            subscribe.setText("Stop notifications");
         }
     }
 
@@ -150,18 +174,51 @@ public class EventsPageController {
         }
     }
 
+    private void setSubscribeToNotificationToggleButtonState(ToggleButton subscribe, Event event){
+        if(ChronoUnit.DAYS.between(LocalDate.now(), event.getDate()) < 0){
+            subscribe.setText("Get notifications!");
+            subscribe.setDisable(true);
+            return;
+        }
+        Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), event.getId());
+        if(eventParticipant.isPresent()){
+            if(eventParticipant.get().getNotificationStatus().equals(NotificationStatus.SUBSCRIBED)){
+                subscribe.setSelected(true);
+                subscribe.setText("Stop notifications");
+            }
+            else{
+                subscribe.setSelected(false);
+                subscribe.setText("Get notifications!");
+            }
+        }
+        else{
+            subscribe.setText("Get notifications!");
+            subscribe.setDisable(true);
+        }
+    }
+
     private HBox createPage(int pageIndex){
         Event event = events.get(pageIndex);
 
         VBox vBox = new VBox();
+
         Label nameLabel = new Label(event.getName());
         Label descriptionLabel = new Label(event.getDescription());
         Label dateLabel = new Label(event.getDate().toString());
+
         ToggleButton signUp = new ToggleButton();
         setSignUpToggleButtonState(signUp, event);
-        signUp.setOnAction((ActionEvent e) -> handleClickOnSignUpToEventToggleButton(e, event.getId(), signUp));
+
+        ToggleButton subscribe = new ToggleButton();
+        setSubscribeToNotificationToggleButtonState(subscribe, event);
+
+        signUp.setOnAction((ActionEvent e) -> handleClickOnSignUpToEventToggleButton(e, event.getId(), signUp, subscribe));
+        subscribe.setOnAction((ActionEvent e) -> handleClickOnSubscribeToNotificationsToggleButton(e, event.getId(), subscribe));
+
         signUpToggleButtons.add(signUp);
-        vBox.getChildren().addAll(nameLabel, descriptionLabel, dateLabel, signUp);
+        subscribeToNotificationsToggleButtons.add(subscribe);
+
+        vBox.getChildren().addAll(nameLabel, descriptionLabel, dateLabel, signUp, subscribe);
 
         //String imageFile = event.getImageFile();
         //int index = imageFile.lastIndexOf('\\');
@@ -178,6 +235,7 @@ public class EventsPageController {
 
     private void setPaginationModel(){
         signUpToggleButtons.removeAll(signUpToggleButtons);
+        subscribeToNotificationsToggleButtons.removeAll(subscribeToNotificationsToggleButtons);
         events = service.getAllEventsService();
         pagination.setPageCount(events.size());
         pagination.setPageFactory((Integer pageIndex) -> {

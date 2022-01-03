@@ -32,7 +32,7 @@ public class UserService {
         return findUserWithCredentials(userName, password);
     }
 
-    public User signUpUser(String firstName, String lastName, String userName, String password){
+    public User signUpUser(String firstName, String lastName, String userName, String password, String profilePictureFile){
         Long id = findAvailableId();
 
         password = encryptor.hash(password);
@@ -40,7 +40,7 @@ public class UserService {
         UserCredential credential = new UserCredential(id, userName, password);
         signupCredentialValidator.validate(credential);
 
-        User user = new User(id, firstName, lastName);
+        User user = new User(id, firstName, lastName, profilePictureFile);
         userValidator.validate(user);
 
         userRepository.save(user);
@@ -88,5 +88,9 @@ public class UserService {
 
     public Optional<User> findUserById(Long senderId) {
         return userRepository.findById(senderId);
+    }
+
+    public Optional<User> updateUser(User newUser){
+        return userRepository.update(newUser);
     }
 }
