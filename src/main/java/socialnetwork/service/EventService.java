@@ -55,6 +55,10 @@ public class EventService {
         return eventParticipantRepository.remove(new UnorderedPair<>(userId, eventId));
     }
 
+    public Optional<EventParticipant> updateEventParticipant(EventParticipant newEventParticipant){
+        return eventParticipantRepository.update(newEventParticipant);
+    }
+
     public Optional<EventParticipant> findOneEventParticipant(Long userId, Long eventId){
         return eventParticipantRepository.findById(new UnorderedPair<>(userId, eventId));
     }

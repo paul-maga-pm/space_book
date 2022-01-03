@@ -167,6 +167,10 @@ public class SocialNetworkService {
         return eventService.removeEventParticipant(userId, eventId);
     }
 
+    public Optional<EventParticipant> updateEventParticipantService(EventParticipant newEventParticipant){
+        return eventService.updateEventParticipant(newEventParticipant);
+    }
+
     public List<Event> getAllEventsThatAreCloseToCurrentDateForUser(Long userId){
         List<Event> events = eventService.getAllEvents();
         List<Event> closeEvents = new ArrayList<>();
@@ -174,10 +178,12 @@ public class SocialNetworkService {
         for(Event event: events){
             Optional<EventParticipant> eventParticipant = eventService.findOneEventParticipant(userId, event.getId());
             if(eventParticipant.isPresent()){
-                LocalDate eventDate = event.getDate();
-                long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
-                if(days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
-                    closeEvents.add(event);
+                if(eventParticipant.get().getNotificationStatus().equals(NotificationStatus.SUBSCRIBED)) {
+                    LocalDate eventDate = event.getDate();
+                    long days = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+                    if (days <= 5 && (eventDate.isAfter(LocalDate.now()) || eventDate.equals(LocalDate.now())))
+                        closeEvents.add(event);
+                }
             }
         }
 
