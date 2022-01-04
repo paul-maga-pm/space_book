@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import socialnetwork.domain.entities.*;
+import socialnetwork.events.NewConversationHasBeenCreatedEvent;
 import socialnetwork.utils.containers.PasswordEncryptor;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 
-public class SocialNetworkService {
+public class SocialNetworkService implements Observable<NewConversationHasBeenCreatedEvent> {
     private UserService userService;
     private NetworkService networkService;
     private FriendRequestService friendRequestService;
@@ -117,9 +118,12 @@ public class SocialNetworkService {
                                               String conversationDescription,
                                               List<Long> participantsIdWithoutLoggedUser){
         participantsIdWithoutLoggedUser.add(loggedUserId);
-        return conversationService.createConversation(conversationName,
-                conversationDescription,
-                participantsIdWithoutLoggedUser);
+        var conversation = conversationService.createConversation(conversationName,
+                                                                conversationDescription,
+                                                                participantsIdWithoutLoggedUser);
+        var event = new NewConversationHasBeenCreatedEvent(conversation);
+        notifyObservers(event);
+        return conversation;
     }
 
     public void sendMessageInConversation(Long senderId, Long conversationId, String text, LocalDateTime date){
@@ -273,5 +277,22 @@ public class SocialNetworkService {
     public FriendRequestDto findFriendRequestDto(Long senderId, Long receiverId) {
         FriendRequest request = friendRequestService.findOneFriendRequest(senderId, receiverId).get();
         return new FriendRequestDto(request, userService.findUserById(senderId).get());
+    }
+
+
+    private List<Observer<NewConversationHasBeenCreatedEvent>> observers = new ArrayList<>();
+    @Override
+    public void addObserver(Observer<NewConversationHasBeenCreatedEvent> observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer<NewConversationHasBeenCreatedEvent> observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(NewConversationHasBeenCreatedEvent event) {
+        observers.forEach(o -> o.update(event));
     }
 }

@@ -8,11 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,12 +17,14 @@ import socialnetwork.Run;
 import socialnetwork.domain.entities.ConversationDto;
 import socialnetwork.domain.entities.MessageDto;
 import socialnetwork.domain.entities.User;
+import socialnetwork.events.NewConversationHasBeenCreatedEvent;
+import socialnetwork.service.Observer;
 import socialnetwork.service.SocialNetworkService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class ConversationController {
+public class ConversationController implements Observer<NewConversationHasBeenCreatedEvent> {
     public void setService(SocialNetworkService service) {
         this.service = service;
     }
@@ -90,10 +89,10 @@ public class ConversationController {
     }
 
     class ChatCell extends ListCell<MessageDto>{
+
         HBox graphic = new HBox();
         Text message = new Text();
         Label label = new Label();
-
         public ChatCell(){
             graphic.getChildren().add(new VBox(label, message));
         }
@@ -111,8 +110,8 @@ public class ConversationController {
                 setGraphic(null);
             }
         }
-    }
 
+    }
     void handleSelectionChangeInConversationListView(){
         var dto = conversationListView.getSelectionModel().getSelectedItem();
         System.out.printf("%s %s\n", dto.getName(), dto.getDescription());
@@ -143,17 +142,22 @@ public class ConversationController {
         conversationDtoObservableList.setAll(convos);
     }
 
+    @Override
+    public void update(NewConversationHasBeenCreatedEvent newConversationHasBeenCreatedEvent) {
+        var conversation = newConversationHasBeenCreatedEvent.getConversation();
+        this.conversationDtoObservableList.add(conversation);
+    }
+
     @FXML
     void handleClickOnCreateConversation(ActionEvent event) throws IOException {
         try{
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-participants-selection.fxml"));
             Scene scene = new Scene(loader.load());
-            ConversationParticipantsSelectionController controller = loader.getController();
-            stage.initModality(Modality.APPLICATION_MODAL);
+            ConversationCreationController controller = loader.getController();
+            //stage.initModality(Modality.APPLICATION_MODAL);
             controller.setService(service);
             controller.setLoggedUser(loggedUser);
-            controller.setConversationDtoObservableList(conversationDtoObservableList);
             controller.setStage(stage);
             stage.initOwner(Run.getPrimaryStage());
             stage.setScene(scene);
