@@ -36,7 +36,9 @@ public class Main {
         UserCSVFileRepository userRepository = new UserCSVFileRepository(userFilePath);
 
         PreparedStatement insertStatementIntoUsers =
-                connection.prepareStatement("insert into users(id, first_name, last_name) values (?,?,?)");
+                connection.prepareStatement("insert into users(id, first_name, last_name, profile_picture_file) " +
+                        "values (?,?,?, ?)");
+        insertStatementIntoUsers.setString(4, "profile_picture.jpg");
 
         PreparedStatement insertStatementIntoUserCredentials =
                 connection.prepareStatement("insert into user_credentials(user_id, username, password) values (?, ?, ?)");
