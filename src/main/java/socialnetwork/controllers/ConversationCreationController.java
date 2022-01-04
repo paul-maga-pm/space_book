@@ -12,31 +12,27 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import socialnetwork.domain.entities.ConversationDto;
 import socialnetwork.domain.entities.User;
+import socialnetwork.events.NewConversationHasBeenCreatedEvent;
 import socialnetwork.pagination.UserSearchResultPagination;
+import socialnetwork.service.Observer;
 import socialnetwork.service.SocialNetworkService;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ConversationParticipantsSelectionController {
-    public void setService(SocialNetworkService service) {
-        this.service = service;
-    }
+public class ConversationCreationController {
+    private SocialNetworkService service;
+    private User loggedUser;
+    private Stage stage;
 
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
     }
 
-    private SocialNetworkService service;
-    private User loggedUser;
-
-    public void setConversationDtoObservableList(ObservableList<ConversationDto> conversationDtoObservableList) {
-        this.conversationDtoObservableList = conversationDtoObservableList;
+    public void setService(SocialNetworkService service) {
+        this.service = service;
     }
-
-    ObservableList<ConversationDto> conversationDtoObservableList;
-    Stage stage;
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -105,11 +101,10 @@ public class ConversationParticipantsSelectionController {
         List<Long> participants = participantsObservableList.stream()
                         .map(User::getId)
                         .collect(Collectors.toList());
-        var dto = service.createConversation(loggedUser.getId(),
+        service.createConversation(loggedUser.getId(),
                 conversationNameTextField.getText().strip(),
                 conversationDescriptionTextField.getText().strip(),
                 participants);
-        conversationDtoObservableList.add(dto);
         stage.close();
     }
 

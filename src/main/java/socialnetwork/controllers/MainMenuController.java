@@ -178,6 +178,7 @@ public class MainMenuController {
         controller.setService(service);
         controller.setLoggedUser(loggedUser);
         controller.loadExistingConversations();
+        service.addObserver(controller);
         mainMenuBorderPane.setCenter(scene.getRoot());
     }
 }
