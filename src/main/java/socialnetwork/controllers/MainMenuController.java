@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.User;
@@ -51,6 +53,16 @@ public class MainMenuController {
 
     @FXML
     Button messagesReportButton;
+
+    @FXML
+    public void initialize(){
+        Image imageSearch = new Image(Run.class.getResourceAsStream("search.png"));
+        userSearchButton.setGraphic(new ImageView(imageSearch));
+        Image imageNotifications = new Image(Run.class.getResourceAsStream("notification_bell.png"));
+        notificationsButton.setGraphic(new ImageView(imageNotifications));
+        Image imageMessages = new Image(Run.class.getResourceAsStream("chat.png"));
+        messagesButton.setGraphic(new ImageView(imageMessages));
+    }
 
     @FXML
     void handleClickOnMessagesReportButton(ActionEvent event) throws IOException {
