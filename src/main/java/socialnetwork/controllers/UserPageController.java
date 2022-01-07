@@ -66,7 +66,6 @@ public class UserPageController {
     @FXML
     void initialize(){
         userFriendsListView.setItems(userFriendsModel);
-        userPageProfileView.setFitWidth(100);
     }
 
     public void loadUserInformationOnPage(){

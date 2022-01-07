@@ -200,7 +200,7 @@ public class EventsPageController {
     private HBox createPage(int pageIndex){
         Event event = events.get(pageIndex);
 
-        VBox vBox = new VBox();
+        VBox vBox = new VBox(10);
 
         Label nameLabel = new Label(event.getName());
         Label descriptionLabel = new Label(event.getDescription());
@@ -229,6 +229,7 @@ public class EventsPageController {
         imageView.setFitWidth(250);
         imageView.setPreserveRatio(true);
         HBox hBox = new HBox(imageView, vBox);
+        hBox.setSpacing(10);
 
         return hBox;
     }
