@@ -68,20 +68,26 @@ public class MessageReportController {
 
     @FXML
     void handleClickOnSaveAsButton(ActionEvent event){
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)",
-                "*.pdf");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        File file = fileChooser.showSaveDialog(Run.getPrimaryStage());
-        System.out.println(file.getAbsolutePath());
-        String fileUrl = file.getAbsolutePath();
-        try {
-            service.exportMessagesReceivedByUserSentByOtherUserInMonth(fileUrl,
-                    loggedUser.getId(),
-                    selectedMessageSender.getId(),
-                    monthChooser.getValue());
-        } catch (IOException e) {
-            Run.showPopUpWindow("Warning", "Couldn't export report");
+        if (selectedMessageSender == null)
+            Run.showPopUpWindow("Warning", "You must select a user!");
+        else {
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)",
+                    "*.pdf");
+            fileChooser.getExtensionFilters().add(extensionFilter);
+            File file = fileChooser.showSaveDialog(Run.getPrimaryStage());
+
+            if (file != null) {
+                String fileUrl = file.getAbsolutePath();
+                try {
+                    service.exportMessagesReceivedByUserSentByOtherUserInMonth(fileUrl,
+                            loggedUser.getId(),
+                            selectedMessageSender.getId(),
+                            monthChooser.getValue());
+                } catch (IOException e) {
+                    Run.showPopUpWindow("Warning", "Couldn't export report");
+                }
+            }
         }
     }
 
@@ -89,14 +95,16 @@ public class MessageReportController {
     void handleClickOnSearchUserButton(ActionEvent event){
         var str = userNameTextField.getText().strip();
         str = parseSearchUserName(str);
-        var users = service.findUsersThatHaveInTheirFullNameTheString(str);
-        UserSearchResultPagination pagination = new UserSearchResultPagination(users, 4) {
+        var count = service.getNumberOfUsersThatHaveInTheirNameTheString(str);
+        UserSearchResultPagination pagination = new UserSearchResultPagination(count, 4, str) {
             @Override
             public void handleClickOnUserLink(ActionEvent event) {
                 Hyperlink source = (Hyperlink)event.getSource();
                 selectedMessageSender = (User)source.getUserData();
             }
         };
+        pagination.setService(service);
+        service.setNumberOfUserPerFiltrationByNamePage(4);
         var children = listAndPaginationLayout.getChildren();
         if (children.size() == 2)
             children.set(1, pagination);

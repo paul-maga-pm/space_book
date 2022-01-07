@@ -11,9 +11,9 @@ import java.util.Optional;
 
 public abstract class AbstractDatabaseRepository<ID, E extends Entity<ID>>
         implements Repository<ID, E> {
-    private String url;
-    private String user;
-    private String password;
+    protected String url;
+    protected String user;
+    protected String password;
 
     public AbstractDatabaseRepository(String url, String user, String password){
         this.url = url;

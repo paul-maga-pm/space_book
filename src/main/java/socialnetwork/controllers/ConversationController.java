@@ -156,7 +156,6 @@ public class ConversationController implements Observer<NewConversationHasBeenCr
             Scene scene = new Scene(loader.load());
             scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
             ConversationCreationController controller = loader.getController();
-            //stage.initModality(Modality.APPLICATION_MODAL);
             controller.setService(service);
             controller.setLoggedUser(loggedUser);
             controller.setStage(stage);

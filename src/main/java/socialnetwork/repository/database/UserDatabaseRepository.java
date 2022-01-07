@@ -1,16 +1,22 @@
 package socialnetwork.repository.database;
 
 import socialnetwork.domain.entities.User;
+import socialnetwork.exceptions.DatabaseException;
+import socialnetwork.repository.paging.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Repository for User model implementation on network database
  */
-public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, User> {
+public class UserDatabaseRepository
+        extends AbstractDatabaseRepository<Long, User>
+        implements PagingUserRepository {
 
     /**
      * Creates a new database with the given connection data
@@ -148,4 +154,47 @@ public class UserDatabaseRepository extends AbstractDatabaseRepository<Long, Use
         }
     }
 
+
+    @Override
+    public PageInterface<User> findAllUsersByName(PageableInterface pageable, String name) {
+        String filterSqlString =
+                "select id, first_name, last_name, username, profile_picture_file from users " +
+                        "inner join user_credentials on users.id = user_credentials.user_id " +
+                "where LOWER(first_name)  || ' ' || LOWER(last_name) like '%' || ? || '%'";
+        try(Connection connection = DriverManager.getConnection(url, user, password);
+            PreparedStatement filterStatement = connection.prepareStatement(filterSqlString)){
+
+            filterStatement.setString(1, name);
+            List<User> allUsers = new ArrayList<>();
+            ResultSet resultSet = filterStatement.executeQuery();
+            while(resultSet.next()){
+                User user = createEntityFromResultSet(resultSet);
+                allUsers.add(user);
+            }
+
+            Paginator<User> paginator = new Paginator<>(pageable, allUsers);
+            resultSet.close();
+            return paginator.paginate();
+
+        } catch (SQLException exception) {
+            throw new DatabaseException(exception);
+        }
+    }
+
+    @Override
+    public int countUsersThatHaveInTheirNameTheString(String name) {
+        String filterSqlString =
+                "select count(*) as total from users " +
+                "where LOWER(first_name)  || ' ' || LOWER(last_name) like '%' || ? || '%'";
+        try(Connection connection = DriverManager.getConnection(url, user, password);
+            PreparedStatement filterStatement = connection.prepareStatement(filterSqlString)){
+
+            filterStatement.setString(1, name);
+            ResultSet resultSet = filterStatement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt("total");
+        } catch (SQLException exception) {
+            throw new DatabaseException(exception);
+        }
+    }
 }

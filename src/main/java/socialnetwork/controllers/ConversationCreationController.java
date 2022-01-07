@@ -10,13 +10,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import socialnetwork.Run;
 import socialnetwork.domain.entities.ConversationDto;
 import socialnetwork.domain.entities.User;
 import socialnetwork.events.NewConversationHasBeenCreatedEvent;
+import socialnetwork.exceptions.ExceptionBaseClass;
 import socialnetwork.pagination.UserSearchResultPagination;
 import socialnetwork.service.Observer;
 import socialnetwork.service.SocialNetworkService;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -77,8 +80,8 @@ public class ConversationCreationController {
     void handleClickOnSearchUserButton(){
         var str = usernameTextField.getText().strip();
         str = parseSearchUserName(str);
-        var users = service.findUsersThatHaveInTheirFullNameTheString(str);
-        UserSearchResultPagination pagination = new UserSearchResultPagination(users, 4) {
+        var count = service.getNumberOfUsersThatHaveInTheirNameTheString(str);
+        UserSearchResultPagination pagination = new UserSearchResultPagination(count, 4, str) {
             @Override
             public void handleClickOnUserLink(ActionEvent event) {
                 var source = (Hyperlink) event.getSource();
@@ -88,6 +91,8 @@ public class ConversationCreationController {
                     participantsObservableList.add(clickedUser);
             }
         };
+        pagination.setService(service);
+        service.setNumberOfUserPerFiltrationByNamePage(4);
         var children = usersListLayout.getChildren();
         if (children.size() == 2)
             children.set(1, pagination);
@@ -101,11 +106,15 @@ public class ConversationCreationController {
         List<Long> participants = participantsObservableList.stream()
                         .map(User::getId)
                         .collect(Collectors.toList());
-        service.createConversation(loggedUser.getId(),
-                conversationNameTextField.getText().strip(),
-                conversationDescriptionTextField.getText().strip(),
-                participants);
-        stage.close();
+
+        try {
+            service.createConversation(loggedUser.getId(),
+                    conversationNameTextField.getText().strip(),
+                    conversationDescriptionTextField.getText().strip(),
+                    participants);
+        } catch (ExceptionBaseClass exception){
+            Run.showPopUpWindow("Warning", exception.getMessage());
+        }
     }
 
     private String parseSearchUserName(String userNameSearchField) {

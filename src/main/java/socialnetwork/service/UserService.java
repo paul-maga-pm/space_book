@@ -6,18 +6,20 @@ import socialnetwork.domain.entities.UserCredential;
 import socialnetwork.domain.validators.EntityValidator;
 import socialnetwork.exceptions.EntityNotFoundValidationException;
 import socialnetwork.repository.Repository;
+import socialnetwork.repository.paging.*;
 import socialnetwork.utils.containers.PasswordEncryptor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserService {
     private EntityValidator<Long, User> userValidator;
-    private Repository<Long, User> userRepository;
+    private PagingUserRepository userRepository;
     private Repository<Long, UserCredential> credentialRepository;
     private EntityValidator<Long, UserCredential> signupCredentialValidator;
     private final PasswordEncryptor encryptor = new PasswordEncryptor();
 
-    public UserService(Repository<Long, User> userRepository,
+    public UserService(PagingUserRepository userRepository,
                        Repository<Long, UserCredential> credentialRepository,
                        EntityValidator<Long, UserCredential> signUpCredentialValidator,
                        EntityValidator<Long, User> userValidator) {
@@ -61,6 +63,39 @@ public class UserService {
                 users.add(user);
         }
         return users;
+    }
+
+    private int currentPageIndex = 0;
+    private int usersPerPageCount = 5;
+
+    public void setUsersPerPageCount(int usersPerPageCount) {
+        this.usersPerPageCount = usersPerPageCount;
+    }
+
+    public void setCurrentPageIndex(int currentPageIndex) {
+        this.currentPageIndex = currentPageIndex;
+    }
+
+    public List<User> getUsersByName(String str, int pageIndex){
+        if (str.length() <= 3)
+            return new ArrayList<>();
+        str = str.toLowerCase(Locale.ROOT);
+        currentPageIndex = pageIndex;
+        PageableInterface pageable = new Pageable(currentPageIndex, usersPerPageCount);
+        PageInterface<User> foundUsers = userRepository.findAllUsersByName(pageable, str);
+        return foundUsers.getContent().collect(Collectors.toList());
+    }
+
+    public List<User> getNextUsersByName(String str){
+        currentPageIndex++;
+        return getUsersByName(str, currentPageIndex);
+    }
+
+    public int getNumberOfUsersThatHaveInTheirNameTheString(String str){
+        if (str.length() <= 3)
+            return 0;
+        str = str.toLowerCase(Locale.ROOT);
+        return userRepository.countUsersThatHaveInTheirNameTheString(str);
     }
 
     public List<User> getAllUsers(){

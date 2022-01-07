@@ -98,23 +98,19 @@ public class MainMenuController {
         String userNameSearchField = userSearchTextField.getText().strip();
 
         String userName = parseSearchUserName(userNameSearchField);
-        List<User> foundUsers;
-        try {
-            foundUsers = service.findUsersThatHaveInTheirFullNameTheString(userName);
-        } catch (ExceptionBaseClass exception){
-            Run.showPopUpWindow("Warning", exception.getMessage());
-            return;
-        }
-        if(foundUsers.size() == 0) {
+        int count = service.getNumberOfUsersThatHaveInTheirNameTheString(userName);
+        if(count == 0) {
             mainMenuBorderPane.setCenter(null);
             return;
         }
 
         UserSearchResultPaginationWithOpeningUserPage pagination =
-                new UserSearchResultPaginationWithOpeningUserPage(foundUsers, 10);
+                new UserSearchResultPaginationWithOpeningUserPage(count, 10, userNameSearchField);
         pagination.setMainMenuBorderPane(mainMenuBorderPane);
         pagination.setService(service);
         pagination.setLoggedUser(loggedUser);
+        service.setCurrentPageIndexOfUserFiltration(0);
+        service.setNumberOfUserPerFiltrationByNamePage(10);
         mainMenuBorderPane.setCenter(pagination);
     }
 

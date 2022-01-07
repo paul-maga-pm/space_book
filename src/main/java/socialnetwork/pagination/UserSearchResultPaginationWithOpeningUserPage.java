@@ -14,16 +14,11 @@ import java.io.IOException;
 import java.util.List;
 
 public class UserSearchResultPaginationWithOpeningUserPage extends UserSearchResultPagination{
-    private SocialNetworkService service;
     private User loggedUser;
     private BorderPane userPageNode;
 
-    public UserSearchResultPaginationWithOpeningUserPage(List<User> usersList, int usersPerPageNumber) {
-        super(usersList, usersPerPageNumber);
-    }
-
-    public void setService(SocialNetworkService service){
-        this.service = service;
+    public UserSearchResultPaginationWithOpeningUserPage(int usersCount, int usersPerPageNumber, String usernameSearchField) {
+        super(usersCount, usersPerPageNumber, usernameSearchField);
     }
 
     public void setLoggedUser(User loggedUser){
@@ -42,7 +37,7 @@ public class UserSearchResultPaginationWithOpeningUserPage extends UserSearchRes
             UserPageController controller = loader.getController();
             var source = (Hyperlink) event.getSource();
             User clickedUser = (User)source.getUserData();
-            controller.setService(service);
+            controller.setService(getService());
             controller.setUserThatOwnsThePage(clickedUser);
             controller.setLoggedUser(loggedUser);
             controller.loadUserInformationOnPage();
