@@ -36,6 +36,26 @@ public class SocialNetworkService implements Observable<NewConversationHasBeenCr
         this.eventService = eventService;
     }
 
+    public void setNumberOfUserPerFiltrationByNamePage(int usersCount){
+        userService.setUsersPerPageCount(usersCount);
+    }
+
+    public void setCurrentPageIndexOfUserFiltration(int pageIndex){
+        userService.setCurrentPageIndex(pageIndex);
+    }
+
+    public List<User> getUsersByName(String name, int pageIndex){
+        return userService.getUsersByName(name, pageIndex);
+    }
+
+    public List<User> getNextUsersByName(String name){
+        return userService.getNextUsersByName(name);
+    }
+
+    public int getNumberOfUsersThatHaveInTheirNameTheString(String name) {
+        return  userService.getNumberOfUsersThatHaveInTheirNameTheString(name);
+    }
+
     public User signUpUserService(String firstName, String lastName, String userName, String password, String profilePictureFile){
         User signedUser = userService.signUpUser(firstName, lastName, userName, password, profilePictureFile);
         signedUser.setUserName(userName);

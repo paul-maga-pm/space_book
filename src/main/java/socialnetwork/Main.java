@@ -7,6 +7,10 @@ import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.csv.UserCSVFileRepository;
 import socialnetwork.repository.database.*;
+import socialnetwork.repository.paging.Page;
+import socialnetwork.repository.paging.Pageable;
+import socialnetwork.repository.paging.PagingRepository;
+import socialnetwork.repository.paging.PagingUserRepository;
 import socialnetwork.service.*;
 import socialnetwork.utils.containers.UnorderedPair;
 
@@ -44,12 +48,19 @@ public class Main {
                 connection.prepareStatement("insert into user_credentials(user_id, username, password) values (?, ?, ?)");
 
         var service = createService();
-        int i = 0;
-        for(var u : userRepository.getAll()){
-            String firstName = u.getFirstName();
-            String lastName = u.getLastName();
-            String email = firstName.toLowerCase(Locale.ROOT) + "." + lastName.toLowerCase(Locale.ROOT) + "@gmail.com";
-            service.signUpUserService(firstName, lastName, email, "parola", "rick.jpg");
+//        int i = 0;
+//        for(var u : userRepository.getAll()){
+//            String firstName = u.getFirstName();
+//            String lastName = u.getLastName();
+//            String email = firstName.toLowerCase(Locale.ROOT) + "." + lastName.toLowerCase(Locale.ROOT) + "@gmail.com";
+//            service.signUpUserService(firstName, lastName, email, "parola", "rick.jpg");
+//        }
+        for (int i = 0; i < 53; i++){
+            service.signUpUserService("jack" ,
+                    "sparrow",
+                    "jack.sparrow" + i + "@gmail.com",
+                    "parola",
+                    "rick.jpg");
         }
 
     }
@@ -76,7 +87,7 @@ public class Main {
         EntityValidator<Long, Event> eventValidator = new EventValidator();
         EntityValidator<UnorderedPair<Long, Long>, EventParticipant> eventParticipantValidator = new EventParticipantValidator(userRepo, eventRepository);
 
-        UserService userService = new UserService(userRepo, credentialRepo, signUpCredentialVal, userVal);
+        UserService userService = new UserService((PagingUserRepository) userRepo, credentialRepo, signUpCredentialVal, userVal);
         NetworkService networkService = new NetworkService(friendshipRepo, userRepo, friendshipVal);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepo, friendshipRepo, friendRequestVal);
         EventService eventService = new EventService(eventValidator, eventRepository, eventParticipantValidator, eventParticipantRepository);
@@ -105,19 +116,6 @@ public class Main {
         final String user = ApplicationContext.getProperty("socialnetwork.database.user");
         final String password = ApplicationContext.getProperty("socialnetwork.database.password");
         loadToDatabase(url, user, password);
-//        var service = createService();
-//        try {
-//            service.exportNewFriendsAndNewMessagesOfUserFromMonth("report.pdf",
-//                    13L,
-//                    12);
-//
-//            service.exportMessagesReceivedByUserSentByOtherUserInMonth("messages.pdf",
-//                    13L,
-//                    7L,
-//                    12);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 }
 

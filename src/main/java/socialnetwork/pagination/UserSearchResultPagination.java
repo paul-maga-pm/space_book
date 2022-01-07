@@ -8,19 +8,31 @@ import javafx.scene.control.Pagination;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import socialnetwork.domain.entities.User;
+import socialnetwork.service.SocialNetworkService;
 
 import java.util.List;
 
 public abstract class UserSearchResultPagination extends Pagination {
     private int itemsPerPageNumber;
     private int itemsNumber;
+    private String usernameSearchField;
+    private SocialNetworkService service;
 
-    private List<User> userList;
 
-    public UserSearchResultPagination(List<User> usersList, int usersPerPageNumber){
-        this.itemsNumber = usersList.size();
+    public SocialNetworkService getService() {
+        return service;
+    }
+
+    public void setService(SocialNetworkService service) {
+        this.service = service;
+    }
+
+
+
+    public UserSearchResultPagination(int usersCount, int usersPerPageNumber, String usernameSearchField){
+        this.usernameSearchField = usernameSearchField;
+        this.itemsNumber = usersCount;
         this.itemsPerPageNumber = usersPerPageNumber;
-        this.userList = usersList;
         this.setPageFactory(new UserSearchResultPageFactory());
         this.setPageCount(calculateNumberOfPages(itemsNumber, itemsPerPageNumber));
         this.setCurrentPageIndex(0);
@@ -43,12 +55,11 @@ public abstract class UserSearchResultPagination extends Pagination {
         @Override
         public Node call(Integer pageIndex) {
             VBox box = new VBox(5);
-            for (int i = pageIndex * itemsPerPageNumber;
-                 i < (pageIndex + 1) * itemsPerPageNumber && i < userList.size();
-                 i++) {
+            List<User> usersOnPage = service.getUsersByName(usernameSearchField, pageIndex);
+            for (var user : usersOnPage){
 
-                Hyperlink link = new Hyperlink("" + userList.get(i));
-                link.setUserData(userList.get(i));
+                Hyperlink link = new Hyperlink("" + user);
+                link.setUserData(user);
                 EventHandler<ActionEvent> handler = UserSearchResultPagination.this::handleClickOnUserLink;
                 link.setOnAction(handler);
                 box.getChildren().add(link);

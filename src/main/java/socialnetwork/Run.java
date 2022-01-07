@@ -12,6 +12,8 @@ import socialnetwork.domain.entities.*;
 import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
 import socialnetwork.repository.database.*;
+import socialnetwork.repository.paging.PagingRepository;
+import socialnetwork.repository.paging.PagingUserRepository;
 import socialnetwork.service.*;
 import socialnetwork.utils.containers.UnorderedPair;
 
@@ -44,7 +46,8 @@ public class Run extends Application {
         EntityValidator<Long, Event> eventValidator = new EventValidator();
         EntityValidator<UnorderedPair<Long, Long>, EventParticipant> eventParticipantValidator = new EventParticipantValidator(userRepo, eventRepository);
 
-        UserService userService = new UserService(userRepo, credentialRepo, signUpCredentialVal, userVal);
+        UserService userService = new UserService((PagingUserRepository) userRepo,
+                credentialRepo, signUpCredentialVal, userVal);
         NetworkService networkService = new NetworkService(friendshipRepo, userRepo, friendshipVal);
         FriendRequestService friendRequestService = new FriendRequestService(friendRequestRepo, friendshipRepo, friendRequestVal);
         EventService eventService = new EventService(eventValidator, eventRepository, eventParticipantValidator, eventParticipantRepository);

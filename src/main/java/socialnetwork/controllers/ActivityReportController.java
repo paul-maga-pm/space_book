@@ -86,12 +86,13 @@ public class ActivityReportController {
                 "*.pdf");
         fileChooser.getExtensionFilters().add(extensionFilter);
         File file = fileChooser.showSaveDialog(Run.getPrimaryStage());
-        System.out.println(file.getAbsolutePath());
-        String fileUrl = file.getAbsolutePath();
-        try {
-            service.exportNewFriendsAndNewMessagesOfUserFromMonth(fileUrl, loggedUser.getId(), monthChooser.getValue());
-        } catch (IOException e) {
-            Run.showPopUpWindow("Warning", "Couldn't export report");
+        if (file != null) {
+            String fileUrl = file.getAbsolutePath();
+            try {
+                service.exportNewFriendsAndNewMessagesOfUserFromMonth(fileUrl, loggedUser.getId(), monthChooser.getValue());
+            } catch (IOException e) {
+                Run.showPopUpWindow("Warning", "Couldn't export report");
+            }
         }
     }
 
