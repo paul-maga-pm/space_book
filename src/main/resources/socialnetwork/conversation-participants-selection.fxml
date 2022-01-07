@@ -7,20 +7,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="342.0" prefWidth="493.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.ConversationCreationController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="551.0" style="-fx-background-color: #000f1e;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.ConversationCreationController">
    <children>
-      <HBox fx:id="usersListLayout" layoutX="34.0" layoutY="28.0" prefHeight="190.0" prefWidth="439.0" spacing="10.0">
+      <HBox fx:id="usersListLayout" layoutX="34.0" layoutY="28.0" prefHeight="190.0" prefWidth="497.0" spacing="10.0">
          <children>
-            <ListView fx:id="participantsListView" prefHeight="190.0" prefWidth="267.0" />
+            <ListView fx:id="participantsListView" prefHeight="190.0" prefWidth="247.0" />
          </children>
       </HBox>
-      <TextField fx:id="conversationNameTextField" layoutX="172.0" layoutY="261.0" prefHeight="26.0" prefWidth="130.0" />
-      <TextField fx:id="conversationDescriptionTextField" layoutX="172.0" layoutY="288.0" prefHeight="26.0" prefWidth="130.0" />
-      <Label alignment="CENTER" layoutX="33.0" layoutY="266.0" text="Name your conversation" />
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="33.0" layoutY="293.0" prefHeight="18.0" prefWidth="130.0" text="Give a nice description" />
-      <Button fx:id="createConversationButton" layoutX="381.0" layoutY="269.0" mnemonicParsing="false" onAction="#handleClickOnCreateConversationButton" prefHeight="47.0" prefWidth="91.0" text="Create" />
-      <TextField fx:id="usernameTextField" layoutX="32.0" layoutY="231.0" prefHeight="26.0" prefWidth="183.0" promptText="Search for participants" />
-      <Button fx:id="searchUserButton" layoutX="229.0" layoutY="231.0" mnemonicParsing="false" onAction="#handleClickOnSearchUserButton" prefHeight="26.0" prefWidth="70.0" text="Search" />
-      <Label layoutX="34.0" layoutY="-2.0" prefHeight="26.0" prefWidth="91.0" text="Participants" />
+      <TextField fx:id="conversationNameTextField" layoutX="34.0" layoutY="242.0" prefHeight="26.0" prefWidth="162.0" promptText="Name your conversation" style="-fx-background-color: #aebecd;" />
+      <TextField fx:id="conversationDescriptionTextField" layoutX="34.0" layoutY="288.0" prefHeight="26.0" prefWidth="162.0" promptText="Give a nice description" style="-fx-background-color: #aebecd;" />
+      <Button fx:id="createConversationButton" layoutX="34.0" layoutY="331.0" mnemonicParsing="false" onAction="#handleClickOnCreateConversationButton" prefHeight="47.0" prefWidth="91.0" style="-fx-background-color: #477998;" text="Create" />
+      <TextField fx:id="usernameTextField" layoutX="289.0" layoutY="242.0" prefHeight="26.0" prefWidth="155.0" promptText="Search for participants" style="-fx-background-color: #aebecd;" />
+      <Button fx:id="searchUserButton" layoutX="455.0" layoutY="242.0" mnemonicParsing="false" onAction="#handleClickOnSearchUserButton" prefHeight="26.0" prefWidth="70.0" style="-fx-background-color: #477998;" text="Search" />
+      <Label layoutX="34.0" layoutY="1.0" prefHeight="26.0" prefWidth="91.0" text="Participants" textFill="WHITE" />
    </children>
 </AnchorPane>

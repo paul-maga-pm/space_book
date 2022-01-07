@@ -64,6 +64,7 @@ public class AuthenticationController {
     private void openUserPage(User loggedUser) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Run.class.getResource("main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         MainMenuController controller = fxmlLoader.getController();
         controller.setLoggedUser(loggedUser);
         controller.setService(service);

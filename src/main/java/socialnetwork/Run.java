@@ -70,10 +70,12 @@ public class Run extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
+
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
         Scene scene = new Scene(loader.load());
         AuthenticationController controller = loader.getController();
         controller.setService(createService());
+        scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
 //        PendingFriendRequestView view = new PendingFriendRequestView(new User(1L, "Michael", "Corleone"),

@@ -13,26 +13,26 @@
          <children>
             <AnchorPane prefHeight="420.0" prefWidth="116.0">
                <children>
-                  <Button fx:id="homeButton" mnemonicParsing="false" onAction="#handleClickOnHomeButton" prefHeight="84.0" prefWidth="116.0" text="Home" />
-                  <Button fx:id="eventsButton" layoutY="84.0" mnemonicParsing="false" onAction="#handleClickOnEventsButton" prefHeight="84.0" prefWidth="116.0" text="Events" />
-                  <Button fx:id="activityReportButton" layoutY="167.0" mnemonicParsing="false" onAction="#handleClickOnActivityReportButton" prefHeight="84.0" prefWidth="116.0" text="Activity report" />
-                  <Button fx:id="messagesReportButton" layoutY="251.0" mnemonicParsing="false" onAction="#handleClickOnMessagesReportButton" prefHeight="84.0" prefWidth="116.0" text="Messages report" />
-                  <Button fx:id="logoutButton" layoutY="335.0" mnemonicParsing="false" onAction="#handleClickOnLogoutButton" prefHeight="84.0" prefWidth="116.0" text="Logout" />
+                  <Button fx:id="homeButton" mnemonicParsing="false" onAction="#handleClickOnHomeButton" prefHeight="84.0" prefWidth="116.0" style="-fx-background-color: #52dee5; -fx-background-radius: 0;" text="Home" />
+                  <Button fx:id="eventsButton" layoutY="84.0" mnemonicParsing="false" onAction="#handleClickOnEventsButton" prefHeight="84.0" prefWidth="116.0" style="-fx-background-color: #92dce5; -fx-background-radius: 0;" text="Events" />
+                  <Button fx:id="activityReportButton" layoutY="167.0" mnemonicParsing="false" onAction="#handleClickOnActivityReportButton" prefHeight="84.0" prefWidth="116.0" style="-fx-background-color: #7c7c7c; -fx-background-radius: 0;" text="Activity report" />
+                  <Button fx:id="messagesReportButton" layoutY="251.0" mnemonicParsing="false" onAction="#handleClickOnMessagesReportButton" prefHeight="84.0" prefWidth="116.0" style="-fx-background-color: #eee5e9; -fx-background-radius: 0;" text="Messages report" />
+                  <Button fx:id="logoutButton" layoutY="335.0" mnemonicParsing="false" onAction="#handleClickOnLogoutButton" prefHeight="84.0" prefWidth="116.0" style="-fx-background-radius: 0; -fx-background-color: white;" text="Logout" />
                </children>
             </AnchorPane>
          </children>
       </VBox>
    </left>
    <center>
-      <Accordion prefHeight="360.0" prefWidth="556.0" BorderPane.alignment="CENTER" />
+      <Accordion prefHeight="360.0" prefWidth="556.0" style="-fx-background-color: #000f1e;" BorderPane.alignment="CENTER" />
    </center>
    <top>
-      <AnchorPane prefHeight="61.0" prefWidth="632.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="61.0" prefWidth="632.0" style="-fx-background-color: #000f1e;" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="userSearchTextField" layoutX="119.0" layoutY="18.0" prefHeight="40.0" prefWidth="298.0" />
-            <Button fx:id="userSearchButton" layoutX="427.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleUserSearchButtonClick" prefHeight="32.0" prefWidth="32.0" />
-            <Button fx:id="notificationsButton" layoutX="587.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleClickOnNotificationsButton" prefHeight="32.0" prefWidth="32.0" />
-            <Button fx:id="messagesButton" layoutX="649.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleClickOnMessagesButton" prefHeight="32.0" prefWidth="32.0" />
+            <TextField fx:id="userSearchTextField" layoutX="119.0" layoutY="18.0" prefHeight="40.0" prefWidth="298.0" style="-fx-background-color: #aebecd; -fx-background-radius: 0;" />
+            <Button fx:id="userSearchButton" layoutX="427.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleUserSearchButtonClick" prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #f6ae2d;" />
+            <Button fx:id="notificationsButton" layoutX="587.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleClickOnNotificationsButton" prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #f06543;" />
+            <Button fx:id="messagesButton" layoutX="649.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleClickOnMessagesButton" prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #f25619;" />
          </children>
       </AnchorPane>
    </top>

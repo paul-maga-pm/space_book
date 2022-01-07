@@ -6,15 +6,15 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="360.0" prefWidth="556.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.ActivityReportController">
+<AnchorPane prefHeight="360.0" prefWidth="556.0" style="-fx-background-color: #000f1e;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.ActivityReportController">
    <children>
       <ListView fx:id="friendshipsListView" layoutX="107.0" layoutY="34.0" prefHeight="200.0" prefWidth="165.0" />
-      <Button fx:id="saveAsButton" layoutX="105.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnSaveAsButton" text="Save as" />
+      <Button fx:id="saveAsButton" layoutX="105.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnSaveAsButton" style="-fx-background-color: #477998;" text="Save as" />
       <ListView fx:id="messagesListView" layoutX="309.0" layoutY="34.0" prefHeight="200.0" prefWidth="215.0" />
-      <Label layoutX="148.0" layoutY="5.0" text="New friends" />
-      <Label layoutX="365.0" layoutY="5.0" text="Received messages" />
+      <Label layoutX="148.0" layoutY="14.0" text="New friends" textFill="WHITE" />
+      <Label layoutX="365.0" layoutY="14.0" text="Received messages" textFill="WHITE" />
       <Spinner fx:id="monthChooser" layoutX="105.0" layoutY="276.0" prefHeight="26.0" prefWidth="174.0" />
-      <Label layoutX="107.0" layoutY="248.0" text="Select month:" />
-      <Button fx:id="loadActivityReportsButton" layoutX="180.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnActivityReportsButton" text="Preview Reports" />
+      <Label layoutX="107.0" layoutY="248.0" prefHeight="18.0" prefWidth="86.0" text="Select month:" textFill="WHITE" />
+      <Button fx:id="loadActivityReportsButton" layoutX="180.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnActivityReportsButton" style="-fx-background-color: #477998;" text="Preview Reports" />
    </children>
 </AnchorPane>

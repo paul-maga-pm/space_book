@@ -68,6 +68,7 @@ public class MainMenuController {
     void handleClickOnMessagesReportButton(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("message-report.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         MessageReportController controller = loader.getController();
 
         controller.setService(service);
@@ -80,6 +81,7 @@ public class MainMenuController {
     void handleClickOnActivityReportButton(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("activity-report.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         ActivityReportController controller = loader.getController();
 
         controller.setLoggedUser(loggedUser);
@@ -135,6 +137,7 @@ public class MainMenuController {
     void handleClickOnLogoutButton(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
         AuthenticationController controller = loader.getController();
         controller.setService(service);
         Run.getPrimaryStage().setScene(scene);
@@ -144,6 +147,7 @@ public class MainMenuController {
     void handleClickOnHomeButton(ActionEvent event) throws IOException{
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("user-page.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         UserPageController controller = loader.getController();
         controller.setService(service);
         controller.setUserThatOwnsThePage(loggedUser);
@@ -156,6 +160,7 @@ public class MainMenuController {
     void handleClickOnEventsButton(ActionEvent event) throws IOException{
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("events-page.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         EventsPageController controller = loader.getController();
         controller.setLoggedUser(loggedUser);
         controller.setService(service);
@@ -186,6 +191,7 @@ public class MainMenuController {
     void handleClickOnMessagesButton() throws IOException {
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-view.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
         ConversationController controller = loader.getController();
         controller.setService(service);
         controller.setLoggedUser(loggedUser);
