@@ -68,6 +68,7 @@ public class AuthenticationController {
         MainMenuController controller = fxmlLoader.getController();
         controller.setLoggedUser(loggedUser);
         controller.setService(service);
+        controller.startEventNotificationChecking();
         Run.getPrimaryStage().setScene(scene);
     }
 

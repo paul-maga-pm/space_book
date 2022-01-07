@@ -6,18 +6,16 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import socialnetwork.domain.entities.*;
 import socialnetwork.events.NewConversationHasBeenCreatedEvent;
-import socialnetwork.utils.containers.PasswordEncryptor;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 
-public class SocialNetworkService implements Observable<NewConversationHasBeenCreatedEvent> {
+public class SocialNetworkService
+        implements Observable<NewConversationHasBeenCreatedEvent>{
     private UserService userService;
     private NetworkService networkService;
     private FriendRequestService friendRequestService;

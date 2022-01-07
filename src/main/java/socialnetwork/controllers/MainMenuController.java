@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
@@ -20,8 +21,10 @@ import java.io.IOException;
 import java.util.List;
 
 public class MainMenuController {
-    SocialNetworkService service;
-    User loggedUser;
+    private SocialNetworkService service;
+    private User loggedUser;
+    private Thread notificationCheckerThread;
+
 
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
@@ -135,6 +138,7 @@ public class MainMenuController {
 
     @FXML
     void handleClickOnLogoutButton(ActionEvent event) throws IOException {
+        notificationCheckerThread.interrupt();
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
         Scene scene = new Scene(loader.load());
         scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
@@ -198,5 +202,12 @@ public class MainMenuController {
         controller.loadExistingConversations();
         service.addObserver(controller);
         mainMenuBorderPane.setCenter(scene.getRoot());
+    }
+
+    public void startEventNotificationChecking() {
+        NotificationChecker checker = new NotificationChecker(service, loggedUser);
+
+        notificationCheckerThread = new Thread(checker);
+        notificationCheckerThread.start();
     }
 }
