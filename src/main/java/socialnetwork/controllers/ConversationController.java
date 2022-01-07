@@ -154,6 +154,7 @@ public class ConversationController implements Observer<NewConversationHasBeenCr
             Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(Run.class.getResource("conversation-participants-selection.fxml"));
             Scene scene = new Scene(loader.load());
+            scene.getStylesheets().add(Run.class.getResource("main-stylesheet.css").toExternalForm());
             ConversationCreationController controller = loader.getController();
             //stage.initModality(Modality.APPLICATION_MODAL);
             controller.setService(service);

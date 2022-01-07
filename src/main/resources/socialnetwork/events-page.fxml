@@ -8,16 +8,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="330.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.EventsPageController">
+<AnchorPane prefHeight="380.0" prefWidth="556.0" style="-fx-background-color: #000f1e;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="socialnetwork.controllers.EventsPageController">
    <children>
-      <Separator layoutX="1.0" layoutY="214.0" prefHeight="0.0" prefWidth="602.0" />
-      <Pagination fx:id="pagination" layoutX="16.0" layoutY="14.0" prefHeight="200.0" prefWidth="574.0" />
-      <Label layoutX="17.0" layoutY="217.0" prefHeight="22.0" prefWidth="108.0" text="Add a new event!" />
-      <TextField fx:id="nameTextField" layoutX="17.0" layoutY="248.0" promptText="Name" />
-      <TextField fx:id="descriptionTextField" layoutX="17.0" layoutY="287.0" promptText="Description" />
-      <DatePicker fx:id="datePicker" layoutX="214.0" layoutY="248.0" promptText="Date" />
-      <Button fx:id="fileChooserButton" layoutX="214.0" layoutY="286.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="175.0" text="Choose an image!" />
-      <Button fx:id="addEventButton" layoutX="428.0" layoutY="269.0" mnemonicParsing="false" onAction="#handleClickOnAddEventButton" prefHeight="34.0" prefWidth="134.0" text="Add event!" />
+      <Separator layoutX="2.0" layoutY="258.0" prefHeight="0.0" prefWidth="602.0" />
+      <Pagination fx:id="pagination" layoutX="16.0" layoutY="14.0" prefHeight="243.0" prefWidth="574.0" />
+      <Label layoutX="17.0" layoutY="262.0" prefHeight="22.0" prefWidth="108.0" text="Add a new event!" textFill="WHITE" />
+      <TextField fx:id="nameTextField" layoutX="17.0" layoutY="298.0" promptText="Name" style="-fx-background-color: #aebecd;" />
+      <TextField fx:id="descriptionTextField" layoutX="17.0" layoutY="337.0" promptText="Description" style="-fx-background-color: #aebecd;" />
+      <DatePicker fx:id="datePicker" layoutX="213.0" layoutY="298.0" promptText="Date" />
+      <Button fx:id="fileChooserButton" layoutX="213.0" layoutY="336.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="175.0" style="-fx-background-color: #477998;" text="Choose an image!" />
+      <Button fx:id="addEventButton" layoutX="426.0" layoutY="306.0" mnemonicParsing="false" onAction="#handleClickOnAddEventButton" prefHeight="34.0" prefWidth="134.0" style="-fx-background-color: #477998;" text="Add event!" />
    </children>
 </AnchorPane>

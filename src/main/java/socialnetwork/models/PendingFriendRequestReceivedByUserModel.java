@@ -22,7 +22,7 @@ public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
     }
     @Override
     public Node getViewForModel() {
-        HBox box = new HBox();
+        HBox box = new HBox(10);
         Label contact = new Label(dto.getSender().toString());
         Button acceptButton = new Button("Accept");
         Button declineButton = new Button("Decline");

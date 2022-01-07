@@ -126,6 +126,7 @@ public class EventsPageController {
         if(eventParticipant.isPresent()){
             service.removeEventParticipantService(loggedUser.getId(), eventId);
             signUp.setSelected(false);
+            signUp.setStyle("-fx-background-color:  #477998; -fx-opacity: 100%");
             signUp.setText("Sign Up");
             subscribe.setDisable(true);
             subscribe.setText("Get notifications!");
@@ -133,9 +134,11 @@ public class EventsPageController {
         else{
             service.addEventParticipantService(loggedUser.getId(), eventId, NotificationStatus.SUBSCRIBED);
             signUp.setSelected(true);
+            signUp.setStyle("-fx-background-color:  #477998; -fx-opacity: 60%");
             signUp.setText("Signed Up");
             subscribe.setDisable(false);
             subscribe.setSelected(true);
+            subscribe.setStyle("-fx-background-color:  #477998; -fx-opacity: 60%");
             subscribe.setText("Stop notifications");
         }
     }
@@ -147,12 +150,14 @@ public class EventsPageController {
             eventParticipant.setNotificationStatus(NotificationStatus.UNSUBSCRIBED);
             service.updateEventParticipantService(eventParticipant);
             subscribe.setSelected(false);
+            subscribe.setStyle("-fx-background-color:  #477998; -fx-opacity: 100%");
             subscribe.setText("Get notifications!");
         }
         else{
             eventParticipant.setNotificationStatus(NotificationStatus.SUBSCRIBED);
             service.updateEventParticipantService(eventParticipant);
             subscribe.setSelected(true);
+            subscribe.setStyle("-fx-background-color:  #477998; -fx-opacity: 60%");
             subscribe.setText("Stop notifications");
         }
     }
@@ -166,10 +171,12 @@ public class EventsPageController {
         Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), event.getId());
         if(eventParticipant.isPresent()){
             signUp.setSelected(true);
+            signUp.setStyle("-fx-background-color:  #477998; -fx-opacity: 60%");
             signUp.setText("Signed Up");
         }
         else{
             signUp.setSelected(false);
+            signUp.setStyle("-fx-background-color:  #477998; -fx-opacity: 100%");
             signUp.setText("Sign Up");
         }
     }
@@ -184,10 +191,12 @@ public class EventsPageController {
         if(eventParticipant.isPresent()){
             if(eventParticipant.get().getNotificationStatus().equals(NotificationStatus.SUBSCRIBED)){
                 subscribe.setSelected(true);
+                subscribe.setStyle("-fx-background-color:  #477998; -fx-opacity: 60%");
                 subscribe.setText("Stop notifications");
             }
             else{
                 subscribe.setSelected(false);
+                subscribe.setStyle("-fx-background-color:  #477998; -fx-opacity: 100%");
                 subscribe.setText("Get notifications!");
             }
         }
@@ -200,16 +209,21 @@ public class EventsPageController {
     private HBox createPage(int pageIndex){
         Event event = events.get(pageIndex);
 
-        VBox vBox = new VBox();
+        VBox vBox = new VBox(10);
 
         Label nameLabel = new Label(event.getName());
+        nameLabel.setStyle("-fx-text-fill: white");
         Label descriptionLabel = new Label(event.getDescription());
+        descriptionLabel.setStyle("-fx-text-fill: white");
         Label dateLabel = new Label(event.getDate().toString());
+        dateLabel.setStyle("-fx-text-fill: white");
 
         ToggleButton signUp = new ToggleButton();
+        signUp.setStyle("-fx-background-color:  #477998");
         setSignUpToggleButtonState(signUp, event);
 
         ToggleButton subscribe = new ToggleButton();
+        subscribe.setStyle("-fx-background-color:  #477998");
         setSubscribeToNotificationToggleButtonState(subscribe, event);
 
         signUp.setOnAction((ActionEvent e) -> handleClickOnSignUpToEventToggleButton(e, event.getId(), signUp, subscribe));
@@ -229,6 +243,7 @@ public class EventsPageController {
         imageView.setFitWidth(250);
         imageView.setPreserveRatio(true);
         HBox hBox = new HBox(imageView, vBox);
+        hBox.setSpacing(10);
 
         return hBox;
     }
