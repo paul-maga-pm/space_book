@@ -121,6 +121,7 @@ public class EventsPageController {
         }
     }
 
+
     private void handleClickOnSignUpToEventToggleButton(ActionEvent event, Long eventId, ToggleButton signUp, ToggleButton subscribe){
         Optional<EventParticipant> eventParticipant = service.findOneEventParticipantService(loggedUser.getId(), eventId);
         if(eventParticipant.isPresent()){
