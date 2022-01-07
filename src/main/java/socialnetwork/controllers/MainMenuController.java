@@ -23,8 +23,8 @@ import java.util.List;
 public class MainMenuController {
     private SocialNetworkService service;
     private User loggedUser;
-    private Thread notificationCheckerThread;
-
+    private NotificationCheckerThread notificationCheckerThread;
+    private NotificationChecker checker;
 
     public void setLoggedUser(User loggedUser) {
         this.loggedUser = loggedUser;
@@ -134,7 +134,7 @@ public class MainMenuController {
 
     @FXML
     void handleClickOnLogoutButton(ActionEvent event) throws IOException {
-        notificationCheckerThread.interrupt();
+        checker.stop();
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
         Scene scene = new Scene(loader.load());
         scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
@@ -201,9 +201,8 @@ public class MainMenuController {
     }
 
     public void startEventNotificationChecking() {
-        NotificationChecker checker = new NotificationChecker(service, loggedUser);
-
-        notificationCheckerThread = new Thread(checker);
+        checker = new NotificationChecker(service, loggedUser);
+        notificationCheckerThread = new NotificationCheckerThread(checker);
         notificationCheckerThread.start();
     }
 }
