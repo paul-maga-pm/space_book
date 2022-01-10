@@ -15,13 +15,14 @@ import socialnetwork.service.SocialNetworkService;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
 
 public class ActivityReportController {
     private SocialNetworkService service;
     private User loggedUser;
-    private FileChooser reportFileChooser;
+
 
     public void setService(SocialNetworkService service) {
         this.service = service;
@@ -41,6 +42,9 @@ public class ActivityReportController {
 
     @FXML
     Spinner<Integer> monthChooser;
+
+    @FXML
+    Spinner<Integer> yearChooser;
 
     @FXML
     Button saveAsButton;
@@ -77,6 +81,9 @@ public class ActivityReportController {
         });
 
         monthChooser.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 12, 1));
+        yearChooser.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1990,
+                LocalDateTime.now().getYear(),
+                LocalDateTime.now().getYear()));
     }
 
     @FXML
@@ -89,7 +96,11 @@ public class ActivityReportController {
         if (file != null) {
             String fileUrl = file.getAbsolutePath();
             try {
-                service.exportNewFriendsAndNewMessagesOfUserFromMonth(fileUrl, loggedUser.getId(), monthChooser.getValue());
+                //service.exportNewFriendsAndNewMessagesOfUserFromMonth(fileUrl, loggedUser.getId(), monthChooser.getValue());
+                service.exportNewFriendsAndNewMessagesOFUserFromYearAndMonth(fileUrl,
+                        loggedUser.getId(),
+                        yearChooser.getValue(),
+                        monthChooser.getValue());
             } catch (IOException e) {
                 Run.showPopUpWindow("Warning", "Couldn't export report");
             }
@@ -99,11 +110,13 @@ public class ActivityReportController {
     @FXML
     void handleClickOnActivityReportsButton(ActionEvent event){
         int month = monthChooser.getValue();
-
-        List<FriendshipDto> friendships = service.getAllNewFriendshipsOfUserFromMonth(loggedUser.getId(), month);
+        int year = yearChooser.getValue();
+        List<FriendshipDto> friendships = service.getAllNewFriendshipsOfUserFromYearAndMonth(loggedUser.getId(),
+                year,
+                month);
         friendshipDtoObservableList.setAll(friendships);
 
-        List<MessageDto> messages = service.getMessagesReceivedByUserSentInMonth(loggedUser.getId(), month);
+        List<MessageDto> messages = service.getMessagesReceivedByUserInYearAndMonth(loggedUser.getId(),year, month);
         messageObservableList.setAll(messages);
     }
 }

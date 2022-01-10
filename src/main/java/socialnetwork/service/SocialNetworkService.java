@@ -212,8 +212,9 @@ public class SocialNetworkService
         return closeEvents;
     }
 
-    public List<MessageDto> getMessagesReceivedByUserSentInMonth(Long userId, int month){
-        List<Message> messageList = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
+
+    public List<MessageDto> getMessagesReceivedByUserInYearAndMonth(Long userId, int year, int month){
+        List<Message> messageList = conversationService.getMessagesReceivedByUserInYearAndMonth(userId, year,  month);
         List<MessageDto> messageDtos = new ArrayList<>();
 
         for(var msg : messageList){
@@ -224,13 +225,23 @@ public class SocialNetworkService
         return messageDtos;
     }
 
-    public List<FriendshipDto> getAllNewFriendshipsOfUserFromMonth(Long userId, int month){
-        return networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
+
+    public List<FriendshipDto> getAllNewFriendshipsOfUserFromYearAndMonth(Long userId, int year, int month){
+        return networkService.getAllNewFriendshipsOfUserFromYearAndMonth(userId, year, month);
     }
 
-    public void exportNewFriendsAndNewMessagesOfUserFromMonth(String fileUrl, Long userId, int month) throws IOException {
-        var messagesFromMonth = conversationService.getMessagesReceivedByUserSentInMonth(userId, month);
-        var newFriendshipsFromMonth = networkService.getAllNewFriendshipsOfUserFromMonth(userId, month);
+
+
+    public void exportNewFriendsAndNewMessagesOFUserFromYearAndMonth(String fileUrl,
+                                                                     Long userId,
+                                                                     int year,
+                                                                     int month) throws IOException {
+        var messagesFromMonth = conversationService.getMessagesReceivedByUserInYearAndMonth(userId,
+                year,
+                month);
+        var newFriendshipsFromMonth = networkService.getAllNewFriendshipsOfUserFromYearAndMonth(userId,
+                year,
+                month);
 
         PDDocument document = new PDDocument();
         exportToPdfDocumentEntities(document, messagesFromMonth, Message::getText, 10);
@@ -239,18 +250,25 @@ public class SocialNetworkService
         document.close();
     }
 
-    public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
-        return conversationService.getMessagesReceivedByUserSentByOtherUserInMonth(receiverId,
+
+    public List<Message> getMessagesReceivedByUserSentByOtherUserInYearMonth(Long receiverId,
+                                                                             Long senderId,
+                                                                             int year,
+                                                                             int month){
+        return conversationService.getMessagesReceivedByUserSentByOtherUserInYearAndMonth(receiverId,
                 senderId,
+                year,
                 month);
     }
 
-    public void exportMessagesReceivedByUserSentByOtherUserInMonth(String fileUrl,
+    public void exportMessagesReceivedByUserSentByOtherUserInYearAndMonth(String fileUrl,
                                                                    Long receiverId,
                                                                    Long senderId,
+                                                                   int year,
                                                                    int month) throws IOException {
-        List<Message> messages = conversationService.getMessagesReceivedByUserSentByOtherUserInMonth(receiverId,
+        List<Message> messages = conversationService.getMessagesReceivedByUserSentByOtherUserInYearAndMonth(receiverId,
                 senderId,
+                year,
                 month);
 
         PDDocument doc = new PDDocument();
@@ -258,6 +276,7 @@ public class SocialNetworkService
         doc.save(fileUrl);
         doc.close();
     }
+
 
     private <E> void exportToPdfDocumentEntities(PDDocument document,
                                                  List<E> entities,

@@ -94,6 +94,29 @@ public class ConversationService {
         return userMessages;
     }
 
+    public List<Message> getMessagesReceivedByUserInYearAndMonth(Long receiverId, int year , int month){
+        List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
+                .filter(convo -> convo.getParticipantId().equals(receiverId))
+                .map(convo -> convo.getConversationId())
+                .collect(Collectors.toList());
+
+        List<Message> userMessages = new ArrayList<>();
+        for(var conversationId : userConversationsIdList)
+            userMessages.addAll(getConversationMessagesSentInYearAndMonth(conversationId, year, month));
+
+        return userMessages;
+    }
+
+    public List<Message> getMessagesReceivedByUserSentByOtherUserInYearAndMonth(Long receiverId,
+                                                                                Long senderId,
+                                                                                int year,
+                                                                                int month) {
+        Predicate<Message> messageWasSentBy = m -> m.getSenderId().equals(senderId);
+        return getMessagesReceivedByUserInYearAndMonth(receiverId, year, month).stream()
+                .filter(messageWasSentBy)
+                .collect(Collectors.toList());
+    }
+
     public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
         Predicate<Message> messageWasSentBy = m -> m.getSenderId().equals(senderId);
         return getMessagesReceivedByUserSentInMonth(receiverId, month).stream()
@@ -109,6 +132,16 @@ public class ConversationService {
                         m.getDate().getYear() == LocalDateTime.now().getYear();
         return messageRepository.getAll().stream()
                 .filter(messageIsInConversationAndWasSentInMonth)
+                .collect(Collectors.toList());
+    }
+
+    private List<Message> getConversationMessagesSentInYearAndMonth(Long conversationId, int year ,int month){
+        Predicate<Message> messageIsInConversationAndWasSentInYearAndMonth =
+                m -> m.getConversationId().equals(conversationId) &&
+                        m.getDate().getMonth().getValue() == month &&
+                        m.getDate().getYear() == year;
+        return messageRepository.getAll().stream()
+                .filter(messageIsInConversationAndWasSentInYearAndMonth)
                 .collect(Collectors.toList());
     }
 
