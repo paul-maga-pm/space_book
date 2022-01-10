@@ -16,6 +16,7 @@ import socialnetwork.service.SocialNetworkService;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,17 +41,23 @@ public class MessageReportController {
     Spinner<Integer> monthChooser;
 
     @FXML
+    Spinner<Integer> yearChooser;
+
+    @FXML
     Button previewReportButton;
 
 
     @FXML
     void handleClickOnPreviewReportButton(ActionEvent event){
-        if (selectedMessageSender == null)
+        if (selectedMessageSender == null || selectedMessageSender.getId().equals(loggedUser.getId()))
             return;
 
         int month = monthChooser.getValue();
-        List<Message> messages = service.getMessagesReceivedByUserSentByOtherUserInMonth(loggedUser.getId(),
+        int year = yearChooser.getValue();
+
+        List<Message> messages = service.getMessagesReceivedByUserSentByOtherUserInYearMonth(loggedUser.getId(),
                 selectedMessageSender.getId(),
+                year,
                 month);
         messageObservableList.setAll(messages);
     }
@@ -80,9 +87,14 @@ public class MessageReportController {
             if (file != null) {
                 String fileUrl = file.getAbsolutePath();
                 try {
-                    service.exportMessagesReceivedByUserSentByOtherUserInMonth(fileUrl,
+                    //service.exportMessagesReceivedByUserSentByOtherUserInMonth(fileUrl,
+                    //        loggedUser.getId(),
+                    //        selectedMessageSender.getId(),
+                    //        monthChooser.getValue());
+                    service.exportMessagesReceivedByUserSentByOtherUserInYearAndMonth(fileUrl,
                             loggedUser.getId(),
                             selectedMessageSender.getId(),
+                            yearChooser.getValue(),
                             monthChooser.getValue());
                 } catch (IOException e) {
                     Run.showPopUpWindow("Warning", "Couldn't export report");
@@ -146,5 +158,7 @@ public class MessageReportController {
         });
 
         monthChooser.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 12, 1));
+        int year = LocalDateTime.now().getYear();
+        yearChooser.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1990, year, year));
     }
 }

@@ -109,19 +109,12 @@ public class NetworkService {
         return friendshipDtoList;
     }
 
-    /**
-     * Finds all friends of the user that became friends in the given month
-     * @param idOfUser identifier of user we find the friends
-     * @param month month when the users became friends
-     * @return a Map with the key representing the friend of the user and the value the date when the users became
-     * friends
-     */
-    public List<FriendshipDto> getAllNewFriendshipsOfUserFromMonth(Long idOfUser, int month){
-        List<FriendshipDto> usersFriendshipsDtoList = findAllFriendsForUserService(idOfUser);
-        int year = LocalDateTime.now().getYear();
+
+    public List<FriendshipDto> getAllNewFriendshipsOfUserFromYearAndMonth(Long userId, int year, int month) {
+        List<FriendshipDto> usersFriendshipsDtoList = findAllFriendsForUserService(userId);
         return  usersFriendshipsDtoList.stream()
                 .filter(dto -> dto.getFriendshipDate().getYear() == LocalDateTime.now().getYear() &&
-                               dto.getFriendshipDate().getMonth().getValue() == month)
+                        dto.getFriendshipDate().getMonth().getValue() == month)
                 .collect(Collectors.toList());
     }
 
