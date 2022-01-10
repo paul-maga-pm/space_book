@@ -134,7 +134,10 @@ public class MainMenuController {
 
     @FXML
     void handleClickOnLogoutButton(ActionEvent event) throws IOException {
-        notificationCheckerThread.interrupt();
+        if (notificationCheckerThread != null){
+            if (notificationCheckerThread.isAlive())
+                notificationCheckerThread.stop();
+        }
         FXMLLoader loader = new FXMLLoader(Run.class.getResource("authentication.fxml"));
         Scene scene = new Scene(loader.load());
         scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
@@ -202,6 +205,11 @@ public class MainMenuController {
 
     public void startEventNotificationChecking() {
         NotificationChecker checker = new NotificationChecker(service, loggedUser);
+
+        if (notificationCheckerThread != null){
+            if (notificationCheckerThread.isAlive())
+                notificationCheckerThread.stop();
+        }
 
         notificationCheckerThread = new Thread(checker);
         notificationCheckerThread.start();
