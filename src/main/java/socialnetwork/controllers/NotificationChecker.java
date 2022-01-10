@@ -16,6 +16,7 @@ public class NotificationChecker implements Runnable {
     private SocialNetworkService service;
     private User loggedUser;
     private List<Event> eventsUserParticipatesAt = new ArrayList<>();
+    private boolean stop = false;
 
     public NotificationChecker(SocialNetworkService service, User loggedUser) {
         this.service = service;
@@ -24,7 +25,7 @@ public class NotificationChecker implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!stop) {
             try {
                 Thread.sleep(1000L);
                 var actualEventsUserParticipatesAt
@@ -54,5 +55,9 @@ public class NotificationChecker implements Runnable {
             }
 
         }
+    }
+
+    public void stop(){
+        stop = true;
     }
 }
