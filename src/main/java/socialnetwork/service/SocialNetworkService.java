@@ -284,7 +284,7 @@ public class SocialNetworkService
                                                  int entitiesPerPageCount) throws IOException {
         int pagesCount = 1;
 
-        if (entities.size() > 10){
+        if (entities.size() > entitiesPerPageCount){
             pagesCount = entities.size() / entitiesPerPageCount;
 
             if (entities.size() % entitiesPerPageCount != 0)
