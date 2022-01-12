@@ -46,6 +46,9 @@ public class MessageReportController {
     @FXML
     Button previewReportButton;
 
+    @FXML
+    Label descriptiveLabel;
+
 
     @FXML
     void handleClickOnPreviewReportButton(ActionEvent event){
@@ -122,6 +125,8 @@ public class MessageReportController {
             children.set(1, pagination);
         else if (children.size() == 1)
             children.add(pagination);
+
+        descriptiveLabel.setText("To select user click one of the links below");
     }
 
     private String parseSearchUserName(String userNameSearchField) {

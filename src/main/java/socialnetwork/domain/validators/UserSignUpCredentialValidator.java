@@ -27,7 +27,7 @@ public class UserSignUpCredentialValidator
         String username = credential.getUserName();
 
         if(!username.endsWith("@email.com") && !username.endsWith("@gmail.com"))
-            throw new InvalidEntityException("Username is invalid");
+            throw new InvalidEntityException("Email is invalid");
     }
 
     private boolean credentialsHaveSameIdOrUserName(UserCredential credential1, UserCredential credential2){
@@ -37,7 +37,7 @@ public class UserSignUpCredentialValidator
     private void validateThatCredentialIsUnique(UserCredential credential) {
         for(var crtCredential : credentialRepository.getAll())
             if(credentialsHaveSameIdOrUserName(crtCredential, credential))
-                throw new InvalidEntityException("Username is already used");
+                throw new InvalidEntityException("Email is already used");
     }
 
 }

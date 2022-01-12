@@ -53,7 +53,7 @@ public class AuthenticationController {
         String email = signInEmailTextField.getText();
         String password = signInPasswordPasswordField.getText();
         try{
-            User signedUser = service.signUpUserService(firstName, lastName, email, password, "rick.jpg");
+            User signedUser = service.signUpUserService(firstName, lastName, email, password, "profile-picture.jpg");
             openUserPage(signedUser);
         } catch (ExceptionBaseClass exception){
             Run.showPopUpWindow("Warning", exception.getMessage());

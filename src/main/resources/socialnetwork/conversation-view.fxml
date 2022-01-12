@@ -28,7 +28,7 @@
                <children>
                   <AnchorPane prefHeight="77.0" prefWidth="406.0">
                      <children>
-                        <TextField fx:id="messageTextField" prefHeight="62.0" prefWidth="402.0" style="-fx-background-radius: 0;" />
+                        <TextField fx:id="messageTextField" prefHeight="62.0" prefWidth="402.0" promptText="Send a nice message to your friends :)" style="-fx-background-radius: 0;" />
                      </children>
                   </AnchorPane>
                   <Button fx:id="sendMessageButton" mnemonicParsing="false" onAction="#handleClickOnSendButton" prefHeight="62.0" prefWidth="72.0" style="-fx-background-radius: 0; -fx-background-color: #477998;" text="Send" />
