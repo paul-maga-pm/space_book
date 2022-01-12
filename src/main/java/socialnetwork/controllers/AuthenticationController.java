@@ -1,5 +1,6 @@
 package socialnetwork.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -69,6 +70,7 @@ public class AuthenticationController {
         controller.setLoggedUser(loggedUser);
         controller.setService(service);
         controller.startEventNotificationChecking();
+        controller.handleClickOnHomeButton(new ActionEvent());
         Run.getPrimaryStage().setScene(scene);
     }
 

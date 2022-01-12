@@ -58,14 +58,15 @@ public class MainMenuController {
     Button messagesReportButton;
 
     @FXML
-    public void initialize(){
+    public void initialize() throws IOException {
         Image imageSearch = new Image(Run.class.getResourceAsStream("search.png"));
         userSearchButton.setGraphic(new ImageView(imageSearch));
         Image imageNotifications = new Image(Run.class.getResourceAsStream("notification_bell.png"));
         notificationsButton.setGraphic(new ImageView(imageNotifications));
         Image imageMessages = new Image(Run.class.getResourceAsStream("chat.png"));
         messagesButton.setGraphic(new ImageView(imageMessages));
-    }
+
+        }
 
     @FXML
     void handleClickOnMessagesReportButton(ActionEvent event) throws IOException {
