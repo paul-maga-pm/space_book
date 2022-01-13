@@ -15,6 +15,6 @@
       <ImageView fx:id="userPageProfileView" fitHeight="235.0" fitWidth="164.0" layoutX="55.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
       <ListView fx:id="userFriendsListView" layoutX="254.0" layoutY="14.0" prefHeight="298.0" prefWidth="345.0" />
       <ToggleButton fx:id="friendRequestToggleButton" layoutX="56.0" layoutY="319.0" mnemonicParsing="false" onAction="#handleClickOnFriendRequestButton" prefHeight="27.0" prefWidth="164.0" style="-fx-background-color: #477998;" text="ToggleButton" />
-      <Button fx:id="removeFriendButton" layoutX="379.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnRemoveFriendButton" style="-fx-background-color: #477998;" text="Remove Friend" />
+      <Button fx:id="removeFriendButton" layoutX="357.0" layoutY="320.0" mnemonicParsing="false" onAction="#handleClickOnRemoveFriendButton" style="-fx-background-color: #477998;" text="Click To Remove Friend" />
    </children>
 </AnchorPane>
