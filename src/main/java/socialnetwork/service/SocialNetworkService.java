@@ -10,6 +10,7 @@ import socialnetwork.events.NewConversationHasBeenCreatedEvent;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
@@ -243,12 +244,84 @@ public class SocialNetworkService
                 year,
                 month);
 
+        int spacesCount = 25;
+        Function<Message, String> messageToLine = m -> {
+            var sender = userService.findUserById(m.getSenderId()).get();
+            var name = sender.getFirstName() + " " + sender.getLastName();
+            var fields = Arrays.asList(m.getText(), m.getDate().format(DateTimeFormatter.ISO_DATE), name);
+            var columnSizes = Arrays.asList(12, 4, 5);
+            return parseToDocLine(fields, columnSizes, spacesCount);
+        };
+
+        User user = userService.findUserById(userId).get();
+        String usersName = user.getFirstName() + " " + user.getLastName();
+        String userHeader = "User: " + usersName;
+        LocalDateTime yearAndMonth = LocalDateTime.of(year, month, 1, 1, 1);
+        String monthString = yearAndMonth.getMonth().toString();
+        String messageReportYearAndMonth = "Messages received in " + monthString + " " + year;
         PDDocument document = new PDDocument();
-        exportToPdfDocumentEntities(document, messagesFromMonth, Message::getText, 10);
-        exportToPdfDocumentEntities(document, newFriendshipsFromMonth, FriendshipDto::toString, 10);
+        exportToPdfDocumentEntities(document,
+                Arrays.asList("Activity report", userHeader, messageReportYearAndMonth),
+                getColumnsLineForReport(Arrays.asList("Message text", "Date", "Sender"), spacesCount),
+                messagesFromMonth,
+                messageToLine,
+                30);
+
+
+        Function<FriendshipDto, String> friendshipToLine = f -> {
+            var friendName = f.getFriend().getFirstName() + " " + f.getFriend().getLastName();
+            var dateStr = f.getFriendshipDate().format(DateTimeFormatter.ISO_DATE);
+            var fields = Arrays.asList(friendName, dateStr);
+            var sizes = Arrays.asList("Friend".length(), "Date".length());
+            return parseToDocLine(fields, sizes, spacesCount);
+        };
+        String newFriendshipsYearAndMonthStr = "Friend requests accepted in " + monthString + " " + year;
+        exportToPdfDocumentEntities(document,
+                Arrays.asList("Activity report", userHeader, newFriendshipsYearAndMonthStr),
+                getColumnsLineForReport(Arrays.asList("Friend", "Date"), spacesCount),
+                newFriendshipsFromMonth,
+                friendshipToLine,
+                30);
         document.save(fileUrl);
         document.close();
     }
+
+    private String getColumnsLineForReport(List<String> columnNamesList, int spacesBetweenColumns){
+        String columnNames = columnNamesList.get(0);
+
+        for(int j = 1; j < columnNamesList.size(); j++) {
+            for (int i = 0; i < spacesBetweenColumns; i++)
+                columnNames = columnNames.concat(" ");
+
+            columnNames = columnNames.concat(columnNamesList.get(j));
+        }
+        return columnNames;
+    }
+
+
+
+    private String parseToDocLine(List<String> fields, List<Integer> columnSizes, int spacesCount){
+        String line = "";
+
+        for (int i = 0; i < fields.size(); i++){
+            String field = fields.get(i);
+            int size = columnSizes.get(i);
+
+            line = line.concat(field);
+
+            int spaces = spacesCount;
+
+            if (field.length() > size)
+                spaces = spacesCount - (field.length() - size);
+            else if (field.length() < size)
+                spaces = spacesCount + (size - field.length());
+
+            for (int j = 0; j < spaces; j++)
+                line = line.concat(" ");
+        }
+        return line;
+    }
+
 
 
     public List<Message> getMessagesReceivedByUserSentByOtherUserInYearMonth(Long receiverId,
@@ -272,13 +345,37 @@ public class SocialNetworkService
                 month);
 
         PDDocument doc = new PDDocument();
-        exportToPdfDocumentEntities(doc, messages, Message::getText, 5);
+
+        LocalDateTime yearAndMonth = LocalDateTime.of(year, month, 1, 1, 1);
+        String monthString = yearAndMonth.getMonth().toString();
+        String title = "Messages report from " + monthString + " " + year;
+        String senderString = "Sent by: ";
+        senderString += userService.findUserById(senderId).get().toString();
+        String receiverString = "Received by: " + userService.findUserById(receiverId).get().toString();
+
+        int spacesCount = 40;
+        String columnNames = getColumnsLineForReport(Arrays.asList("Text", "Date"), spacesCount);
+
+
+        Function<Message, String> messageToDocLine = m -> {
+            var fields = Arrays.asList(m.getText(), m.getDate().format(DateTimeFormatter.ISO_DATE));
+            var columnSizes = Arrays.asList(4, 4);
+            return parseToDocLine(fields, columnSizes, spacesCount);
+        };
+
+        exportToPdfDocumentEntities(doc, Arrays.asList(title, senderString, receiverString),
+                columnNames,
+                messages,
+                messageToDocLine,
+                30);
         doc.save(fileUrl);
         doc.close();
     }
 
 
     private <E> void exportToPdfDocumentEntities(PDDocument document,
+                                                 List<String> headerLines,
+                                                 String columnNames,
                                                  List<E> entities,
                                                  Function<E, String> entityToDocumentLineFunction,
                                                  int entitiesPerPageCount) throws IOException {
@@ -296,10 +393,38 @@ public class SocialNetworkService
             document.addPage(page);
             PDPageContentStream stream = new PDPageContentStream(document, page);
 
+
+            float startY = 750;
+            stream.beginText();
+            stream.setLeading(19f);
+            stream.newLineAtOffset(25, 750);
+            stream.setFont(PDType1Font.COURIER, 18);
+
+            for(var line : headerLines) {
+                stream.showText(line);
+                stream.newLine();
+                startY -= 19f;
+            }
+            stream.endText();
+
+            startY -= 2 * 14.5f;
+
             stream.beginText();
             stream.setLeading(14.5f);
-            stream.newLineAtOffset(25, 700);
-            stream.setFont(PDType1Font.COURIER, 14);
+            stream.newLineAtOffset(25, startY);
+            stream.setFont(PDType1Font.COURIER, 10);
+            stream.showText(columnNames);
+            stream.endText();
+            startY -= 14.5f;
+            stream.moveTo(25, startY);
+            stream.lineTo(page.getCropBox().getWidth() - 25, startY);
+            stream.stroke();
+            startY =  startY - 14.5f;
+
+            stream.beginText();
+            stream.setLeading(20f);
+            stream.newLineAtOffset(25, startY);
+            stream.setFont(PDType1Font.COURIER, 10);
 
             for(int j = i * entitiesPerPageCount; j <  entities.size() && j < (i + 1) * entitiesPerPageCount; j++) {
                 var entity = entities.get(j);

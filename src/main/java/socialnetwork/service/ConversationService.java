@@ -101,9 +101,12 @@ public class ConversationService {
                 .collect(Collectors.toList());
 
         List<Message> userMessages = new ArrayList<>();
-        for(var conversationId : userConversationsIdList)
-            userMessages.addAll(getConversationMessagesSentInYearAndMonth(conversationId, year, month));
-
+        for(var conversationId : userConversationsIdList) {
+            var messages = getConversationMessagesSentInYearAndMonth(conversationId, year, month).stream()
+                            .filter(m -> m.getSenderId() != receiverId)
+                            .collect(Collectors.toList());
+            userMessages.addAll(messages);
+        }
         return userMessages;
     }
 

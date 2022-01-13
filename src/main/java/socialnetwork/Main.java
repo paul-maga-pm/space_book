@@ -115,7 +115,8 @@ public class Main {
         final String url = ApplicationContext.getProperty("socialnetwork.database.url");
         final String user = ApplicationContext.getProperty("socialnetwork.database.user");
         final String password = ApplicationContext.getProperty("socialnetwork.database.password");
-        loadToDatabase(url, user, password);
+        //loadToDatabase(url, user, password);
+
     }
 }
 
