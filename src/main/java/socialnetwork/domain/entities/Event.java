@@ -3,7 +3,7 @@ package socialnetwork.domain.entities;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Event extends Entity<Long>{
+public class  Event extends Entity<Long>{
     private String name;
     private String description;
     private LocalDate date;

@@ -5,6 +5,7 @@ import socialnetwork.config.ApplicationContext;
 import socialnetwork.domain.entities.*;
 import socialnetwork.domain.validators.*;
 import socialnetwork.repository.Repository;
+import socialnetwork.repository.csv.EventsCsvFileRepository;
 import socialnetwork.repository.csv.UserCSVFileRepository;
 import socialnetwork.repository.database.*;
 import socialnetwork.repository.paging.Page;
@@ -19,6 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Locale;
 
 public class Main {
@@ -48,21 +50,24 @@ public class Main {
                 connection.prepareStatement("insert into user_credentials(user_id, username, password) values (?, ?, ?)");
 
         var service = createService();
-//        int i = 0;
-//        for(var u : userRepository.getAll()){
-//            String firstName = u.getFirstName();
-//            String lastName = u.getLastName();
-//            String email = firstName.toLowerCase(Locale.ROOT) + "." + lastName.toLowerCase(Locale.ROOT) + "@gmail.com";
-//            service.signUpUserService(firstName, lastName, email, "parola", "rick.jpg");
-//        }
-        for (int i = 0; i < 53; i++){
-            service.signUpUserService("jack" ,
-                    "sparrow",
-                    "jack.sparrow" + i + "@gmail.com",
-                    "parola",
-                    "rick.jpg");
+        int i = 0;
+        for (var u : userRepository.getAll()){
+            String firstName = u.getFirstName();
+            String lastName = u.getLastName();
+            String email = firstName.toLowerCase(Locale.ROOT) + "." + lastName.toLowerCase(Locale.ROOT) + "@gmail.com";
+            String filePath = u.getProfilePictureFile();
+            service.signUpUserService(firstName, lastName, email, "parola", filePath);
         }
 
+        var eventRepository = new EventsCsvFileRepository(ApplicationContext.getProperty("socialnetwork.csv.events"));
+
+        for (var e : eventRepository.getAll()){
+            String name = e.getName();
+            String description = e.getDescription();
+            LocalDate date = e.getDate();
+            String file = e.getImageFile();
+            service.addEventService(name, description, date, file);
+        }
     }
 
     public static SocialNetworkService createService(){
@@ -115,8 +120,7 @@ public class Main {
         final String url = ApplicationContext.getProperty("socialnetwork.database.url");
         final String user = ApplicationContext.getProperty("socialnetwork.database.user");
         final String password = ApplicationContext.getProperty("socialnetwork.database.password");
-        //loadToDatabase(url, user, password);
-
+        loadToDatabase(url, user, password);
     }
 }
 

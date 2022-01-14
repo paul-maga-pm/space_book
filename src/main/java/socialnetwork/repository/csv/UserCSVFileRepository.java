@@ -28,7 +28,8 @@ public class UserCSVFileRepository extends AbstractCSVFileRepository<Long, User>
         return "" +
                 user.getId() + "," +
                 user.getFirstName().stripTrailing().stripLeading() + "," +
-                user.getLastName().stripTrailing().stripLeading();
+                user.getLastName().stripTrailing().stripLeading() + "," +
+                user.getProfilePictureFile().stripLeading().stripTrailing();
     }
 
     /**
@@ -40,7 +41,7 @@ public class UserCSVFileRepository extends AbstractCSVFileRepository<Long, User>
     public User stringToEntity(String rawUserString) {
         String[] userStringAttributes = rawUserString.split(",");
 
-        if(userStringAttributes.length != 3)
+        if(userStringAttributes.length != 4)
             throw new CorruptedDataException("user csv file is corrupted");
 
         long id;
@@ -51,6 +52,7 @@ public class UserCSVFileRepository extends AbstractCSVFileRepository<Long, User>
         }
         String firstName = userStringAttributes[1].stripLeading().stripTrailing();
         String lastName = userStringAttributes[2].stripLeading().stripTrailing();
-        return new User(id, firstName, lastName);
+        String profilePicture = userStringAttributes[3].stripLeading().stripTrailing();
+        return new User(id, firstName, lastName, profilePicture);
     }
 }
