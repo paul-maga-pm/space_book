@@ -25,7 +25,9 @@ public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
         HBox box = new HBox(10);
         Label contact = new Label(dto.getSender().toString());
         Button acceptButton = new Button("Accept");
+        acceptButton.setStyle("-fx-background-color:  #477998");
         Button declineButton = new Button("Decline");
+        declineButton.setStyle("-fx-background-color:  #477998");
         acceptButton.setOnAction(acceptHandler);
         declineButton.setOnAction(declineHandler);
         Label notifDate = new Label(super.toString());

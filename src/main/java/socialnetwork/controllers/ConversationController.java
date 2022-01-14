@@ -102,6 +102,7 @@ public class ConversationController implements Observer<NewConversationHasBeenCr
             super.updateItem(item, empty);
             if(!empty && (item != null)){
                 label.setText(item.getSender().getId().equals(loggedUser.getId()) ? "" : item.getSender().getFirstName()+" "+item.getSender().getLastName());
+                label.setStyle("-fx-font-size: 9px;");
                 message.setText(item.getText());
                 graphic.setAlignment(item.getSender().getId().equals(loggedUser.getId()) ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
                 setGraphic(graphic);

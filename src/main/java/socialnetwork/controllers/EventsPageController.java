@@ -236,7 +236,11 @@ public class EventsPageController {
         vBox.getChildren().addAll(nameLabel, descriptionLabel, dateLabel, signUp, subscribe);
 
 
-        Image eventImage = new Image(String.valueOf(Run.class.getResource(event.getImageFile())));
+        String imageFile = event.getImageFile();
+        int index = imageFile.lastIndexOf('\\');
+        imageFile = imageFile.substring(index+1);
+        Image eventImage = new Image(String.valueOf(Run.class.getResource(imageFile)));
+
         ImageView imageView = new ImageView(eventImage);
         imageView.setFitWidth(250);
         imageView.setPreserveRatio(true);
