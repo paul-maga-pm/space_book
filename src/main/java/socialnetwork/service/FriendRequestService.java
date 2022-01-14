@@ -113,27 +113,21 @@ public class FriendRequestService {
         return friendRequestsForUser;
     }
 
+    /**
+     * Returns a list with all friend requests sent by the given user
+     */
     public List<FriendRequest> getAllFriendRequestsSentByUser(Long senderId){
         return friendRequestRepository.getAll().stream()
                 .filter(request -> request.getSenderId().equals(senderId))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Search for a friend request sent by idOfFirstUser to idOfSecondUser
+    */
     public Optional<FriendRequest> findOneFriendRequest(Long idOfFirstUser, Long idOfSecondUser){
         UnorderedPair<Long, Long> idOfSearchedFriendRequest = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
         return friendRequestRepository.findById(idOfSearchedFriendRequest);
     }
 
-    /**
-     * Remove all friendRequests for which the user with the given id is a part of
-     * @param idOfUser identifier of the user
-     */
-    public void removeAllFriendRequestsOfUserService(Long idOfUser){
-        List<FriendRequest> friendRequests = friendRequestRepository.getAll();
-
-        friendRequests.forEach(friendRequest -> {
-            if(friendRequest.hasUser(idOfUser))
-                friendRequestRepository.remove(friendRequest.getId());
-        });
-    }
 }

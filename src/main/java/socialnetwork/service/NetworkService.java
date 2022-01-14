@@ -38,25 +38,7 @@ public class NetworkService {
 
     }
 
-    /**
-     * Adds a new friendship between the users with the given identifiers
-     * @param idOfFirstUser id of first user
-     * @param idOfSecondUser id of second user
-     * @param date LocalDateTime of when the friendship was created
-     * @return empty Optional if the relationship was added, empty Optional if the relationship already exists
-     * @throws InvalidEntityException if one of the users is not found in the repository
-     */
-    public Optional<Friendship> addFriendshipService(Long idOfFirstUser, Long idOfSecondUser, LocalDateTime date){
-        UnorderedPair<Long, Long> idOfNewFriendship = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
-        Optional<Friendship> existingFriendshipOptional = friendshipRepository.findById(idOfNewFriendship);
 
-        if(existingFriendshipOptional.isEmpty()){
-            Friendship friendship = new Friendship(idOfFirstUser, idOfSecondUser, date);
-            friendshipValidator.validate(friendship);
-            friendshipRepository.save(friendship);
-        }
-        return existingFriendshipOptional;
-    }
 
     /**
      * Removes the friendship between the users with the given identifiers
@@ -71,26 +53,8 @@ public class NetworkService {
     }
 
     /**
-     * Finds the friendship between the given users
-     * Order of parameters is irrelevant: friendship with id (1, 2) is the same with (2, 1)
-     * @param idOfFirstUser identifier of one of the users
-     * @param idOfSecondUser identifier of other user
-     * @return empty Optional if the friendship doesn't exist, Optional containing the friendship otherwise
+     * Returns a list of FriendshipDto's with all the friends of the given user
      */
-    public Optional<Friendship> findFriendshipService(Long idOfFirstUser, Long idOfSecondUser){
-        UnorderedPair<Long, Long> id = new UnorderedPair<>(idOfFirstUser, idOfSecondUser);
-        return friendshipRepository.findById(id);
-    }
-
-    public void removeAllFriendshipsOfUserService(Long idOfUser){
-        List<Friendship> friendships = friendshipRepository.getAll();
-
-        friendships.forEach((friendship) -> {
-            if(friendship.hasUser(idOfUser))
-                friendshipRepository.remove(friendship.getId());
-        });
-    }
-
     public List<FriendshipDto> findAllFriendsForUserService(Long id){
         List<FriendshipDto> friendshipDtoList = new ArrayList<>();
         List<Friendship> friendships = friendshipRepository.getAll();
@@ -110,66 +74,21 @@ public class NetworkService {
     }
 
 
+    /**
+     * Returns a list with all FriendshipDto-s from the given year and month for the given user
+     */
     public List<FriendshipDto> getAllNewFriendshipsOfUserFromYearAndMonth(Long userId, int year, int month) {
         List<FriendshipDto> usersFriendshipsDtoList = findAllFriendsForUserService(userId);
         return  usersFriendshipsDtoList.stream()
-                .filter(dto -> dto.getFriendshipDate().getYear() == LocalDateTime.now().getYear() &&
+                .filter(dto -> dto.getFriendshipDate().getYear() == year &&
                         dto.getFriendshipDate().getMonth().getValue() == month)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Computes the number of communities of the network
-     * @return number of communities
-     */
-    public int getNumberOfCommunitiesService(){
-        UndirectedGraph<Long> graphOfUserNetwork = new UndirectedGraph<>();
-
-        for(User user : userRepository.getAll())
-            graphOfUserNetwork.addVertex(user.getId());
-
-        for(Friendship friendship : friendshipRepository.getAll())
-            graphOfUserNetwork.addEdge(friendship.getId().first, friendship.getId().second);
-
-        return graphOfUserNetwork.findNumberOfConnectedComponents();
-    }
 
     /**
-     * Finds the users of the most social community from the network
-     * @return list of the users of the most social community
+     * Returns the date of the friendship between the users
      */
-    public List<User> getMostSocialCommunityService(){
-        UndirectedGraph<User> graphOfUsers = new UndirectedGraph<>(userRepository.getAll());
-
-        for(Friendship friendship : friendshipRepository.getAll()) {
-            User user1 = userRepository.findById(friendship.getId().first).get();
-            User user2 = userRepository.findById(friendship.getId().second).get();
-            graphOfUsers.addEdge(user1, user2);
-        }
-
-        return graphOfUsers.findConnectedComponentWithLongestWalk().getVertices();
-    }
-
-    /**
-     * Returns a list with all users and their friends
-     * @return list of user, each user containing the list of his friends
-     */
-    public List<User> getAllUsersAndTheirFriendsService() {
-        List<Friendship> allFriendships = friendshipRepository.getAll();
-        UndirectedGraph<User> userUndirectedGraph = new UndirectedGraph<>(userRepository.getAll());
-
-        for(Friendship friendship : allFriendships){
-            User user1 = userRepository.findById(friendship.getId().first).get();
-            User user2 = userRepository.findById(friendship.getId().second).get();
-            userUndirectedGraph.addEdge(user1, user2);
-        }
-        List<User> allUsersAndTheirFriends = new ArrayList<>(userRepository.getAll());
-        for (User currentUser : allUsersAndTheirFriends) {
-            currentUser.setFriendsList(userUndirectedGraph.getNeighboursOf(currentUser).stream().toList());
-        }
-        return allUsersAndTheirFriends;
-    }
-
     public LocalDateTime findDateOfFriendship(Long firstUserId, Long secondUserId) {
         var friendship = friendshipRepository.findById(new UnorderedPair<>(firstUserId, secondUserId));
         if (friendship.isEmpty())

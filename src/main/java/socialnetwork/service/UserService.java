@@ -19,6 +19,9 @@ public class UserService {
     private EntityValidator<Long, UserCredential> signupCredentialValidator;
     private final PasswordEncryptor encryptor = new PasswordEncryptor();
 
+    /**
+     * Constructor of the service
+     */
     public UserService(PagingUserRepository userRepository,
                        Repository<Long, UserCredential> credentialRepository,
                        EntityValidator<Long, UserCredential> signUpCredentialValidator,
@@ -29,11 +32,17 @@ public class UserService {
         this.userValidator = userValidator;
     }
 
-
+    /**
+     * Returns the user with the given username and password
+     */
     public User loginUser(String userName, String password) {
         return findUserWithCredentials(userName, password);
     }
 
+    /**
+     * Adds a new User entity and returns it
+     * @param profilePictureFile relative path to the Resource folder to the profile picture of the user
+     */
     public User signUpUser(String firstName, String lastName, String userName, String password, String profilePictureFile){
         Long id = findAvailableId();
 
@@ -50,6 +59,9 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Returns all user for which the string "firstName lastName" contains the given string
+     */
     public List<User> findUsersThatHaveInTheirFullNameTheString(String str){
         if(str.length() < 3)
             return new ArrayList<>();
@@ -68,14 +80,24 @@ public class UserService {
     private int currentPageIndex = 0;
     private int usersPerPageCount = 5;
 
+    /**
+     * Sets the number of users per page
+     */
     public void setUsersPerPageCount(int usersPerPageCount) {
         this.usersPerPageCount = usersPerPageCount;
     }
 
+    /**
+     * Sets the current page
+     */
     public void setCurrentPageIndex(int currentPageIndex) {
         this.currentPageIndex = currentPageIndex;
     }
 
+    /**
+     * Returns a list with all users from the given page that have in their full name (firstName + " " + lastName) the
+     * String str
+     */
     public List<User> getUsersByName(String str, int pageIndex){
         if (str.length() <= 3)
             return new ArrayList<>();
@@ -86,11 +108,17 @@ public class UserService {
         return foundUsers.getContent().collect(Collectors.toList());
     }
 
+    /**
+     * Returns the users from the next page that have in their name the given string
+     */
     public List<User> getNextUsersByName(String str){
         currentPageIndex++;
         return getUsersByName(str, currentPageIndex);
     }
 
+    /**
+     * Returns the number of users that have in their full name the given string
+     */
     public int getNumberOfUsersThatHaveInTheirNameTheString(String str){
         if (str.length() <= 3)
             return 0;
@@ -98,10 +126,16 @@ public class UserService {
         return userRepository.countUsersThatHaveInTheirNameTheString(str);
     }
 
+    /**
+     * Returns a list with all users
+     */
     public List<User> getAllUsers(){
         return userRepository.getAll();
     }
 
+    /**
+     * Returns an available id for adding a new user
+     */
     private Long findAvailableId() {
         var optional = userRepository.getAll().stream()
                 .max(Comparator.comparing(User::getId));
@@ -112,6 +146,10 @@ public class UserService {
 
     }
 
+    /**
+     * Returns the user with the given credentials
+     * @throws EntityNotFoundValidationException if the user doesn't exist
+     */
     private User findUserWithCredentials(String userName, String password){
         for(UserCredential credential : credentialRepository.getAll())
             if(credential.getUserName().equals(userName) &&
@@ -121,10 +159,16 @@ public class UserService {
         throw new EntityNotFoundValidationException("Username or password incorrect. User doesn't exist");
     }
 
+    /**
+     * Returns the user with the given id
+     */
     public Optional<User> findUserById(Long senderId) {
         return userRepository.findById(senderId);
     }
 
+    /**
+     * Updates the given user and returns the old value
+     */
     public Optional<User> updateUser(User newUser){
         return userRepository.update(newUser);
     }

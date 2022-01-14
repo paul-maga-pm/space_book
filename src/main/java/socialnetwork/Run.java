@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import socialnetwork.config.ApplicationContext;
 import socialnetwork.controllers.AuthenticationController;
@@ -80,12 +81,11 @@ public class Run extends Application {
         controller.setService(createService());
         scene.getStylesheets().add(Run.class.getResource("authentication-stylesheet.css").toExternalForm());
         primaryStage.setScene(scene);
+
+        Image logo = new Image(String.valueOf(Run.class.getResource("logo.png")));
+        primaryStage.getIcons().add(logo);
+        primaryStage.setTitle("SpaceBook");
         primaryStage.show();
-//        PendingFriendRequestView view = new PendingFriendRequestView(new User(1L, "Michael", "Corleone"),
-//                LocalDateTime.now());
-//        Scene scene = new Scene(view);
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
     }
 
     public static Stage getPrimaryStage(){

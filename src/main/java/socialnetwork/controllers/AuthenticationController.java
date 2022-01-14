@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import socialnetwork.Run;
 import socialnetwork.domain.entities.User;
 import socialnetwork.exceptions.ExceptionBaseClass;
@@ -31,6 +33,15 @@ public class AuthenticationController {
     private TextField signInEmailTextField;
     @FXML
     private PasswordField signInPasswordPasswordField;
+
+    @FXML
+    private ImageView appLogoImageView;
+
+    @FXML
+    void initialize(){
+        Image image = new Image(String.valueOf(Run.class.getResource("logo.png")));
+        appLogoImageView.setImage(image);
+    }
 
     @FXML
     protected void loginUser(Event event){

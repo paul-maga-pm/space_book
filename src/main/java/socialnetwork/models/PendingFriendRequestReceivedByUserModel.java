@@ -23,7 +23,9 @@ public class PendingFriendRequestReceivedByUserModel extends NotificationModel{
     @Override
     public Node getViewForModel() {
         HBox box = new HBox(10);
-        Label contact = new Label(dto.getSender().toString());
+        String senderName = dto.getSender().getFirstName() + " ";
+        senderName += dto.getSender().getLastName();
+        Label contact = new Label(senderName + " sent you a friend request");
         Button acceptButton = new Button("Accept");
         acceptButton.setStyle("-fx-background-color:  #477998");
         Button declineButton = new Button("Decline");

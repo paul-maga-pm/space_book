@@ -20,6 +20,9 @@ public class ConversationService {
     private EntityValidator<Long, Message> messageValidator;
     private EntityValidator<Long, Conversation> conversationValidator;
 
+    /**
+     * Constructor of the service
+     */
     public ConversationService(Repository<Long, User> userRepository,
                                Repository<Long, Conversation> conversationRepository,
                                Repository<ConversationParticipationId, ConversationParticipation>
@@ -37,6 +40,13 @@ public class ConversationService {
         this.participationValidator = participationValidator;
     }
 
+    /**
+     * Creates a new conversation with the given name, description and participants and returns it
+     * @param name name of the conversation
+     * @param description description of the conversation
+     * @param participantsIdList list of the id-s of the participants of the conversation
+     * @return ConversationDto that contains the name, description and the list of participants (User entities)
+     */
     public ConversationDto createConversation(String name, String description, List<Long> participantsIdList){
         Long conversationId = findAvailableIdForConversation();
         Conversation conversation = new Conversation(conversationId, name, description);
@@ -59,6 +69,13 @@ public class ConversationService {
                                 new ArrayList<>());
     }
 
+    /**
+     * Sends a message in the conversation with the given id
+     * @param conversationId id of the conversation in which the message is sent
+     * @param senderId id of the User that sends the message
+     * @param text body of the message
+     * @param date the date when the message was sent
+     */
     public void sendMessageInConversation(Long conversationId, Long senderId, String text, LocalDateTime date){
         Long id = findAvailableIdForMessage();
         Message message = new Message(id, conversationId, senderId, text, date);
@@ -67,6 +84,9 @@ public class ConversationService {
         messageRepository.save(message);
     }
 
+    /**
+     * Returns a list with all conversations of the user with the given id
+     */
     public List<ConversationDto> getConversationsOfUser(Long userId){
         List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
                 .filter(convo -> convo.getParticipantId().equals(userId))
@@ -81,19 +101,10 @@ public class ConversationService {
         return conversationDtoList;
     }
 
-    public List<Message> getMessagesReceivedByUserSentInMonth(Long receiverId, int month){
-        List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
-                .filter(convo -> convo.getParticipantId().equals(receiverId))
-                .map(convo -> convo.getConversationId())
-                .collect(Collectors.toList());
 
-        List<Message> userMessages = new ArrayList<>();
-        for(var conversationId : userConversationsIdList)
-            userMessages.addAll(getConversationMessagesSentInMonth(conversationId, month));
-
-        return userMessages;
-    }
-
+    /**
+     * Returns a list with all messages received by the user in the given year and month
+     */
     public List<Message> getMessagesReceivedByUserInYearAndMonth(Long receiverId, int year , int month){
         List<Long> userConversationsIdList = conversationParticipationRepository.getAll().stream()
                 .filter(convo -> convo.getParticipantId().equals(receiverId))
@@ -110,6 +121,9 @@ public class ConversationService {
         return userMessages;
     }
 
+    /**
+     * Returns all messages between the users sent in the given year and month
+     */
     public List<Message> getMessagesReceivedByUserSentByOtherUserInYearAndMonth(Long receiverId,
                                                                                 Long senderId,
                                                                                 int year,
@@ -119,25 +133,9 @@ public class ConversationService {
                 .filter(messageWasSentBy)
                 .collect(Collectors.toList());
     }
-
-    public List<Message> getMessagesReceivedByUserSentByOtherUserInMonth(Long receiverId, Long senderId, int month){
-        Predicate<Message> messageWasSentBy = m -> m.getSenderId().equals(senderId);
-        return getMessagesReceivedByUserSentInMonth(receiverId, month).stream()
-                .filter(messageWasSentBy)
-                .collect(Collectors.toList());
-    }
-
-
-    private List<Message> getConversationMessagesSentInMonth(Long conversationId, int month){
-        Predicate<Message> messageIsInConversationAndWasSentInMonth =
-                m -> m.getConversationId().equals(conversationId) &&
-                        m.getDate().getMonth().getValue() == month &&
-                        m.getDate().getYear() == LocalDateTime.now().getYear();
-        return messageRepository.getAll().stream()
-                .filter(messageIsInConversationAndWasSentInMonth)
-                .collect(Collectors.toList());
-    }
-
+    /**
+     * Returns all messages of the given conversation sent in the given year and month
+     */
     private List<Message> getConversationMessagesSentInYearAndMonth(Long conversationId, int year ,int month){
         Predicate<Message> messageIsInConversationAndWasSentInYearAndMonth =
                 m -> m.getConversationId().equals(conversationId) &&
@@ -148,6 +146,9 @@ public class ConversationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a ConversationDto object with the given id
+     */
     private ConversationDto getConversationDtoWithId(Long conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId).get();
         String name = conversation.getName();
@@ -164,6 +165,9 @@ public class ConversationService {
                 messages);
     }
 
+    /**
+     * Returns all messages of the given conversation
+     */
     private List<MessageDto> getConversationMessages(Long conversationId) {
         List<MessageDto> messages = messageRepository.getAll().stream()
                 .filter(message -> message.getConversationId().equals(conversationId))
@@ -174,6 +178,9 @@ public class ConversationService {
         return messages;
     }
 
+    /**
+     * Returns a list of the Users that participate in the given conversation
+     */
     private List<User> getConversationParticipants(Long conversationId) {
         List<User> participants = conversationParticipationRepository.getAll().stream()
                 .filter(convo -> convo.getConversationId().equals(conversationId))
@@ -182,6 +189,9 @@ public class ConversationService {
         return participants;
     }
 
+    /**
+     * Returns a long representing an available id for creating a new conversation
+     */
     private Long findAvailableIdForConversation() {
         var optional = conversationRepository.getAll().stream()
                         .max(Comparator.comparing(Conversation::getId));
@@ -190,6 +200,9 @@ public class ConversationService {
         return optional.get().getId() + 1;
     }
 
+    /**
+     * Returns a long representing an available id for creating a new message
+     */
     private Long findAvailableIdForMessage() {
         var optional = messageRepository.getAll().stream()
                 .max(Comparator.comparing(Message::getId));

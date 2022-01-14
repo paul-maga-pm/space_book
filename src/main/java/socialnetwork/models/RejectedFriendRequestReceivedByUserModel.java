@@ -16,8 +16,9 @@ public class RejectedFriendRequestReceivedByUserModel extends NotificationModel 
 
     @Override
     public Node getViewForModel() {
+        String senderName = dto.getSender().getFirstName() + " " + dto.getSender().getLastName();
         return new Label(super.toString() + " You declined friend request sent by " +
-                dto.getSender() + " on " +
+                senderName + " on " +
                 dto.getFriendRequest().getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }
