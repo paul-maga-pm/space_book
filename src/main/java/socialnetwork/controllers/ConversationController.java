@@ -136,6 +136,8 @@ public class ConversationController implements Observer<NewConversationHasBeenCr
         var message = new MessageDto(loggedUser, messageText, date);
         messageDtoObservableList.add(message);
         conversationListView.getSelectionModel().getSelectedItem().addMessage(message);
+
+        messageTextField.clear();
     }
 
     public void loadExistingConversations(){
