@@ -34,7 +34,7 @@ public class NotificationController {
     private ObservableList<NotificationModel> allModels = FXCollections.observableArrayList();
     private ObservableList<NotificationModel> modelsPerCurrentPage = FXCollections.observableArrayList();
 
-    private static final int itemsPerPageCount = 2;
+    private static final int itemsPerPageCount = 10;
 
 
 
