@@ -69,3 +69,6 @@ The owner of the database is postgres. Connection details regarding url, user an
 Bellow is the script for generating the database:
 [generate_database.zip](https://github.com/paul-maga-pm/space_book/files/8381964/generate_database.zip)
 
+# Prerequisites
+Gradle build system for Java
+Postgresql server for local database
