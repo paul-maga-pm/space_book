@@ -6,7 +6,7 @@ Space book is a socialnetwork application implemented using JavaFx.
 The user can see all groups he's part of by clicking on the "Messages" icon on top right. The main view will display a list of all conversations and the messages of
 the selected conversation. New groups can be created by clicking on the "New Conversation" button on top of the list of conversations. A new window will open in which
 the user can select the participants of the group by searching by name and then entering the name and the description.
-![Screenshot 2022-03-30 175551](https://user-images.githubusercontent.com/93886764/160865136-3cd7c446-b934-4d4c-a75a-dc6aa3f77501.png)
+![Screenshot 2022-03-30 224133](https://user-images.githubusercontent.com/93886764/160917600-48f5ad7a-6ea0-46dc-812d-6bc68124b022.png)
 
 ![Screenshot 2022-03-30 175712](https://user-images.githubusercontent.com/93886764/160865542-8ffc4ad8-2bd4-44f7-8c5c-b6b2072489d6.png)
 
