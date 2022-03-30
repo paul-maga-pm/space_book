@@ -37,7 +37,6 @@ displayed in the main view. A request can be accepted or declined by clicking on
 Received messages and new friends from a month of year can be displayed by selecting "Activity report" button on the left menu, then entering the month and year and
 finally clicking on "Preview reports".
 
-Viewing new friends and received messages
 ![image](https://user-images.githubusercontent.com/93886764/160870207-daeab165-f346-4517-8baa-ec7ac6a405d0.png)
 
 Also, messages received from a certain user can be displayed by selecting "Messages report", searching for the sender by using the bottom search text field and search
